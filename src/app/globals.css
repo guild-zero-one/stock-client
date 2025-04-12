@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --black: #000000;
+    --white: #ffffff;
+  
+    /* Branco */
+    --white-default: #fafafa;
+  
+    /* Cinza */
+    --gray-default: #EDEEF2;
+    --gray-dark: #DEDFE3;
+    --gray-m-dark: #5A5A5A;
+    --gray-light: #F6F7F9;
+  
+    /* / Rosa / */
+    --pink-default: #a6036d;
+    --pink-dark: #4f0030;
+    --pink-light: #ffdfff;
+  
+    --pink-secondary: #eda2c0;
+    --pink-secondary-dark: #5e263f;
+    --pink-secondary-light: #fae1f6;
+  
+    /* / Texto / */
+    --text-default: #1e1b18;
+    --text-c: #787674;
+    --text-desactive: #A5A4A3;
+  
+    /* / Erro / */
+    --error-default: #DC3C18;
+    --error-dark: #560000;
+    --error-light: #F6F0EA;
+  
+    /* / Ok / */
+    --ok-default: #769B06;
+    --ok-dark: #416300;
+    --ok-light: #F3F9F1;
+  
+    /* / Info / */
+    --info-default: #0388BC;
+    --info-dark: #00416E;
+    --info-light: #F1F9F9;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  input:is(:-webkit-autofill, :autofill) {
+    box-shadow: 0 0 0px 100px white inset !important;
+  }
+
+
