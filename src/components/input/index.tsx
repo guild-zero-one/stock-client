@@ -25,16 +25,17 @@ export default function Input({
     name,
     type = "text",
     messageHelper = "Este campo não deve ficar vazio!",
-    showHelper = true,
+    showHelper = false,
     showIcon = false,
     iconSymbol = <AddCircleIcon />,
     iconColor = "(--pink-default)",
     inputSize = "default",
-    inputStyle = "success",
+    inputStyle = "default",
     helperStatus = inputStyle,
     helpersymbol = inputStyle,
 
 }: InputProps) {
+
     const sizeClasses =
     inputSize === "small"
       ? "py-2 text-sm"
@@ -81,7 +82,7 @@ export default function Input({
             <label
                 htmlFor={name}
                 className={`
-                absolute ${iconSpace} -top-2 text-xs bg-white px-1 transition-all pointer-events-none
+                absolute ${iconSpace} top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none
 
                 // Classes para o placeholder do input
                 peer-placeholder-shown:text-sm
@@ -90,7 +91,7 @@ export default function Input({
                 peer-placeholder-shown:text-(--gray-m-dark)
 
                 // Classes para o label do input
-                peer-focus:text-sm
+                peer-focus:text-xs
                 peer-focus:top-0
                 peer-focus:-translate-y-1/2
                 peer-focus:text-(--pink-default)
