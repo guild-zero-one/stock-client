@@ -1,21 +1,14 @@
 import type { Metadata } from "next";
-import { Lexend, Nunito, Roboto } from "next/font/google";
+import { Lexend, Nunito} from "next/font/google";
 import "./globals.css";
 
 const lexend = Lexend({
-    subsets: ["latin"],
-    variable: "--font-lexend",
+    subsets: ["latin"]
   });
 
 const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-nunito",
+  subsets: ["latin"]
 });
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  variable: "--font-roboto",
-}); 
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${lexend.variable} ${nunito.variable} ${roboto.variable}`}>
-      <body className={`antialiased `}>
+    <html lang="pt-br">
+      <body className={`antialiased`}>
         {children}
       </body>
     </html>

@@ -15,6 +15,7 @@
   
     /* / Rosa / */
     --pink-default: #a6036d;
+    --pink-hovered: color-mix(in srgb, var(--pink-default) 100%, white 55%);
     --pink-dark: #4f0030;
     --pink-light: #ffdfff;
   
