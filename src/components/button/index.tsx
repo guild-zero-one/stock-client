@@ -32,7 +32,7 @@ const Button: React.FC<ButtonProps> = ({
             onClick={onClick}
             disabled={disabled}
             className={`
-                 h-fit  ${fullWidth ? 'w-full' : ''} font-[lexend] font-medium btn rounded transition-colors ease-linear ${buttonSizeClasses[size]} ${buttonVariantClasses[variant]} cursor-pointer focus:outline-none 
+                 h-fit text-nowrap ${fullWidth ? 'w-full' : 'w-fit'} font-[lexend] font-medium btn rounded transition-colors ease-linear ${buttonSizeClasses[size]} ${buttonVariantClasses[variant]} cursor-pointer focus:outline-none 
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
             {label}
