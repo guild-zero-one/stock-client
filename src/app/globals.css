@@ -5,11 +5,12 @@
     --white: #ffffff;
   
     /* Branco */
-    --white-default: #fafafa;
+    --white-default: #FAFAFA;
   
     /* Cinza */
     --gray-default: #EDEEF2;
     --gray-dark: #DEDFE3;
+    --gray-dark-hovered: color-mix(in srgb, var(--gray-dark) 100%, black 8%);
     --gray-m-dark: #5A5A5A;
     --gray-light: #F6F7F9;
   

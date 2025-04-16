@@ -35,20 +35,20 @@ export default function Header({
         }
 };
 return (
-    <header className="w-full h-14 flex items-center justify-between px-4 border border-solid border-gray-300">
-        <div className="flex justify-between items-center w-full relative">
+    <header className="flex justify-between items-center px-4 w-full h-14">
+        <div className="relative flex justify-between items-center w-full">
 
             {/* Button Nav Voltar */}
             {backButton && (
                 <button onClick={() => router.back()}
-                    className="w-[24px] h-[24px]  absolute left-0 flex cursor-pointer">
-                    <NavigateBeforeIcon className={`${headerVariant[variant].icon}`} />
+                    className="left-0 absolute flex w-[24px] h-[24px] cursor-pointer">
+                    <NavigateBeforeIcon  className={`${headerVariant[variant].icon}`} />
                 </button>
             )}
 
             {/* Centro */}
-            <div className="w-fit flex justify-center absolute left-1/2 -translate-x-1/2">
-                <div className="w-full flex flex-col grow h-fit font-[nunito] items-center justify-center">
+            <div className="left-1/2 absolute flex justify-center w-fit -translate-x-1/2">
+                <div className="flex flex-col justify-center items-center w-full h-fit font-[nunito] grow">
                     <span className={`text-xs font-normal ${headerVariant[variant].secondaryText}`}>{subtitle}</span>
                     <span className={`text-sm font-bold ${headerVariant[variant].primaryText}`}>{title}</span>
                 </div>

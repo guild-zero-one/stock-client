@@ -1,35 +1,78 @@
 'use client'
-import Input from "@/components/input";
-import { use } from "react";
-import FaceIcon from '@mui/icons-material/Face';
-import AddReactionIcon from '@mui/icons-material/AddReaction';
+
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import Link from 'next/link';
+import MenuLink from '@/components/menu-link';
 
 export default function Home() {
   return (
-    <main>
-      <header className="bg-gray-100 p-4 shadow-md w-full">
-        <h1 className="text-2xl font-bold mb-4">Página Inicial</h1>
-        <p className="text-gray-700">Bem-vindo à página inicial!</p>  
-      </header>
-      
-      <div className="grid grid-cols-4 mx-4 items-center place-items-center align-middle justify-center mt-8">
-        <div className="w-16 h-16 sm:w-24 sm:h-24 bg-blue-500 rounded-full"></div>
-        <div className="w-16 h-16 sm:w-24 sm:h-24 bg-red-500 rounded-full"></div>
-        <div className="w-16 h-16 sm:w-24 sm:h-24 bg-green-500 rounded-full"></div>
-        <div className="w-16 h-16 sm:w-24 sm:h-24 bg-yellow-500 rounded-full"></div>
+    <div className="flex flex-col bg-(pink-default) w-full min-h-screen">
 
-        <div className="col-span-4 w-full mt-10">
-          <Input
-        type="text"
-        name="nome"
-        label="Nome"
-        showIcon={true}
-        iconSymbol={<AddReactionIcon />}
-        inputStyle="default"
-        inputSize="small"
-          />
+      {/* Banner */}
+      <header className="relative h-[35vh] text-white">
+
+        {/* Imagem de fundo */}
+        <div className="absolute inset-0 bg-[url(/assets/images/people.jpg)] bg-cover bg-no-repeat object-cover" />
+
+        {/* Filtro de cor */}
+        <div className="absolute inset-0 bg-(--pink-default)/65" />
+
+        {/* Conteúdo */}
+        <div className="z-10 relative p-4">
+          <h1 className="font-bold text-2xl">Bem-vinde</h1>
         </div>
-      </div>
-    </main>
-  );
-}
+        
+      </header>
+
+
+      {/* Painel de Navegação */}
+      <main className="z-10 relative flex bg-(--white-default) -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
+
+        {/* Grid */}
+        <div className="gap-2 grid grid-cols-2 grid-rows-[repeat(auto-fill,_30%)] w-full grow">
+
+          {/* Dashboard View */}
+          <div className="col-span-2 bg-(--gray-dark) rounded-2xl w-full h-[95%]">
+
+          </div>
+
+          {/* Clientes */}
+          <Link href={"/clientes"}>
+            <MenuLink
+              label="Clientes"
+              icon={<PeopleAltOutlinedIcon />}
+            />
+          </Link>
+
+          {/* Estoque */}
+          <Link href={"/estoque"}>
+            <MenuLink
+              label="Estoque"
+              icon={<Inventory2OutlinedIcon />}
+            />
+          </Link>
+
+          {/* Pedidos */}
+          <Link href={"/pedidos"}>
+            <MenuLink
+              label="Pedidos"
+              icon={<ShoppingBagOutlinedIcon />}
+            />
+          </Link>
+
+          {/* Relatório */}
+          <Link href={"/relatorio"}>
+            <MenuLink
+              label="Relatório"
+              icon={<InsertChartOutlinedIcon />}
+            />
+          </Link>
+
+        </div>
+      </main >
+    </div>
+  )
+};
