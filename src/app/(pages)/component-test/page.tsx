@@ -1,10 +1,12 @@
 'use client'
-import Input from "@/components/input";
+// import Input from "@/components/input";
 import Button from "@/components/button";
 import FaceIcon from '@mui/icons-material/Face';
 import React from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
+import Input from "@/components/input";
+import CategoriesMenu from "@/components/categories-menu";
 
 export default function ComponentTest() {
 
@@ -13,25 +15,25 @@ export default function ComponentTest() {
   const handleChangeNome = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNome(e.target.value);
   }
-   const alertar = () => {
-    alert("Cliquei no botão!"); 
+  const alertar = () => {
+    alert("Cliquei no botão!");
   }
   return (
-    <main className="p-4 w-[100%] h-screen bg-(--white-default)">
-      <h1 className="font-[lexend] text-5xl font-bold mb-4 ">Componentes</h1>
+    <main className="bg-(--white-default) p-4 w-[100%] h-screen">
+      <h1 className="mb-4 font-[lexend] font-bold text-5xl">Componentes</h1>
 
-      <div className="grid grid-cols-4 gap-4 justify-items-center">
+      <div className="justify-items-center gap-4 grid grid-cols-4">
         {/* Card */}
-        <div className="col-span-4 bg-(--white) rounded-lg p-4 w-[100%] border border-(--gray-default) gap-8 flex flex-col">
+        <div className="flex flex-col gap-8 col-span-4 bg-(--white) p-4 border border-(--gray-default) rounded-lg w-[100%]">
 
           <div className="w-full">
             <h2 className="font-[nunito] text-(--text-secondary)">Header Componente</h2>
             <Header
-            title="Produtos"
-            subtitle="Navegar"
-            addRightButton 
-            rightIcon={<AddCircle/>}
-            rightElementFunction={alertar}
+              title="Produtos"
+              subtitle="Navegar"
+              addRightButton
+              rightIcon={<AddCircle />}
+              rightElementFunction={alertar}
             />
           </div>
 
@@ -48,7 +50,7 @@ export default function ComponentTest() {
           {/* Button */}
           <div className="w-full h-full">
             <h2 className="font-[nunito] text-(--text-secondary)">Botão Componente</h2>
-            <div className="grid grid-cols-2 flex-wrap gap-2 items-center">
+            <div className="flex-wrap items-center gap-2 grid grid-cols-2">
               <Button
                 label={"Clique aqui"}
                 size="small"
@@ -71,16 +73,25 @@ export default function ComponentTest() {
                 variant="filled"
               />
             </div>
-            <div className="w-full mt-3.5">
-            <Button
-              label={"Linha Completa"}
-              size="default"
-              variant="filled"
-              fullWidth>
-            </Button>
-          </div>
+            <div className="mt-3.5 w-full">
+              <Button
+                label={"Linha Completa"}
+                size="default"
+                variant="filled"
+                fullWidth>
+              </Button>
+            </div>
           </div>
 
+          <div className="gap-2 bg-(--pink-default) p-4 border border-(--gray-dark) rounded-3xl w-full h-[50vh]">
+
+            <div className="flex flex-col flex-1 gap-3 h-full overflow-y-auto scrollbar-minimal">
+              {Array(20).fill(0).map((_, i) => (
+                <CategoriesMenu key={i}/>
+              ))}
+            </div>
+
+          </div>
 
         </div>
       </div>

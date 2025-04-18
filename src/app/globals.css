@@ -1,4 +1,9 @@
+@layer theme, base, components, utilities;
+
 @import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight" layer(base);
+
 
 :root {
     --black: #000000;
@@ -48,5 +53,38 @@
   input:is(:-webkit-autofill, :autofill) {
     box-shadow: 0 0 0px 100px white inset !important;
   }
+
+html, body {
+  color: var(--text-default);
+}
+
+  @layer utilities {
+    .scrollbar-minimal {
+      scrollbar-width: thin;
+      scrollbar-color: #aaa transparent;
+    }
+  
+    .scrollbar-minimal::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+  
+    .scrollbar-minimal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  
+    .scrollbar-minimal::-webkit-scrollbar-thumb {
+      background-color: #aaa;
+      border-radius: 9999px;
+      border: none;
+    }
+  
+    .scrollbar-minimal::-webkit-scrollbar-button {
+      display: none;
+      height: 0;
+      width: 0;
+    }
+  }
+  
 
 

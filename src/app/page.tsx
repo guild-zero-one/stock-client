@@ -35,8 +35,9 @@ export default function Home() {
         <div className="gap-2 grid grid-cols-2 grid-rows-[repeat(auto-fill,_30%)] w-full grow">
 
           {/* Dashboard View */}
-          <div className="col-span-2 bg-(--gray-dark) rounded-2xl w-full h-[95%]">
-
+          <div className="flex flex-col justify-center items-start col-span-2 bg-(--gray-dark) p-4 rounded-2xl w-full h-[95%]">
+              <span className='text-(--text-secondary) text-sm'>Total em $ de vendas este mês</span>
+              <span className="font-bold text-(--text-default) text-3xl">R$ 0,00</span>
           </div>
 
           {/* Clientes */}

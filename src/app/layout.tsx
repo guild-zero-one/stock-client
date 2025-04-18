@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`antialiased`}>
+      <body className={`antialiased font-[nunito]`}>
         {children}
       </body>
     </html>
