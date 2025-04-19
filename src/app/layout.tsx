@@ -3,11 +3,13 @@ import { Lexend, Nunito} from "next/font/google";
 import "./globals.css";
 
 const lexend = Lexend({
-    subsets: ["latin"]
+    subsets: ["latin"],
+    variable: "--font-lexend",
   });
 
 const nunito = Nunito({
-  subsets: ["latin"]
+  subsets: ["latin"],
+  variable: "--font-nunito",
 });
 
 export const metadata: Metadata = {
@@ -22,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`antialiased font-[nunito]`}>
+       <body className={`${lexend.variable} ${nunito.variable} font-nunito text-text-default`}>
         {children}
       </body>
     </html>

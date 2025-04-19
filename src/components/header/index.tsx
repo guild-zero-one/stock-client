@@ -24,14 +24,14 @@ export default function Header({
     const router = useRouter();
     const headerVariant = {
         primary: {
-            primaryText: "text-(--pink-default)",
-            secondaryText: "text-(--text-secondary)",
-            icon: "text-(--pink-default)",
+            primaryText: "text-pink-default",
+            secondaryText: "text-text-secondary",
+            icon: "text-pink-default",
         },
         secondary: {
-            primaryText: "text-(--white)",
-            secondaryText: "text-(--white)",
-            icon: "text-(--white)",
+            primaryText: "text-white",
+            secondaryText: "text-white",
+            icon: "text-white",
         }
 };
 return (

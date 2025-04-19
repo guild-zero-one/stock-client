@@ -3,60 +3,50 @@
 @import "tailwindcss";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/utilities" layer(utilities);
 
+@theme {
+  --font-lexend: 'Lexend', sans-serif;
+  --font-nunito: 'Nunito', sans-serif;
+  
+  --color-white-default: #FAFAFA;
+  
+  --color-gray-default: #EDEEF2;
+  --color-gray-dark: #DEDFE3;
+  --color-gray-dark-hovered: color-mix(in srgb, var(--color-gray-dark) 100%, black 8%);
+  --color-gray-m-dark: #5A5A5A;
+  --color-gray-light: #F6F7F9;
+  
+  --color-pink-default: #a6036d;
+  --color-pink-hovered: color-mix(in srgb, var(--color-pink-default) 100%, white 55%);
+  --color-pink-dark: #4f0030;
+  --color-pink-light: #ffdfff;
+  
+  --color-pink-secondary: #eda2c0;
+  --color-pink-secondary-dark: #5e263f;
+  --color-pink-secondary-light: #fae1f6;
+  
+  --color-text-default: #1e1b18;
+  --color-text-secondary: #787674;
+  --color-text-desactive: #A5A4A3;
+  
+  --color-error-default: #DC3C18;
+  --color-error-dark: #560000;
+  --color-error-light: #F6F0EA;
+  
+  --color-ok-default: #769B06;
+  --color-ok-dark: #416300;
+  --color-ok-light: #F3F9F1;
+  
+  --color-info-default: #0388BC;
+  --color-info-dark: #00416E;
+  --color-info-light: #F1F9F9;
 
-:root {
-    --black: #000000;
-    --white: #ffffff;
-  
-    /* Branco */
-    --white-default: #FAFAFA;
-  
-    /* Cinza */
-    --gray-default: #EDEEF2;
-    --gray-dark: #DEDFE3;
-    --gray-dark-hovered: color-mix(in srgb, var(--gray-dark) 100%, black 8%);
-    --gray-m-dark: #5A5A5A;
-    --gray-light: #F6F7F9;
-  
-    /* / Rosa / */
-    --pink-default: #a6036d;
-    --pink-hovered: color-mix(in srgb, var(--pink-default) 100%, white 55%);
-    --pink-dark: #4f0030;
-    --pink-light: #ffdfff;
-  
-    --pink-secondary: #eda2c0;
-    --pink-secondary-dark: #5e263f;
-    --pink-secondary-light: #fae1f6;
-  
-    /* / Texto / */
-    --text-default: #1e1b18;
-    --text-secondary: #787674;
-    --text-desactive: #A5A4A3;
-  
-    /* / Erro / */
-    --error-default: #DC3C18;
-    --error-dark: #560000;
-    --error-light: #F6F0EA;
-  
-    /* / Ok / */
-    --ok-default: #769B06;
-    --ok-dark: #416300;
-    --ok-light: #F3F9F1;
-  
-    /* / Info / */
-    --info-default: #0388BC;
-    --info-dark: #00416E;
-    --info-light: #F1F9F9;
-  }
+}
 
   input:is(:-webkit-autofill, :autofill) {
     box-shadow: 0 0 0px 100px white inset !important;
   }
-
-html, body {
-  color: var(--text-default);
-}
 
   @layer utilities {
     .scrollbar-minimal {

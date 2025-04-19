@@ -24,8 +24,8 @@ const Button: React.FC<ButtonProps> = ({
     };
 
     const buttonVariantClasses = {
-        outlined: 'border border-(--pink-default) bg-transparent hover:bg-(--pink-default) hover:bg-(--pink-default) text-(--pink-default) hover:text-white',
-        filled: 'bg-(--pink-default) text-white hover:bg-(--pink-hovered)',
+        outlined: 'border border-pink-default bg-transparent hover:bg-pink-default hover:bg-pink-default text-pink-default hover:text-white',
+        filled: 'bg-pink-default text-white hover:bg-pink-hovered',
     };
     return (
         <button
