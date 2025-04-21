@@ -24,7 +24,7 @@ export default function Home() {
         <div className="z-10 relative p-4">
           <h1 className="font-bold text-2xl">Bem-vinde</h1>
         </div>
-        
+
       </header>
 
 
@@ -32,45 +32,53 @@ export default function Home() {
       <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
 
         {/* Grid */}
-        <div className="gap-2 grid grid-cols-2 grid-rows-[repeat(auto-fill,_25%)] w-full md:[grid-template-rows:repeat(auto-fill,_150px)] grow">
+        <div className="gap-2 grid grid-cols-2 w-full h-fit">
 
           {/* Dashboard View */}
-          <div className="flex flex-col justify-center items-start col-span-2 bg-gray-default p-4 rounded-2xl w-full h-[95%]">
-              <span className='text-text-secondary text-sm'>Total em $ de vendas este mês</span>
-              <span className="font-bold text-text-default text-3xl">R$ 0,00</span>
+          <div className="flex flex-col justify-center items-start col-span-2 bg-gray-default p-4 rounded-xl w-full h-[10vh] min-h-[120px] max-h-[300px]">
+            <span className='text-text-secondary text-sm'>Total em $ de vendas este mês</span>
+            <span className="font-bold text-text-default text-3xl">R$ 0,00</span>
           </div>
 
           {/* Clientes */}
-          <Link href={"/clientes"}>
-            <MenuLink
-              label="Clientes"
-              icon={<PeopleAltOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/clientes"}>
+              <MenuLink
+                label="Clientes"
+                icon={<PeopleAltOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Estoque */}
-          <Link href={"/estoque"}>
-            <MenuLink
-              label="Estoque"
-              icon={<Inventory2OutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/estoque"}>
+              <MenuLink
+                label="Estoque"
+                icon={<Inventory2OutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Pedidos */}
-          <Link href={"/pedidos"}>
-            <MenuLink
-              label="Pedidos"
-              icon={<ShoppingBagOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/pedidos"}>
+              <MenuLink
+                label="Pedidos"
+                icon={<ShoppingBagOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Relatório */}
-          <Link href={"/relatorio"}>
-            <MenuLink
-              label="Relatório"
-              icon={<InsertChartOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/relatorio"}>
+              <MenuLink
+                label="Relatório"
+                icon={<InsertChartOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
         </div>
       </main >

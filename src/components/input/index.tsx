@@ -9,6 +9,7 @@ type InputProps = {
     label: string
     name: string
     type?: string
+    value?: string | number
     messageHelper?: string
     showHelper?: boolean
     showIcon?: boolean
@@ -18,12 +19,14 @@ type InputProps = {
     inputStyle?: "default" | "success" | "info" | "error"
     helpersymbol?: "default" | "success" | "info" | "error"
     helperStatus?: "default" | "success" | "info" | "error"
+    handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function Input({
     label,
     name,
     type = "text",
+    value,
     messageHelper = "Este campo não deve ficar vazio!",
     showHelper = false,
     showIcon = false,
@@ -33,6 +36,7 @@ export default function Input({
     inputStyle = "default",
     helperStatus = inputStyle,
     helpersymbol = inputStyle,
+    handleChange = () => { },
 
 }: InputProps) {
 
@@ -74,7 +78,7 @@ export default function Input({
                 </div>
             )}
             <input
-                type={type} id={name} name={name} placeholder=" "
+                type={type} id={name} name={name} value={value} placeholder="" onChange={handleChange}
                 className={`peer border border-gray-dark focus:border-pink-default rounded focus:outline-none w-full bg-white border-none ${sizeClasses}`}
             />
 

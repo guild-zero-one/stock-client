@@ -14,10 +14,10 @@ export default function MenuLink({
 }: MenuLinkProps) {
 
     return (
-        <div className="group relative col-span-1 bg-gray-dark rounded-2xl w-full h-full overflow-hidden hover:text-pink-default">
+        <div className="group relative bg-gray-dark rounded-xl w-full max-h-[140px] aspect-[4/3] overflow-hidden hover:text-pink-default">
 
             {/* Conteúdo */}
-            <div className="z-12 relative flex flex-col justify-center items-start p-4 w-full h-full">
+            <div className="z-12 relative flex flex-col justify-center items-start p-4 w-full min-w-0 h-full">
                 {React.cloneElement(icon, { fontSize: "medium" })}
                 <span className="font-medium text-[clamp(1rem, 3.45vw, 2rem)]">{label}</span>
             </div>
