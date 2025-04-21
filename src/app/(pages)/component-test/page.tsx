@@ -1,23 +1,37 @@
 'use client'
-// import Input from "@/components/input";
 import Button from "@/components/button";
 import FaceIcon from '@mui/icons-material/Face';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
 import CategoriesMenu from "@/components/categories-menu";
+import apiSpring from "@/api/api-spring";
+import { Category } from "@/models/Categoria";
 
 export default function ComponentTest() {
 
-  const [nome, setNome] = React.useState<string>("");
-
-  const handleChangeNome = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNome(e.target.value);
-  }
   const alertar = () => {
     alert("Cliquei no botão!");
   }
+  const [category, setCategory] = useState<Category>();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+
+
+
+  useEffect(() => {
+    apiSpring.get("/categories")
+      .then((res) => {
+        console.log(res.data);
+        setCategories(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+  }, []);
+
   return (
     <>
       <main className="bg-white-default p-4 w-[100%] h-dvh">
@@ -90,9 +104,21 @@ export default function ComponentTest() {
 
       <div className="gap-2 bg-pink-default p-4 border border-gray-dark rounded-t-3xl w-full h-[75vh]">
         <div className="flex flex-col flex-1 gap-3 h-full overflow-y-auto scrollbar-minimal">
-          {Array(20).fill(0).map((_, i) => (
-            <CategoriesMenu key={i} />
+
+          {categories.map((category) => (
+            <CategoriesMenu
+              key={category.id}
+              name={category.name}
+              image={category.image}
+              description={category.description}
+              quantity={category.quantity}
+
+              onClick={() => {
+                alert(`Você clicou na categoria ${category.name}`)
+              }}
+            />
           ))}
+
         </div>
       </div>
     </>
