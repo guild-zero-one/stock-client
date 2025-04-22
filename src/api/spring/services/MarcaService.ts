@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { Categoria } from '@/models/Categoria';
+import { Marca } from '@/models/Marca';
 import api from '../api';
 
 // Listar todas as categorias
-export const todasCategorias = async () => {
+export const todasMarcas = async () => {
   try {
-    const response = await api.get<Categoria[]>('/categories');
+    const response = await api.get<Marca[]>('/categories');
     return response.data;
   } catch (error) {
     console.error('Erro ao listar categorias:', error);
@@ -13,10 +13,10 @@ export const todasCategorias = async () => {
   }
 }
 
-// Listar categoria por ID
-export const categoriaPorId = async (categoriaId: number) => {
+// Listar marca por ID
+export const marcaPorId = async (marcaId: number) => {
   try {
-    const response = await api.get<Categoria>(`/categories/${categoriaId}`);
+    const response = await api.get<Marca>(`/categories/${marcaId}`);
     return response.data;
   } catch (error) {
     console.error('Erro ao listar categoria:', error);
@@ -25,9 +25,9 @@ export const categoriaPorId = async (categoriaId: number) => {
 }
 
 // Listar produtos por categoria
-export const produtosPorCategoria = async (categoriaId: number) => {
+export const produtosPorMarca = async (categoriaId: number) => {
   try {
-    const response = await api.get<Categoria>(`/categories/${categoriaId}`);
+    const response = await api.get<Marca>(`/categories/${categoriaId}`);
     return response.data.products;
   } catch (error) {
     console.error('Erro ao listar produtos por categoria:', error);

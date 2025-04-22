@@ -1,6 +1,6 @@
 import { Produto } from "./Produto";
 
-export interface Categoria {
+export interface Marca {
     id: number;
     name: string;
     image: string;

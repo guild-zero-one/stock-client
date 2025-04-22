@@ -4,30 +4,31 @@ import Input from "@/components/input";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useState } from "react";
-import { Categoria } from "@/models/Categoria";
+import { Marca } from "@/models/Marca";
 import CategoriesMenu from "@/components/categories-menu";
-import { todasCategorias } from "@/api/spring/services/CategoriaService";
+import { todasMarcas } from "@/api/spring/services/MarcaService";
+import Link from "next/link";
 
 export default function Estoque() {
 
     const [inputPesquisar, setInputPesquisar] = useState("");
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const [marcas, setMarcas] = useState<Marca[]>([]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setInputPesquisar(value);
     }
     useEffect(() => {
-        const fetchCategories = async () => {
-            const categorias = await todasCategorias();
-            setCategorias(categorias);
+        const fetchMarcas = async () => {
+            const marcas = await todasMarcas();
+            setMarcas(marcas);
         };
 
-        fetchCategories();
+        fetchMarcas();
     }, []);
 
-    const categoriasFiltradas = categorias.filter(categoria =>
-        categoria.name
+    const marcasFiltradas = marcas.filter(marca =>
+        marca.name
             .toLowerCase()
             .includes(inputPesquisar
                 .toLowerCase()
@@ -35,10 +36,10 @@ export default function Estoque() {
     );
 
     return (
-        <div className="relative flex flex-col bg-white-default w-full min-h-screen">
+        <div className="relative flex flex-col w-full min-h-screen">
             <Header
                 title="Estoque"
-                subtitle="Categorias"
+                subtitle="Marcas"
                 addRightButton={true}
                 rightIcon={<AddCircleIcon />}
             />
@@ -58,39 +59,34 @@ export default function Estoque() {
 
             <div className="bottom-0 absolute flex flex-col bg-pink-secondary p-4 pb-0 rounded-t-2xl w-full h-[80%] max-h-[85%]">
                 <div className="flex flex-col justify-center items-center my-1 w-full">
-                    <span className="font-bold text-pink-secondary-dark text-sm">Categorias</span>
+                    <span className="font-bold text-pink-secondary-dark text-sm">Marcas</span>
                 </div>
                 <div className="flex flex-col flex-1 gap-2 w-full overflow-y-auto scrollbar-minimal">
 
                     {inputPesquisar.length === 0 ? (
-                        categorias.map((categoria) => (
-                            <CategoriesMenu
-                                key={categoria.id}
-                                name={categoria.name}
-                                image={categoria.image}
-                                description={categoria.description}
-                                quantity={categoria.quantity}
-                                onClick={() => {
-                                    alert(`Categoria: ${categoria.name}`);
-                                }}
-                            />
+                        marcas.map((marca) => (
+                            <Link key={marca.id} href={`./marcas/${marca.id}/produtos`}>
+                                <CategoriesMenu
+                                    name={marca.name}
+                                    image={marca.image}
+                                    description={marca.description}
+                                    quantity={marca.quantity}
+                                />
+                            </Link>
                         ))
-                    ) : categoriasFiltradas.length > 0 ? (
-                        categoriasFiltradas.map((categoria) => (
+                    ) : marcasFiltradas.length > 0 ? (
+                        marcasFiltradas.map((marca) => (
                             <CategoriesMenu
-                                key={categoria.id}
-                                name={categoria.name}
-                                image={categoria.image}
-                                description={categoria.description}
-                                quantity={categoria.quantity}
-                                onClick={() => {
-                                    alert(`Categoria: ${categoria.name}`);
-                                }}
+                                key={marca.id}
+                                name={marca.name}
+                                image={marca.image}
+                                description={marca.description}
+                                quantity={marca.quantity}
                             />
                         ))
                     ) : (
                         <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
-                            <h2 className="text-2xl">Nenhuma categoria encontrada :( </h2>
+                            <h2 className="text-2xl">Nenhuma marca encontrada :( </h2>
                         </div>
                     )}
 
