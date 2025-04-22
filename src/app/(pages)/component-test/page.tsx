@@ -7,7 +7,7 @@ import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
 import CategoriesMenu from "@/components/categories-menu";
 import apiSpring from "@/api/api-spring";
-import { Category } from "@/models/Categoria";
+import { Category } from "@/models/Marca";
 
 export default function ComponentTest() {
 

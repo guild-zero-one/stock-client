@@ -5,17 +5,18 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import Link from 'next/link';
+import Image from 'next/image'
 import MenuLink from '@/components/menu-link';
 
 export default function Home() {
   return (
-    <div className="flex flex-col bg-(pink-default) w-full h-dvh">
+    <div className="flex flex-col w-full h-dvh">
 
       {/* Banner */}
       <header className="relative h-[45vh] text-white">
 
         {/* Imagem de fundo */}
-        <div className="absolute inset-0 bg-[url(/assets/images/people.jpg)] bg-cover bg-no-repeat object-cover" />
+        <Image className="z-0 object-center object-cover" src="/assets/images/people.jpg" alt="Pessoas" fill priority />
 
         {/* Filtro de cor */}
         <div className="absolute inset-0 bg-pink-default/65" />
@@ -26,7 +27,6 @@ export default function Home() {
         </div>
 
       </header>
-
 
       {/* Painel de Navegação */}
       <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
@@ -52,7 +52,7 @@ export default function Home() {
 
           {/* Estoque */}
           <div className="h-fit">
-            <Link href={"/estoque"}>
+            <Link href={"/estoque/marcas/"}>
               <MenuLink
                 label="Estoque"
                 icon={<Inventory2OutlinedIcon />}

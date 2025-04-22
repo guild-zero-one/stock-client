@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-       <body className={`${lexend.variable} ${nunito.variable} font-nunito text-text-default`}>
+       <body className={`${lexend.variable} ${nunito.variable} font-nunito text-text-default bg-white-default`}>
         {children}
       </body>
     </html>
