@@ -1,89 +1,134 @@
 'use client'
-import Input from "@/components/input";
 import Button from "@/components/button";
 import FaceIcon from '@mui/icons-material/Face';
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
+import Input from "@/components/input";
+import CategoriesMenu from "@/components/categories-menu";
+import { Marca } from "@/models/Marca";
+import { todasMarcas } from "@/api/spring/services/MarcaService";
+import DropdownAdd from "@/components/dropdown/dropdown-add";
+import DropdownItem from "@/components/dropdown/dropdown-item";
+import Link from "next/link";
 
 export default function ComponentTest() {
 
-  const [nome, setNome] = React.useState<string>("");
+  const [categories, setCategories] = useState<Marca[]>([]);
 
-  const handleChangeNome = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNome(e.target.value);
-  }
-   const alertar = () => {
-    alert("Cliquei no botão!"); 
-  }
+  useEffect(() => {
+    const fecthData = async () => {
+      const marcas = await todasMarcas()
+      if (marcas) {
+        setCategories(marcas)
+      }
+
+    }
+    fecthData();
+  }, []);
+
   return (
-    <main className="p-4 w-[100%] h-screen bg-(--white-default)">
-      <h1 className="font-[lexend] text-5xl font-bold mb-4 ">Componentes</h1>
+    <>
+      <main className="bg-white-default p-4 w-[100%] h-dvh">
+        <h1 className="mb-4 w-auto font-lexend font-bold text-4xl">Componentes</h1>
 
-      <div className="grid grid-cols-4 gap-4 justify-items-center">
-        {/* Card */}
-        <div className="col-span-4 bg-(--white) rounded-lg p-4 w-[100%] border border-(--gray-default) gap-8 flex flex-col">
+        <div className="justify-items-center gap-4 grid grid-cols-4">
+          {/* Card */}
+          <div className="flex flex-col gap-8 col-span-4 bg-white p-4 border border-gray-default rounded-lg w-[100%]">
 
-          <div className="w-full">
-            <h2 className="font-[nunito] text-(--text-secondary)">Header Componente</h2>
-            <Header
-            title="Produtos"
-            subtitle="Navegar"
-            addRightButton 
-            rightIcon={<AddCircle/>}
-            rightElementFunction={alertar}
-            />
-          </div>
+            <div className="relative w-full">
+              <h2 className="text-text-secondary">Header Componente</h2>
 
-          {/* Input*/}
-          <div className="">
-            <h2 className="font-[nunito] text-(--text-secondary)">Input Componente</h2>
-            <Input type="text"
-              name="nome"
-              label="Nome"
-              showIcon={true}
-              inputSize="small" iconSymbol={<FaceIcon />} />
-          </div>
+              <Header title="Produtos" subtitle="Navegar">
+              
+                  <DropdownAdd>
+                   
+                    <Link href={"#"}>
+                      <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
+                    </Link>
 
-          {/* Button */}
-          <div className="w-full h-full">
-            <h2 className="font-[nunito] text-(--text-secondary)">Botão Componente</h2>
-            <div className="grid grid-cols-2 flex-wrap gap-2 items-center">
-              <Button
-                label={"Clique aqui"}
-                size="small"
-                variant="outlined"
-              />
-              <Button
-                label={"Clique aqui"}
-                size="small"
-                variant="filled"
-              />
-              <Button
-                label={"Clique aqui"}
-                size="default"
-                variant="outlined"
-              />
+                    <Link href={"#"}>
+                      <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+                    </Link>
 
-              <Button
-                label={"Clique aqui"}
-                size="default"
-                variant="filled"
-              />
+                  </DropdownAdd>
+                
+              </Header>
+
+
             </div>
-            <div className="w-full mt-3.5">
-            <Button
-              label={"Linha Completa"}
-              size="default"
-              variant="filled"
-              fullWidth>
-            </Button>
-          </div>
-          </div>
 
+            {/* Input*/}
+            <div className="">
+              <h2 className="text-text-secondary">Input Componente</h2>
+              <Input type="text"
+                name="nome"
+                label="Nome"
+                showIcon={true}
+                inputSize="small" iconSymbol={<FaceIcon />} />
+            </div>
+
+            {/* Button */}
+            <div className="w-full h-full">
+              <h2 className="font-[nunito] text-(--text-secondary)">Botão Componente</h2>
+              <div className="flex-wrap items-center gap-2 grid grid-cols-2">
+                <Button
+                  label={"Clique aqui"}
+                  size="small"
+                  variant="outlined"
+                />
+                <Button
+                  label={"Clique aqui"}
+                  size="small"
+                  variant="filled"
+                />
+                <Button
+                  label={"Clique aqui"}
+                  size="default"
+                  variant="outlined"
+                />
+
+                <Button
+                  label={"Clique aqui"}
+                  size="default"
+                  variant="filled"
+                />
+              </div>
+              <div className="mt-3.5 w-full">
+                <Button
+                  label={"Linha Completa"}
+                  size="default"
+                  variant="filled"
+                  fullWidth>
+                </Button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+
+      <div className="gap-2 bg-pink-default p-4 border border-gray-dark rounded-t-3xl w-full h-[75vh]">
+        <div className="flex flex-col flex-1 gap-3 h-full overflow-y-auto scrollbar-minimal">
+
+          {categories.map((category) => (
+            <CategoriesMenu
+              key={category.id}
+              name={category.name}
+              image={category.image}
+              description={category.description}
+              quantity={category.quantity}
+
+              onClick={() => {
+                alert(`Você clicou na categoria ${category.name}`)
+              }}
+            />
+          ))}
 
         </div>
       </div>
-    </main>
+    </>
+
   );
 }
+

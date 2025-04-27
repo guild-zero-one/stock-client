@@ -5,71 +5,80 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import Link from 'next/link';
+import Image from 'next/image'
 import MenuLink from '@/components/menu-link';
 
 export default function Home() {
   return (
-    <div className="flex flex-col bg-(pink-default) w-full min-h-screen">
+    <div className="flex flex-col w-full h-dvh">
 
       {/* Banner */}
-      <header className="relative h-[35vh] text-white">
+      <header className="relative h-[45vh] text-white">
 
         {/* Imagem de fundo */}
-        <div className="absolute inset-0 bg-[url(/assets/images/people.jpg)] bg-cover bg-no-repeat object-cover" />
+        <Image className="z-0 object-center object-cover" src="/assets/images/people.jpg" alt="Pessoas" fill priority />
 
         {/* Filtro de cor */}
-        <div className="absolute inset-0 bg-(--pink-default)/65" />
+        <div className="absolute inset-0 bg-pink-default/65" />
 
         {/* Conteúdo */}
         <div className="z-10 relative p-4">
           <h1 className="font-bold text-2xl">Bem-vinde</h1>
         </div>
-        
+
       </header>
 
-
       {/* Painel de Navegação */}
-      <main className="z-10 relative flex bg-(--white-default) -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
+      <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
 
         {/* Grid */}
-        <div className="gap-2 grid grid-cols-2 grid-rows-[repeat(auto-fill,_30%)] w-full grow">
+        <div className="gap-2 grid grid-cols-2 w-full h-fit">
 
           {/* Dashboard View */}
-          <div className="col-span-2 bg-(--gray-dark) rounded-2xl w-full h-[95%]">
-
+          <div className="flex flex-col justify-center items-start col-span-2 bg-gray-default p-4 rounded-xl w-full h-[10vh] min-h-[120px] max-h-[300px]">
+            <span className='text-text-secondary text-sm'>Total em $ de vendas este mês</span>
+            <span className="font-bold text-text-default text-3xl">R$ 0,00</span>
           </div>
 
           {/* Clientes */}
-          <Link href={"/clientes"}>
-            <MenuLink
-              label="Clientes"
-              icon={<PeopleAltOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/clientes"}>
+              <MenuLink
+                label="Clientes"
+                icon={<PeopleAltOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Estoque */}
-          <Link href={"/estoque"}>
-            <MenuLink
-              label="Estoque"
-              icon={<Inventory2OutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/estoque/marcas/"}>
+              <MenuLink
+                label="Estoque"
+                icon={<Inventory2OutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Pedidos */}
-          <Link href={"/pedidos"}>
-            <MenuLink
-              label="Pedidos"
-              icon={<ShoppingBagOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/pedidos"}>
+              <MenuLink
+                label="Pedidos"
+                icon={<ShoppingBagOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
           {/* Relatório */}
-          <Link href={"/relatorio"}>
-            <MenuLink
-              label="Relatório"
-              icon={<InsertChartOutlinedIcon />}
-            />
-          </Link>
+          <div className="h-fit">
+            <Link href={"/relatorio"}>
+              <MenuLink
+                label="Relatório"
+                icon={<InsertChartOutlinedIcon />}
+              />
+            </Link>
+          </div>
 
         </div>
       </main >
