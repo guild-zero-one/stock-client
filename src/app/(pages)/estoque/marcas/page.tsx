@@ -8,6 +8,9 @@ import { Marca } from "@/models/Marca";
 import CategoriesMenu from "@/components/categories-menu";
 import { todasMarcas } from "@/api/spring/services/MarcaService";
 import Link from "next/link";
+import DropdownAdd from "@/components/dropdown/dropdown-add";
+import DropdownItem from "@/components/dropdown/dropdown-item";
+import AddCircle from "@mui/icons-material/AddCircle";
 
 export default function Estoque() {
 
@@ -37,12 +40,13 @@ export default function Estoque() {
 
     return (
         <div className="relative flex flex-col w-full min-h-screen">
-            <Header
-                title="Estoque"
-                subtitle="Marcas"
-                addRightButton={true}
-                rightIcon={<AddCircleIcon />}
-            />
+            <Header title="Estoque" subtitle="Marca">
+                <DropdownAdd>
+                    <Link href={"#"}>
+                        <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
+                    </Link>
+                </DropdownAdd>
+            </Header>
 
             {/* Grid */}
             <div className="flex flex-col gap-4 p-4 w-full">
