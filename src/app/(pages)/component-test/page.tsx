@@ -1,35 +1,30 @@
 'use client'
 import Button from "@/components/button";
 import FaceIcon from '@mui/icons-material/Face';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
 import CategoriesMenu from "@/components/categories-menu";
-import apiSpring from "@/api/api-spring";
-import { Category } from "@/models/Marca";
+import { Marca } from "@/models/Marca";
+import { todasMarcas } from "@/api/spring/services/MarcaService";
+import DropdownAdd from "@/components/dropdown/dropdown-add";
+import DropdownItem from "@/components/dropdown/dropdown-item";
+import Link from "next/link";
 
 export default function ComponentTest() {
 
-  const alertar = () => {
-    alert("Cliquei no botão!");
-  }
-  const [category, setCategory] = useState<Category>();
-  const [categories, setCategories] = useState<Category[]>([]);
-
-
-
+  const [categories, setCategories] = useState<Marca[]>([]);
 
   useEffect(() => {
-    apiSpring.get("/categories")
-      .then((res) => {
-        console.log(res.data);
-        setCategories(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    const fecthData = async () => {
+      const marcas = await todasMarcas()
+      if (marcas) {
+        setCategories(marcas)
+      }
 
+    }
+    fecthData();
   }, []);
 
   return (
@@ -41,15 +36,26 @@ export default function ComponentTest() {
           {/* Card */}
           <div className="flex flex-col gap-8 col-span-4 bg-white p-4 border border-gray-default rounded-lg w-[100%]">
 
-            <div className="w-full">
-              <h2 className="font-[nunito] text-text-secondary">Header Componente</h2>
-              <Header
-                title="Produtos"
-                subtitle="Navegar"
-                addRightButton
-                rightIcon={<AddCircle />}
-                rightElementFunction={alertar}
-              />
+            <div className="relative w-full">
+              <h2 className="text-text-secondary">Header Componente</h2>
+
+              <Header title="Produtos" subtitle="Navegar">
+              
+                  <DropdownAdd>
+                   
+                    <Link href={"#"}>
+                      <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
+                    </Link>
+
+                    <Link href={"#"}>
+                      <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+                    </Link>
+
+                  </DropdownAdd>
+                
+              </Header>
+
+
             </div>
 
             {/* Input*/}
@@ -125,3 +131,4 @@ export default function ComponentTest() {
 
   );
 }
+

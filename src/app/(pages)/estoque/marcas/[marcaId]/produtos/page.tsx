@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { marcaPorId } from '@/api/spring/services/MarcaService';
 import { Marca } from '@/models/Marca';
 import Header from '@/components/header';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import SearchIcon from "@mui/icons-material/Search";
 import Input from '@/components/input';
 import { useParams } from 'next/navigation'
 import ProductsList from '@/components/products-list';
 import { Produto } from '@/models/Produto';
+import DropdownAdd from '@/components/dropdown/dropdown-add';
+import DropdownItem from '@/components/dropdown/dropdown-item';
+import { AddCircle } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
+import SearchIcon from "@mui/icons-material/Search";
 
 const ProdutosPage = () => {
 
@@ -33,25 +36,18 @@ const ProdutosPage = () => {
 
     return (
         <div className="flex flex-col w-full min-h-dvh">
-            <Header
-                title="Estoque"
-                subtitle={marca?.name ?? 'Carregando...'}
-                addRightButton
-                rightIcon={<AddCircleIcon />}
-            />
+            <Header title="Estoque" subtitle={marca?.name ?? 'Carregando...'}>
+                <DropdownAdd>
+                    <DropdownItem text='Editar Marca' icon={<EditIcon />}/>
+                    <DropdownItem text='Adicionar Produto' icon={<AddCircle/>} />
+                </DropdownAdd>
+            </Header>
 
             {/* Grid */}
             <div className="flex flex-col gap-4 p-4 w-full">
-                <Input
-                    name="search"
-                    label="Pesquisar"
-                    type="text"
-                    showIcon
-                    iconSymbol={<SearchIcon />}
-                    inputSize="small"
-                />
+                <Input name="search" label="Pesquisar" showIcon iconSymbol={<SearchIcon />} inputSize="small" />
             </div>
-            
+
             {marca && (
                 <div className="gap-4 grid grid-cols-1 px-4">
                     <ProductsList produtos={produtos} marca={marca} />

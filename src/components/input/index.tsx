@@ -86,7 +86,7 @@ export default function Input({
             <label
                 htmlFor={name}
                 className={`
-                absolute ${iconSpace} top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none
+                absolute ${iconSpace}  z-1 top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none
 
                 // Classes para o placeholder do input
                 peer-placeholder-shown:text-sm
