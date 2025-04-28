@@ -1,8 +1,10 @@
+import { ImagemProduto } from "./ImagemProduto";
+
 export interface Produto {
-    id: number;
-    name: string;
-    image: string;
-    description: string;
-    price: number;
-    quantity: number;
+  id: number;
+  nome: string;
+  descricao: string;
+  valor_venda: number;
+  qtd: number;
+  ImagemProduto: ImagemProduto[];
 }

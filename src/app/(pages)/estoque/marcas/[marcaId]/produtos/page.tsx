@@ -1,61 +1,69 @@
-'use client'
-import React, { useEffect, useState } from 'react';
-import { marcaPorId } from '@/api/spring/services/MarcaService';
-import { Marca } from '@/models/Marca';
-import Header from '@/components/header';
-import Input from '@/components/input';
-import { useParams } from 'next/navigation'
-import ProductsList from '@/components/products-list';
-import { Produto } from '@/models/Produto';
-import DropdownAdd from '@/components/dropdown/dropdown-add';
-import DropdownItem from '@/components/dropdown/dropdown-item';
-import { AddCircle } from '@mui/icons-material';
-import EditIcon from '@mui/icons-material/Edit';
+"use client";
+
+import { useEffect, useState } from "react";
+import { authMiddleware } from "@/middlewares/auth";
+
+import { marcaPorId } from "@/api/spring/services/MarcaService";
+import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
+
+import { Marca } from "@/models/Marca";
+import { Produto } from "@/models/Produto";
+
+import { useParams } from "next/navigation";
+
+import Header from "@/components/header";
+import Input from "@/components/input";
+import ProductsList from "@/components/products-list";
+import DropdownAdd from "@/components/dropdown/dropdown-add";
+import DropdownItem from "@/components/dropdown/dropdown-item";
+
+import AddCircle from "@mui/icons-material/AddCircle";
+import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 
-const ProdutosPage = () => {
+export default function ProdutosPage() {
+  authMiddleware();
 
-    const { marcaId } = useParams();
-    const [marca, setMarca] = useState<Marca>();
-    const [produtos, setProdutos] = useState<Produto[]>([]);
+  const { marcaId } = useParams();
+  const [marca, setMarca] = useState<Marca>();
+  const [produtos, setProdutos] = useState<Produto[]>([]);
 
-    useEffect(() => {
-        const fetchMarca = async () => {
-            const marca = await marcaPorId(Number(marcaId))
-            if (marca) {
-                setProdutos(marca.products);
-                setMarca(marca);
-            }
-        }
-        fetchMarca()
-    }, [])
+  useEffect(() => {
+    const fetchMarca = async () => {
+      const marca = await marcaPorId(Number(marcaId));
+      if (marca) {
+        const produtos = await produtoPorMarca(Number(marcaId));
 
-    useEffect(() => {
-        console.log(produtos);
-    }, [produtos]);
+        setProdutos(produtos);
+        setMarca(marca);
+      }
+    };
+    fetchMarca();
+  }, []);
 
-    return (
-        <div className="flex flex-col w-full min-h-dvh">
-            <Header title="Estoque" subtitle={marca?.name ?? 'Carregando...'}>
-                <DropdownAdd>
-                    <DropdownItem text='Editar Marca' icon={<EditIcon />}/>
-                    <DropdownItem text='Adicionar Produto' icon={<AddCircle/>} />
-                </DropdownAdd>
-            </Header>
+  useEffect(() => {
+    console.log(produtos);
+  }, [produtos]);
 
-            {/* Grid */}
-            <div className="flex flex-col gap-4 p-4 w-full">
-                <Input name="search" label="Pesquisar" showIcon iconSymbol={<SearchIcon />} inputSize="small" />
-            </div>
+  return (
+    <div className="flex flex-col w-full min-h-dvh">
+      <Header title="Estoque" subtitle={marca?.nome ?? "Carregando..."}>
+        <DropdownAdd>
+          <DropdownItem text="Editar Marca" icon={<EditIcon />} />
+          <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+        </DropdownAdd>
+      </Header>
 
-            {marca && (
-                <div className="gap-4 grid grid-cols-1 px-4">
-                    <ProductsList produtos={produtos} marca={marca} />
-                </div>
-            )}
+      {/* Grid */}
+      <div className="flex flex-col gap-4 p-4 w-full">
+        <Input name="search" label="Pesquisar" showIcon iconSymbol={<SearchIcon />} inputSize="small" />
+      </div>
+
+      {marca && (
+        <div className="gap-4 grid grid-cols-1 px-4">
+          <ProductsList produtos={produtos} marca={marca} />
         </div>
-    );
-};
-
-export default ProdutosPage;
-
+      )}
+    </div>
+  );
+}

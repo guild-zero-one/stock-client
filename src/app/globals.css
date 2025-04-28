@@ -6,75 +6,71 @@
 @import "tailwindcss/utilities" layer(utilities);
 
 @theme {
-  --font-lexend: 'Lexend', sans-serif;
-  --font-nunito: 'Nunito', sans-serif;
-  
-  --color-white-default: #FAFAFA;
-  
-  --color-gray-default: #EDEEF2;
-  --color-gray-dark: #DEDFE3;
+  --font-lexend: "Lexend", sans-serif;
+  --font-nunito: "Nunito", sans-serif;
+
+  --color-white-default: #fafafa;
+
+  --color-gray-default: #edeef2;
+  --color-gray-dark: #dedfe3;
   --color-gray-dark-hovered: color-mix(in srgb, var(--color-gray-dark) 100%, black 8%);
-  --color-gray-m-dark: #5A5A5A;
-  --color-gray-light: #F6F7F9;
-  
+  --color-gray-m-dark: #5a5a5a;
+  --color-gray-light: #f6f7f9;
+
   --color-pink-default: #a6036d;
   --color-pink-hovered: color-mix(in srgb, var(--color-pink-default) 100%, white 55%);
   --color-pink-dark: #4f0030;
   --color-pink-light: #ffdfff;
-  
+
   --color-pink-secondary: #eda2c0;
   --color-pink-secondary-dark: #5e263f;
   --color-pink-secondary-light: #fae1f6;
-  
+
   --color-text-default: #1e1b18;
   --color-text-secondary: #787674;
-  --color-text-desactive: #A5A4A3;
-  
-  --color-error-default: #DC3C18;
-  --color-error-dark: #560000;
-  --color-error-light: #F6F0EA;
-  
-  --color-ok-default: #769B06;
-  --color-ok-dark: #416300;
-  --color-ok-light: #F3F9F1;
-  
-  --color-info-default: #0388BC;
-  --color-info-dark: #00416E;
-  --color-info-light: #F1F9F9;
+  --color-text-desactive: #a5a4a3;
 
+  --color-error-default: #dc3c18;
+  --color-error-dark: #560000;
+  --color-error-light: #f6f0ea;
+
+  --color-ok-default: #769b06;
+  --color-ok-dark: #416300;
+  --color-ok-light: #f3f9f1;
+
+  --color-info-default: #0388bc;
+  --color-info-dark: #00416e;
+  --color-info-light: #f1f9f9;
 }
 
-  input:is(:-webkit-autofill, :autofill) {
-    box-shadow: 0 0 0px 100px white inset !important;
+input:is(:-webkit-autofill, :autofill) {
+  box-shadow: 0 0 0px 100px white inset !important;
+}
+
+@layer utilities {
+  .scrollbar-minimal {
+    scrollbar-width: thin;
+    scrollbar-color: #aaa transparent;
   }
 
-  @layer utilities {
-    .scrollbar-minimal {
-      scrollbar-width: thin;
-      scrollbar-color: #aaa transparent;
-    }
-  
-    .scrollbar-minimal::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-  
-    .scrollbar-minimal::-webkit-scrollbar-track {
-      background: transparent;
-    }
-  
-    .scrollbar-minimal::-webkit-scrollbar-thumb {
-      background-color: #aaa;
-      border-radius: 9999px;
-      border: none;
-    }
-  
-    .scrollbar-minimal::-webkit-scrollbar-button {
-      display: none;
-      height: 0;
-      width: 0;
-    }
+  .scrollbar-minimal::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-  
 
+  .scrollbar-minimal::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
+  .scrollbar-minimal::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 9999px;
+    border: none;
+  }
+
+  .scrollbar-minimal::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+  }
+}
