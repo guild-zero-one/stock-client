@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { marcaPorId } from "@/api/spring/services/MarcaService";
+import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import { produtoPorId } from "@/api/spring/services/ProdutoService";
 import { imagensPorProduto } from "@/api/spring/services/ImagenService";
 

@@ -3,36 +3,36 @@
 import React, { useState, useEffect } from "react";
 import { imagensPorProduto } from "@/api/spring/services/ImagenService";
 import { Produto } from "@/models/Produto";
-import { Marca } from "@/models/Marca";
-import { ImagemProduto } from "@/models/ImagemProduto";
+import { Fornecedor } from "@/models/Marca";
 import Link from "next/link";
 import ProductListItem from "../product-list-item";
+import { ProdutoHasImagens } from "@/models/ProdutoHasImagens";
 
 interface ProductsListProps {
   produtos: Produto[];
-  marca: Marca;
+  marca: Fornecedor;
 }
 
 export default function ProductsList({ produtos, marca }: ProductsListProps) {
-  const [imagensPorProdutoId, setImagensPorProdutoId] = useState<Record<number, ImagemProduto>>({});
+  const [produtosComImagens, setProdutosComImagens] = useState<ProdutoHasImagens[]>([]);
 
   useEffect(() => {
-    // Carrega todas as imagens quando o componente montar
-    const carregarImagens = async () => {
-      const imagensMap: Record<number, ImagemProduto> = {};
-
-      for (const produto of produtos) {
-        const imagens = await imagensPorProduto(produto.id);
-        if (imagens && imagens.length > 0) {
-          const imagemPrincipal = imagens.find((img: ImagemProduto) => img.imagem_principal) || imagens[0];
-          imagensMap[produto.id] = imagemPrincipal;
-        }
-      }
-
-      setImagensPorProdutoId(imagensMap);
+    const fetchData = async () => {
+      const produtoComImagens = await Promise.all(
+        produtos.map(async (produto) => {
+          const imagens = await imagensPorProduto(produto.id);
+          return {
+            ...produto,
+            imagens,
+          };
+        })
+      );
+      setProdutosComImagens(produtoComImagens);
     };
 
-    carregarImagens();
+    if (produtos.length > 0) {
+      fetchData();
+    }
   }, [produtos]);
 
   if (!produtos || produtos.length === 0) {
@@ -45,11 +45,14 @@ export default function ProductsList({ produtos, marca }: ProductsListProps) {
 
   return (
     <div className="gap-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {produtos.map((produto) => (
-        <Link href={`/estoque/marcas/${marca.id}/produtos/${produto.id}`} key={produto.id}>
-          <ProductListItem produto={produto} imagem={imagensPorProdutoId[produto.id]} />
-        </Link>
-      ))}
+      {produtosComImagens.map((produto) => {
+        const imagemPrincipal = produto.imagens.find((img) => img.imagemPrincipal);
+        return (
+          <Link href={`/estoque/marcas/${marca.id}/produtos/${produto.id}`} key={produto.id}>
+            <ProductListItem produto={produto} imagem={imagemPrincipal} />
+          </Link>
+        );
+      })}
     </div>
   );
 }

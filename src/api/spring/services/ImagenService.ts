@@ -1,6 +1,6 @@
 import api from "../api";
 
-const router = "/produtos-imagens";
+const router = "/imagens/produto";
 
 export const todasImagens = async () => {
   try {
@@ -14,7 +14,7 @@ export const todasImagens = async () => {
 
 export const imagensPorProduto = async (produtoId: number) => {
   try {
-    const response = await api.get(`${router}?fk_produto=${produtoId}`);
+    const response = await api.get(`${router}/${produtoId}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar imagens por produto:", error);

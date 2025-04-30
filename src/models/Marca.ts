@@ -1,9 +1,9 @@
 import { Produto } from "./Produto";
 
-export interface Marca {
+export interface Fornecedor {
   id: number;
   nome: string;
-  url_imagem: string;
+  imagemUrl: string;
   descricao: string;
   produtos: Produto[];
 }

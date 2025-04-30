@@ -1,12 +1,13 @@
-import { Marca } from "@/models/Marca";
+import { Fornecedor } from "@/models/Marca";
 import api from "../api";
 
-const router = "/marcas";
+const router = "/fornecedores";
 
 // Listar todas as categorias
 export const todasMarcas = async () => {
   try {
-    const response = await api.get<Marca[]>(router);
+    const response = await api.get<[Fornecedor]>(router);
+    
     return response.data;
   } catch (error) {
     console.error("Erro ao listar categorias:", error);
@@ -15,9 +16,9 @@ export const todasMarcas = async () => {
 };
 
 // Listar marca por ID
-export const marcaPorId = async (marcaId: number) => {
+export const marcaPorId = async (id: number) => {
   try {
-    const response = await api.get<Marca>(`${router}/${marcaId}`);
+    const response = await api.get<Fornecedor>(`${router}/${id}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao listar categoria:", error);
@@ -26,9 +27,9 @@ export const marcaPorId = async (marcaId: number) => {
 };
 
 // Listar produtos por categoria
-export const produtosPorMarca = async (categoriaId: number) => {
+export const produtosPorMarca = async (id: number) => {
   try {
-    const response = await api.get<Marca>(`${router}/${categoriaId}`);
+    const response = await api.get<Fornecedor>(`${router}/${id}`);
     return response.data.produtos;
   } catch (error) {
     console.error("Erro ao listar produtos por categoria:", error);

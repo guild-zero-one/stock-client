@@ -7,7 +7,7 @@ import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
 import CategoriesMenu from "@/components/categories-menu";
 import { Marca } from "@/models/Marca";
-import { todasMarcas } from "@/api/spring/services/MarcaService";
+import { todasMarcas } from "@/api/spring/services/FornecedorService";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
 import Link from "next/link";

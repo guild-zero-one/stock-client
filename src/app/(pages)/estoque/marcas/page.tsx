@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { authMiddleware } from "@/middlewares/auth";
 
-import { Marca } from "@/models/Marca";
-import { todasMarcas } from "@/api/spring/services/MarcaService";
+import { Fornecedor } from "@/models/Marca";
+import { todasMarcas } from "@/api/spring/services/FornecedorService";
 
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ export default function Estoque() {
   authMiddleware();
 
   const [inputPesquisar, setInputPesquisar] = useState("");
-  const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [marcas, setMarcas] = useState<Fornecedor[]>([]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -61,11 +61,11 @@ export default function Estoque() {
           {inputPesquisar.length === 0 ? (
             marcas.map((marca) => (
               <Link key={marca.id} href={`./marcas/${marca.id}/produtos`}>
-                <MenuBrand name={marca.nome} image={marca.url_imagem} description={marca.descricao} />
+                <MenuBrand name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />
               </Link>
             ))
           ) : marcasFiltradas.length > 0 ? (
-            marcasFiltradas.map((marca) => <MenuBrand key={marca.id} name={marca.nome} image={marca.url_imagem} description={marca.descricao} />)
+            marcasFiltradas.map((marca) => <MenuBrand key={marca.id} name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />)
           ) : (
             <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
               <h2 className="text-2xl">Nenhuma marca encontrada :( </h2>

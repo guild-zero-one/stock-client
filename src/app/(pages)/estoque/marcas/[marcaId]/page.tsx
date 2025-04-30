@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { authMiddleware } from "@/middlewares/auth";
 
-import { todasMarcas } from "@/api/spring/services/MarcaService";
+import { todasMarcas } from "@/api/spring/services/FornecedorService";
 
 import { Marca } from "@/models/Marca";
 

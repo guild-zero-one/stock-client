@@ -12,3 +12,22 @@ export const login = async (user: UsuarioLogin) => {
     throw error;
   }
 };
+
+export const usuarioPorId = async (id: number) => {
+  try {
+    const response = await api.get(`${router}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao procurar usuário: ", error);
+    throw error;
+  }
+}
+export const listarUsuarios = async () => {
+  try {
+    const response = await api.get(`${router}`);
+    return response.data;
+  } catch (error) {
+    console.error("Deu ruim: ", error);
+    throw error;
+  }
+}

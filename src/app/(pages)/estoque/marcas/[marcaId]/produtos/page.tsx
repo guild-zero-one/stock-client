@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import { authMiddleware } from "@/middlewares/auth";
 
-import { marcaPorId } from "@/api/spring/services/MarcaService";
+import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
 
-import { Marca } from "@/models/Marca";
+import { Fornecedor } from "@/models/Marca";
 import { Produto } from "@/models/Produto";
 
 import { useParams } from "next/navigation";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
-import ProductsList from "@/components/products-list";
+import ProductsList from "@/components/products-list/index2";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
 
@@ -25,7 +25,7 @@ export default function ProdutosPage() {
   authMiddleware();
 
   const { marcaId } = useParams();
-  const [marca, setMarca] = useState<Marca>();
+  const [marca, setMarca] = useState<Fornecedor>();
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
   useEffect(() => {
@@ -41,9 +41,6 @@ export default function ProdutosPage() {
     fetchMarca();
   }, []);
 
-  useEffect(() => {
-    console.log(produtos);
-  }, [produtos]);
 
   return (
     <div className="flex flex-col w-full min-h-dvh">

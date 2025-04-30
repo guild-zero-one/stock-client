@@ -60,13 +60,13 @@ export default function Home() {
 
       {/* Painel de Navegação */}
       <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
-        <form onSubmit={handleLogin} className="flex flex-col justify-between w-full gap-4">
-          <h2 className="font-lexend font-semibold text-4xl text-center text-pink-default">SimLady</h2>
+        <form onSubmit={handleLogin} className="flex flex-col justify-between gap-4 w-full">
+          <h2 className="font-lexend font-semibold text-pink-default text-4xl text-center">SimLady</h2>
 
           <p className="text-center">Faça seu login para continuar</p>
 
           <Input label="E-mail" name="email" inputSize="small" handleChange={handleUser} />
-          <Input label="Senha" name="senha" inputSize="small" handleChange={handleUser} />
+          <Input label="Senha" name="senha" inputSize="small" handleChange={handleUser} type="password" />
           <Button label="Entrar" fullWidth />
 
           <p className="text-center">Esqueci minha senha</p>
