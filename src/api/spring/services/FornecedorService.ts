@@ -1,4 +1,4 @@
-import { Fornecedor } from "@/models/Marca";
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import api from "../api";
 
 const router = "/fornecedores";
@@ -7,7 +7,7 @@ const router = "/fornecedores";
 export const todasMarcas = async () => {
   try {
     const response = await api.get<[Fornecedor]>(router);
-    
+    console.log("resposta: ",response.data)
     return response.data;
   } catch (error) {
     console.error("Erro ao listar categorias:", error);

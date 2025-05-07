@@ -1,8 +1,8 @@
 // Service
 
-import { Produto } from "@/models/Produto";
-import { ImagemProduto } from "@/models/ImagemProduto";
-import { ProdutoHasImagens } from "@/models/ProdutoHasImagens";
+import { Produto } from "@/models/Produto/Produto";
+import { ImagemProduto } from "@/models/Imagem/ImagemProduto";
+import { ProdutoHasImagens } from "@/models/Produto/ProdutoHasImagens";
 import { produtoPorId } from "./ProdutoService";
 import { imagensPorProduto } from "./ImagenService";
 

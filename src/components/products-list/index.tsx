@@ -2,18 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import { imagensPorProduto } from "@/api/spring/services/ImagenService";
-import { Produto } from "@/models/Produto";
-import { Fornecedor } from "@/models/Marca";
+import { Produto } from "@/models/Produto/Produto";
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import Link from "next/link";
 import ProductListItem from "../product-list-item";
-import { ProdutoHasImagens } from "@/models/ProdutoHasImagens";
+import { ProdutoHasImagens } from "@/models/Produto/ProdutoHasImagens";
+import { ImagemProduto } from "@/models/Imagem/ImagemProduto";
 
 interface ProductsListProps {
   produtos: Produto[];
-  marca: Fornecedor;
+  fornecedor: Fornecedor;
 }
 
-export default function ProductsList({ produtos, marca }: ProductsListProps) {
+export default function ProductsList({ produtos, fornecedor }: ProductsListProps) {
   const [produtosComImagens, setProdutosComImagens] = useState<ProdutoHasImagens[]>([]);
 
   useEffect(() => {
@@ -23,17 +24,20 @@ export default function ProductsList({ produtos, marca }: ProductsListProps) {
           const imagens = await imagensPorProduto(produto.id);
           return {
             ...produto,
-            imagens,
+            imagens: imagens ?? [], // evita criar array de arrays
           };
         })
       );
-      setProdutosComImagens(produtoComImagens);
+  
+      if (produtoComImagens) {
+        setProdutosComImagens(produtoComImagens);
+        console.log(produtoComImagens);
+      }
     };
-
-    if (produtos.length > 0) {
-      fetchData();
-    }
+  
+    fetchData();
   }, [produtos]);
+  
 
   if (!produtos || produtos.length === 0) {
     return (
@@ -46,9 +50,14 @@ export default function ProductsList({ produtos, marca }: ProductsListProps) {
   return (
     <div className="gap-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {produtosComImagens.map((produto) => {
-        const imagemPrincipal = produto.imagens.find((img) => img.imagemPrincipal);
+        console.log("produto: ", produto);
+        const imagemPrincipal = produto.imagens?.find(
+          (img: ImagemProduto) => img.imagemPrincipal === true
+        );
+
+        console.log("principal: ", imagemPrincipal);
         return (
-          <Link href={`/estoque/marcas/${marca.id}/produtos/${produto.id}`} key={produto.id}>
+          <Link href={`/estoque/marcas/${fornecedor.id}/produtos/${produto.id}`} key={produto.id}>
             <ProductListItem produto={produto} imagem={imagemPrincipal} />
           </Link>
         );

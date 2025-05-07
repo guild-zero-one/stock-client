@@ -15,6 +15,7 @@ export const todasImagens = async () => {
 export const imagensPorProduto = async (produtoId: number) => {
   try {
     const response = await api.get(`${router}/${produtoId}`);
+    // console.log("imagens :",response.data)
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar imagens por produto:", error);

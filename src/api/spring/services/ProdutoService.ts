@@ -1,4 +1,4 @@
-import { Produto } from "@/models/Produto";
+import { Produto } from "@/models/Produto/Produto";
 import api from "../api";
 
 const router = "/produtos";
@@ -28,7 +28,8 @@ export const produtoPorId = async (id: number) => {
 // Listar produto por marca
 export const produtoPorMarca = async (marcaId: number) => {
   try {
-    const response = await api.get<Produto[]>(`${router}?fk_marca=${marcaId}`);
+    const response = await api.get<Produto[]>(`${router}/fornecedor/${marcaId}`);
+    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error("Erro ao listar produto:", error);
