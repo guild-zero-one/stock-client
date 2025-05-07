@@ -1,10 +1,9 @@
 "use client";
 
 import Header from "@/components/header";
-import type { Usuario } from "@/models/Usuario";
+import type { Usuario } from "@/models/Usuario/Usuario";
 import { useEffect, useState } from "react";
 import { listarUsuarios } from "@/api/spring/services/UsuarioService";
-import { authMiddleware } from "@/middlewares/auth";
 import PersonIcon from '@mui/icons-material/Person';
 import Button from "@/components/button";
 import { useRouter } from "next/navigation";
@@ -13,8 +12,6 @@ export default function Usuario() {
     const [usuario, setUsuario] = useState<Usuario>();
     const [usuarios, setUsuarios] = useState<Usuario[]>([])
     const router = useRouter();
-
-    authMiddleware();
 
     useEffect(() => {
         const fetchData = async () => {

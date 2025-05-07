@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authMiddleware } from "@/middlewares/auth";
+
 
 import { todasMarcas } from "@/api/spring/services/FornecedorService";
 
-import { Marca } from "@/models/Marca";
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 
 import Link from "next/link";
 
@@ -19,10 +19,9 @@ import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
 
 export default function Estoque() {
-  authMiddleware();
 
   const [inputPesquisar, setInputPesquisar] = useState("");
-  const [marcas, setMarcas] = useState<Marca[]>([]);
+  const [marcas, setMarcas] = useState<Fornecedor[]>([]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -36,8 +35,6 @@ export default function Estoque() {
 
     fetchMarcas();
   }, []);
-
-  const marcasFiltradas = marcas.filter((marca) => marca.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim()));
 
   return (
     <div className="relative flex flex-col bg-white-default w-full min-h-screen">

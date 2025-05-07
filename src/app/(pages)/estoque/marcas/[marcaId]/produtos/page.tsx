@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authMiddleware } from "@/middlewares/auth";
 
 import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
 
-import { Fornecedor } from "@/models/Marca";
-import { Produto } from "@/models/Produto";
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
+import { Produto } from "@/models/Produto/Produto";
 
 import { useParams } from "next/navigation";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
-import ProductsList from "@/components/products-list/index2";
+import ProductsList from "@/components/products-list";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
 
@@ -22,29 +21,30 @@ import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function ProdutosPage() {
-  authMiddleware();
 
   const { marcaId } = useParams();
-  const [marca, setMarca] = useState<Fornecedor>();
+  const [fornecedor, setFornecedor] = useState<Fornecedor>();
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
   useEffect(() => {
-    const fetchMarca = async () => {
-      const marca = await marcaPorId(Number(marcaId));
-      if (marca) {
+    const fetchFornecedor = async () => {
+      const fornecedor = await marcaPorId(Number(marcaId));
+      if (fornecedor) {
         const produtos = await produtoPorMarca(Number(marcaId));
 
         setProdutos(produtos);
-        setMarca(marca);
+        setFornecedor(fornecedor);
+        console.log("Fornecedor: ", fornecedor.nome)
+        console.log("Produtos: ", produtos)
       }
     };
-    fetchMarca();
+    fetchFornecedor();
   }, []);
 
 
   return (
     <div className="flex flex-col w-full min-h-dvh">
-      <Header title="Estoque" subtitle={marca?.nome ?? "Carregando..."}>
+      <Header title="Estoque" subtitle={fornecedor?.nome ?? "Carregando..."}>
         <DropdownAdd>
           <DropdownItem text="Editar Marca" icon={<EditIcon />} />
           <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
@@ -56,9 +56,9 @@ export default function ProdutosPage() {
         <Input name="search" label="Pesquisar" showIcon iconSymbol={<SearchIcon />} inputSize="small" />
       </div>
 
-      {marca && (
+      {fornecedor && (
         <div className="gap-4 grid grid-cols-1 px-4">
-          <ProductsList produtos={produtos} marca={marca} />
+          <ProductsList produtos={produtos} fornecedor={fornecedor} />
         </div>
       )}
     </div>

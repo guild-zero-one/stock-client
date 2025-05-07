@@ -1,7 +1,5 @@
 "use client";
 
-import { authMiddleware } from "@/middlewares/auth";
-
 import MenuLink from "@/components/menu-link";
 
 import Link from "next/link";
@@ -13,39 +11,29 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useEffect, useState } from "react";
-import { Usuario } from "@/models/Usuario";
-import { listarUsuarios } from "@/api/spring/services/UsuarioService";
+import { Usuario } from "@/models/Usuario/Usuario";
+import { listarUsuarios, usuarioAutenticado } from "@/api/spring/services/UsuarioService";
 
 export default function Home() {
   const [usuario, setUsuario] = useState<Usuario>();
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
-  authMiddleware();
 
   useEffect(() => {
     const fetchData = async () => {
-      const emailArmazenado = localStorage.getItem("email");
-      if (!emailArmazenado) return;
-
       try {
-        const listaUsuarios = await listarUsuarios();
-        if (listaUsuarios) {
-          setUsuarios(listaUsuarios);
-
-          const usuarioEncontrado = listaUsuarios.find(
-            (u: Usuario) => u.email === emailArmazenado
-          );
-
-          if (usuarioEncontrado) {
-            setUsuario(usuarioEncontrado);
-          }
+        const usuario = await usuarioAutenticado();
+        if (usuario) {
+          setUsuario(usuario);
         }
       } catch (error) {
         console.error("Erro ao buscar usuários:", error);
       }
+
     };
 
     fetchData();
   }, []);
+
 
   return (
     <div className="flex flex-col w-full h-dvh">
@@ -62,7 +50,7 @@ export default function Home() {
           <h1 className="font-bold text-2xl">Boas vindas {usuario?.nome}</h1>
           <Link href={"/usuario"}>
             <div className="group flex justify-center items-center bg-pink-default rounded-full w-8 h-8 text-gray-default text-2xl">
-                <AccountCircleIcon className="group-hover:scale-125" fontSize="inherit" />
+              <AccountCircleIcon className="group-hover:scale-125" fontSize="inherit" />
             </div>
           </Link>
         </div>

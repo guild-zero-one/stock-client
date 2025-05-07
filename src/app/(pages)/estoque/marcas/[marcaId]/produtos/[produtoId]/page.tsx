@@ -6,9 +6,9 @@ import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import { produtoPorId } from "@/api/spring/services/ProdutoService";
 import { imagensPorProduto } from "@/api/spring/services/ImagenService";
 
-import { Marca } from "@/models/Marca";
-import { Produto } from "@/models/Produto";
-import { ImagemProduto } from "@/models/ImagemProduto";
+import { Marca } from "@/models/Fornecedor/Fornecedor";
+import { Produto } from "@/models/Produto/Produto";
+import { ImagemProduto } from "@/models/Imagem/ImagemProduto";
 
 import { useParams } from "next/navigation";
 

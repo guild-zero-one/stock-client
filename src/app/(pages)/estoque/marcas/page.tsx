@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authMiddleware } from "@/middlewares/auth";
 
-import { Fornecedor } from "@/models/Marca";
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import { todasMarcas } from "@/api/spring/services/FornecedorService";
 
 import Link from "next/link";
@@ -18,7 +17,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddCircle from "@mui/icons-material/AddCircle";
 
 export default function Estoque() {
-  authMiddleware();
+
 
   const [inputPesquisar, setInputPesquisar] = useState("");
   const [marcas, setMarcas] = useState<Fornecedor[]>([]);
@@ -30,14 +29,15 @@ export default function Estoque() {
   useEffect(() => {
     const fetchMarcas = async () => {
       const marcas = await todasMarcas();
-      setMarcas(marcas);
+      if(marcas) {
+        setMarcas(marcas);
+      }
     };
 
     fetchMarcas();
   }, []);
 
   const marcasFiltradas = marcas.filter((marca) => marca.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim()));
-
   return (
     <div className="relative flex flex-col w-full min-h-screen">
       <Header title="Estoque" subtitle="Marca">
