@@ -3,10 +3,11 @@
 import Header from "@/components/header";
 import type { Usuario } from "@/models/Usuario/Usuario";
 import { useEffect, useState } from "react";
-import { listarUsuarios } from "@/api/spring/services/UsuarioService";
+import { listarUsuarios, usuarioAutenticado } from "@/api/spring/services/UsuarioService";
 import PersonIcon from '@mui/icons-material/Person';
 import Button from "@/components/button";
 import { useRouter } from "next/navigation";
+import Input from "@/components/input";
 
 export default function Usuario() {
     const [usuario, setUsuario] = useState<Usuario>();
@@ -15,25 +16,15 @@ export default function Usuario() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const emailArmazenado = localStorage.getItem("email");
-            if (!emailArmazenado) return;
-
             try {
-                const listaUsuarios = await listarUsuarios();
-                if (listaUsuarios) {
-                    setUsuarios(listaUsuarios);
-
-                    const usuarioEncontrado = listaUsuarios.find(
-                        (u: Usuario) => u.email === emailArmazenado
-                    );
-
-                    if (usuarioEncontrado) {
-                        setUsuario(usuarioEncontrado);
-                    }
+                const usuario = await usuarioAutenticado();
+                if (usuario) {
+                    setUsuario(usuario);
                 }
             } catch (error) {
                 console.error("Erro ao buscar usuários:", error);
             }
+
         };
 
         fetchData();
@@ -43,6 +34,9 @@ export default function Usuario() {
         localStorage.removeItem("token");
         localStorage.removeItem("email");
         router.push("/login");
+
+        //Preciso de uma rota no backend que crie um jwt com 0 segs
+        // "usuarios/logout"
     };
 
     return (
@@ -51,16 +45,25 @@ export default function Usuario() {
                 <Header title="Meu Perfil" subtitle="Configurações" variant="secondary"></Header>
             </div>
 
-            <div className="relative bg-white-default -mt-4 rounded-t-2xl grow">
-                <div className="bottom-[100%] left-1/2 absolute flex justify-center items-center bg-gray-default rounded-full w-50 h-50 text-gray-m-dark text-8xl -translate-x-1/2 translate-y-1/2">
+            <form className="relative flex flex-col bg-white-default -mt-4 p-4 rounded-t-2xl w-full h-full grow">
+                {/* <div className="bottom-[100%] left-1/2 absolute flex justify-center items-center bg-gray-default rounded-full w-50 h-50 text-gray-m-dark text-8xl -translate-x-1/2 translate-y-1/2">
                     <PersonIcon fontSize="inherit" />
-                </div>
+                </div> */}
 
-                <footer className="bottom-0 absolute flex flex-col gap-2 p-4 w-full">
+                <main className="w-full h-full grow">
+                    <Input label="Nome" name="name" iconSymbol={<PersonIcon/>} value={usuario?.nome ?? ""}/>
+                    <Input label="Apelido" name="name" iconSymbol={<PersonIcon/>} value={usuario?.apelido ?? ""}/>
+                    <Input label="Email" name="name" iconSymbol={<PersonIcon/>} value={usuario?.email ?? ""}/>
+                    <Input label="CPF" name="name" iconSymbol={<PersonIcon/>} value={usuario?.cpf ?? ""}/>
+                    {/* <Input label="Nome" name="name" iconSymbol={<PersonIcon/>} value={usuario?.senha ?? ""}/> */}
+                </main>
+
+                <footer className="flex flex-col gap-2 mt-auto w-full">
                     <div><Button label="Editar perfil" fullWidth /></div>
                     <div><Button label="Encerrar Sessão" fullWidth variant="outlined" onClick={handleLogout} /></div>
+                    <div><Button label="Alterar Senha" fullWidth variant="outlined" onClick={handleLogout} /></div>
                 </footer>
-            </div>
+            </form>
         </div>
     )
 }

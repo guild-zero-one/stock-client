@@ -12,10 +12,9 @@ type InputProps = {
     value?: string | number
     messageHelper?: string
     showHelper?: boolean
-    showIcon?: boolean
     iconSymbol?: React.ReactNode
     iconColor?: string
-    inputSize?: "small" | "default" 
+    size?: "small" | "default"
     inputStyle?: "default" | "success" | "info" | "error"
     helpersymbol?: "default" | "success" | "info" | "error"
     helperStatus?: "default" | "success" | "info" | "error"
@@ -29,10 +28,9 @@ export default function Input({
     value,
     messageHelper = "Este campo não deve ficar vazio!",
     showHelper = false,
-    showIcon = false,
     iconSymbol = <AddCircleIcon />,
     iconColor = "pink-default",
-    inputSize = "default",
+    size = "default",
     inputStyle = "default",
     helperStatus = inputStyle,
     helpersymbol = inputStyle,
@@ -41,38 +39,38 @@ export default function Input({
 }: InputProps) {
 
     const sizeClasses =
-    inputSize === "small"
-      ? "py-2 text-sm"
-      : "py-4 text-base";
+        size === "small"
+            ? "py-2 text-sm"
+            : "py-4 text-base";
 
-      const iconSpace = showIcon ? "left-13" : "left-3";
+    const iconSpace = iconSymbol ? "left-13" : "left-3";
 
     const inputStyleClasses = {
-      default: "border-gray-dark",    
-      success: "border-ok-default",
-      info: "border-info-default",
-      error: "border-error-default",
-      };
+        default: "border-gray-dark",
+        success: "border-ok-default",
+        info: "border-info-default",
+        error: "border-error-default",
+    };
 
-        const helperStatusClass = {
-            default: "text-gray-m-dark",
-            success: "text-ok-default",
-            info: "text-info-default",
-            error: "text-error-default",
-        };
-        
-        const helperSymbol = {
-            default: "",
-            success: <CheckCircleOutlineIcon fontSize='small' className="text-ok-default" />,
-            info: <InfoOutlineIcon fontSize='small' className="text-info-default" />,
-            error: <ErrorOutlineIcon fontSize='small' className="text-error-default" />,
-        };
+    const helperStatusClass = {
+        default: "text-gray-m-dark",
+        success: "text-ok-default",
+        info: "text-info-default",
+        error: "text-error-default",
+    };
+
+    const helperSymbol = {
+        default: "",
+        success: <CheckCircleOutlineIcon fontSize='small' className="text-ok-default" />,
+        info: <InfoOutlineIcon fontSize='small' className="text-info-default" />,
+        error: <ErrorOutlineIcon fontSize='small' className="text-error-default" />,
+    };
     return (
 
         <div className={`relative flex border ${inputStyleClasses[inputStyle]} rounded focus-within:border-pink-default items-center px-4 gap-4`}>
 
             {/* Icone do input */}
-            {showIcon && iconSymbol && (
+            {iconSymbol && (
                 <div className={`text-${iconColor}`}>
                     {iconSymbol}
                 </div>
@@ -110,7 +108,7 @@ export default function Input({
                     {helperSymbol[helpersymbol]} {messageHelper}
                 </span>
             )}
-            
+
 
         </div>
 
