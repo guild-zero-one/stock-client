@@ -1,3 +1,4 @@
+import { Usuario } from "@/models/Usuario/Usuario";
 import api from "../api";
 import { UsuarioLogin } from "@/models/Usuario/UsuarioLogin";
 
@@ -51,5 +52,16 @@ export const listarUsuarios = async () => {
   } catch (error) {
     console.error("Deu ruim: ", error);
     throw error;
+  }
+}
+
+export const editarUsuario = async (id: number, usuarioEditado: Usuario) => {
+  try {
+    const response = await api.patch(`${router}/${id}`, usuarioEditado);
+    return response.data;
+  }
+  catch (error) {
+    console.error("Erro ao editar usuário:", error);
+    throw error
   }
 }
