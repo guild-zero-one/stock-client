@@ -25,7 +25,8 @@ export function middleware(request: NextRequest) {
         '/usuario',          // Rota principal de perfil
         '/usuario/.*',       // Qualquer sub-rota dentro de /perfil
       
-        '/dashboard'        // Rota principal de dashboard
+        '/dashboard',        // Rota principal de dashboard
+        '/'
       ];
       
     const path = request.nextUrl.pathname;
@@ -36,6 +37,11 @@ export function middleware(request: NextRequest) {
     // Permitir acesso livre às rotas públicas
     const isPublicPath = publicPaths.some((publicPath) => path.startsWith(publicPath));
 
+
+    if (isPublicPath) {
+        return NextResponse.next();
+    }
+    
     // Redirecionar usuários não autenticados que tentam acessar rotas privadas
     if (!isAuth && protectedPaths.some((protectedPath) => path.startsWith(protectedPath))) {
         return NextResponse.redirect(new URL('/login', request.url));

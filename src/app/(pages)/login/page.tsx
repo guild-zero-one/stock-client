@@ -65,9 +65,9 @@ export default function Home() {
 
           <p className="text-center">Faça seu login para continuar</p>
 
-          <Input label="E-mail" name="email" inputSize="small" handleChange={handleUser} />
-          <Input label="Senha" name="senha" inputSize="small" handleChange={handleUser} type="password" />
-          <Button label="Entrar" fullWidth />
+          <Input label="E-mail" name="email" size="small" handleChange={handleUser} />
+          <Input label="Senha" name="senha" size="small" handleChange={handleUser} type="password" />
+          <Button label="Entrar" fullWidth type="submit"/>
 
           <p className="text-center">Esqueci minha senha</p>
         </form>

@@ -3,46 +3,66 @@
 import Header from "@/components/header";
 import type { Usuario } from "@/models/Usuario/Usuario";
 import { useEffect, useState } from "react";
-import { listarUsuarios } from "@/api/spring/services/UsuarioService";
+import { editarUsuario, usuarioAutenticado } from "@/api/spring/services/UsuarioService";
 import PersonIcon from '@mui/icons-material/Person';
 import Button from "@/components/button";
 import { useRouter } from "next/navigation";
+import Input from "@/components/input";
+import BadgeIcon from '@mui/icons-material/Badge';
+import MailIcon from '@mui/icons-material/Mail';
 
 export default function Usuario() {
     const [usuario, setUsuario] = useState<Usuario>();
-    const [usuarios, setUsuarios] = useState<Usuario[]>([])
+    const [usuarioEditado, setUsuarioEditado] = useState<Usuario>();
+    const [editar, setEditar] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
-            const emailArmazenado = localStorage.getItem("email");
-            if (!emailArmazenado) return;
-
             try {
-                const listaUsuarios = await listarUsuarios();
-                if (listaUsuarios) {
-                    setUsuarios(listaUsuarios);
-
-                    const usuarioEncontrado = listaUsuarios.find(
-                        (u: Usuario) => u.email === emailArmazenado
-                    );
-
-                    if (usuarioEncontrado) {
-                        setUsuario(usuarioEncontrado);
-                    }
-                }
+                atualizarUsuario();
             } catch (error) {
-                console.error("Erro ao buscar usuários:", error);
+                console.error("Erro ao buscar usuário:", error);
             }
         };
 
         fetchData();
     }, []);
 
+    const atualizarUsuario = async () => {
+        const usuario = await usuarioAutenticado();
+        if (usuario) {
+            setUsuario(usuario);
+            setUsuarioEditado({ ...usuario });
+        }
+    }
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("email");
         router.push("/login");
+    };
+
+    const inative = () => {
+        return editar ? false : true;
+    }
+
+    const handleEditar = async () => {
+        if (!usuario || !usuarioEditado) return;
+
+        await editarUsuario(usuario.id, usuarioEditado);
+        atualizarUsuario()
+        setEditar(!editar);
+    }
+
+    const handleCancelar = () => {
+        setUsuarioEditado(usuario);
+        setEditar(false);
+    };
+
+    const handleUsuarioEditado = (field: keyof Usuario) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUsuarioEditado((prev) =>
+            prev ? { ...prev, [field]: e.target.value } : prev
+        );
     };
 
     return (
@@ -51,16 +71,68 @@ export default function Usuario() {
                 <Header title="Meu Perfil" subtitle="Configurações" variant="secondary"></Header>
             </div>
 
-            <div className="relative bg-white-default -mt-4 rounded-t-2xl grow">
-                <div className="bottom-[100%] left-1/2 absolute flex justify-center items-center bg-gray-default rounded-full w-50 h-50 text-gray-m-dark text-8xl -translate-x-1/2 translate-y-1/2">
-                    <PersonIcon fontSize="inherit" />
+            <form className="relative flex flex-col bg-white-default -mt-4 p-4 rounded-t-2xl w-full h-full grow">
+                <div className="flex flex-col gap-2">
+                    <Input
+                        label="Nome"
+                        name="name"
+                        iconSymbol={<PersonIcon />}
+                        value={editar ? usuarioEditado?.nome ?? "" : usuario?.nome ?? ""}
+                        disabled={inative()}
+                        handleChange={handleUsuarioEditado("nome")}
+                    />
+                    <Input
+                        label="Sobrenome"
+                        name="sobrenome"
+                        iconSymbol={<BadgeIcon />}
+                        value={editar ? usuarioEditado?.sobrenome ?? "" : usuario?.sobrenome ?? ""}
+                        disabled={inative()}
+                        handleChange={handleUsuarioEditado("sobrenome")}
+                    />
+                    <Input
+                        label="Apelido"
+                        name="apelido"
+                        iconSymbol={<PersonIcon />}
+                        value={editar ? usuarioEditado?.apelido ?? "" : usuario?.apelido ?? ""}
+                        disabled={inative()}
+                        handleChange={handleUsuarioEditado("apelido")}
+                    />
+                    <Input
+                        label="Email"
+                        name="email"
+                        iconSymbol={<MailIcon />}
+                        value={editar ? usuarioEditado?.email ?? "" : usuario?.email ?? ""}
+                        disabled={inative()}
+                        handleChange={handleUsuarioEditado("email")}
+                    />
+                    <Input
+                        label="CPF"
+                        name="cpf"
+                        iconSymbol={<BadgeIcon />}
+                        value={editar ? usuarioEditado?.cpf ?? "" : usuario?.cpf ?? ""}
+                        disabled={inative()}
+                        handleChange={handleUsuarioEditado("cpf")}
+                    />
                 </div>
 
-                <footer className="bottom-0 absolute flex flex-col gap-2 p-4 w-full">
-                    <div><Button label="Editar perfil" fullWidth /></div>
-                    <div><Button label="Encerrar Sessão" fullWidth variant="outlined" onClick={handleLogout} /></div>
+                <footer className="flex flex-col gap-2 mt-auto w-full">
+                    {editar ? (
+                        <div className="flex flex-col gap-2">
+                            <Button label="Confirmar alterações" onClick={() => handleEditar()} fullWidth />
+                            <Button label="Cancelar" fullWidth variant="outlined" onClick={handleCancelar} />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="flex flex-col gap-2">
+                                <Button label="Editar perfil" fullWidth onClick={() => setEditar(!editar)} />
+                                <Button label="Encerrar Sessão" fullWidth variant="outlined" onClick={handleLogout} />
+                                <Button label="Alterar Senha" fullWidth variant="outlined" />
+                            </div>
+                        </>
+                    )}
                 </footer>
-            </div>
+
+            </form>
         </div>
     )
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     label: string;
     onClick?: () => void;
     disabled?: boolean;
@@ -16,6 +16,7 @@ const Button: React.FC<ButtonProps> = ({
     size = 'default',
     variant = 'filled',
     fullWidth = false,
+    type = 'button'
 }) => {
 
     const buttonSizeClasses = {
@@ -29,6 +30,7 @@ const Button: React.FC<ButtonProps> = ({
     };
     return (
         <button
+            type={type}
             onClick={onClick}
             disabled={disabled}
             className={`

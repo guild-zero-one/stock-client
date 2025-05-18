@@ -12,13 +12,11 @@ type InputProps = {
     value?: string | number
     messageHelper?: string
     showHelper?: boolean
-    showIcon?: boolean
     iconSymbol?: React.ReactNode
     iconColor?: string
-    inputSize?: "small" | "default" 
-    inputStyle?: "default" | "success" | "info" | "error"
-    helpersymbol?: "default" | "success" | "info" | "error"
-    helperStatus?: "default" | "success" | "info" | "error"
+    disabled?: boolean
+    size?: "small" | "default"
+    status?: "default" | "success" | "info" | "error"
     handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -29,88 +27,87 @@ export default function Input({
     value,
     messageHelper = "Este campo não deve ficar vazio!",
     showHelper = false,
-    showIcon = false,
-    iconSymbol = <AddCircleIcon />,
+    iconSymbol,
     iconColor = "pink-default",
-    inputSize = "default",
-    inputStyle = "default",
-    helperStatus = inputStyle,
-    helpersymbol = inputStyle,
+    disabled = false,
+    size = "default",
+    status = "default",
     handleChange = () => { },
 
 }: InputProps) {
 
     const sizeClasses =
-    inputSize === "small"
-      ? "py-2 text-sm"
-      : "py-4 text-base";
+        size === "small"
+            ? "py-2 text-sm"
+            : "py-4 text-base";
 
-      const iconSpace = showIcon ? "left-13" : "left-3";
+    const iconSpace = iconSymbol ? "left-13" : "left-3";
 
     const inputStyleClasses = {
-      default: "border-gray-dark",    
-      success: "border-ok-default",
-      info: "border-info-default",
-      error: "border-error-default",
-      };
+        default: "border-gray-dark",
+        success: "border-ok-default",
+        info: "border-info-default",
+        error: "border-error-default",
+    };
 
-        const helperStatusClass = {
-            default: "text-gray-m-dark",
-            success: "text-ok-default",
-            info: "text-info-default",
-            error: "text-error-default",
-        };
-        
-        const helperSymbol = {
-            default: "",
-            success: <CheckCircleOutlineIcon fontSize='small' className="text-ok-default" />,
-            info: <InfoOutlineIcon fontSize='small' className="text-info-default" />,
-            error: <ErrorOutlineIcon fontSize='small' className="text-error-default" />,
-        };
+    const helperStatusClass = {
+        default: "text-gray-m-dark",
+        success: "text-ok-default",
+        info: "text-info-default",
+        error: "text-error-default",
+    };
+
+    const helperSymbol = {
+        default: "",
+        success: <CheckCircleOutlineIcon fontSize='small' className="text-ok-default" />,
+        info: <InfoOutlineIcon fontSize='small' className="text-info-default" />,
+        error: <ErrorOutlineIcon fontSize='small' className="text-error-default" />,
+    };
     return (
+        <div>
+            <div className={`relative flex border ${inputStyleClasses[status]} rounded focus-within:border-pink-default items-center px-4 gap-4`}>
 
-        <div className={`relative flex border ${inputStyleClasses[inputStyle]} rounded focus-within:border-pink-default items-center px-4 gap-4`}>
+                {/* Icone do input */}
+                {iconSymbol && (
+                    <div className={`text-${iconColor}`}>
+                        {iconSymbol}
+                    </div>
+                )}
+                <input
+                    type={type} id={name} name={name} value={value} placeholder=""
+                    onChange={handleChange}
+                    disabled={disabled}
+                    className={`peer border border-gray-dark focus:border-pink-default rounded focus:outline-none w-full bg-white border-none ${sizeClasses} ${disabled ? 'text-gray-400' : 'inherit'}`}
+                />
 
-            {/* Icone do input */}
-            {showIcon && iconSymbol && (
-                <div className={`text-${iconColor}`}>
-                    {iconSymbol}
-                </div>
-            )}
-            <input
-                type={type} id={name} name={name} value={value} placeholder="" onChange={handleChange}
-                className={`peer border border-gray-dark focus:border-pink-default rounded focus:outline-none w-full bg-white border-none ${sizeClasses}`}
-            />
+                {/* Label do input */}
+                <label
+                    htmlFor={name}
+                    className={`
+                        absolute ${iconSpace} z-1 top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none ${disabled ? 'text-gray-400' : 'inherit'}
 
-            {/* Label do input */}
-            <label
-                htmlFor={name}
-                className={`
-                absolute ${iconSpace}  z-1 top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none
+                        // Classes para o placeholder do input
+                        peer-placeholder-shown:text-sm
+                        peer-placeholder-shown:top-1/2
+                        peer-placeholder-shown:-translate-y-1/2
+                        peer-placeholder-shown:text-gray-m-dark
 
-                // Classes para o placeholder do input
-                peer-placeholder-shown:text-sm
-                peer-placeholder-shown:top-1/2
-                peer-placeholder-shown:-translate-y-1/2
-                peer-placeholder-shown:text-gray-m-dark
+                        // Classes para o label do input
+                        peer-focus:text-xs
+                        peer-focus:top-0
+                        peer-focus:-translate-y-1/2
+                        peer-focus:text-pink-default`}>
+                    {label}
+                </label>
+            </div>
 
-                // Classes para o label do input
-                peer-focus:text-xs
-                peer-focus:top-0
-                peer-focus:-translate-y-1/2
-                peer-focus:text-pink-default
-                `}
-            >
-                {label}
-            </label>
 
             {/* Mensagem de ajuda do input */}
             {showHelper && (
-                <span className={`text-xs ${helperStatusClass[helperStatus]} mt-1 absolute top-full left-4 flex items-center gap-2`}>
-                    {helperSymbol[helpersymbol]} {messageHelper}
+                <span className={`text-xs ${helperStatusClass[status]} flex items-center gap-1 ml-4 mt-1`}>
+                    {helperSymbol[status]} {messageHelper}
                 </span>
             )}
-            
 
         </div>
 
