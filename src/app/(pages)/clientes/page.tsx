@@ -1,6 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+
+import { listarClientes } from "@/api/spring/services/ClienteService";
+
+import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 
 import Link from "next/link";
 
@@ -15,45 +19,21 @@ import AddCircle from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function Cliente() {
+  const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [filter, setFilter] = useState<string>("Pedidos");
 
-  const clientes = [
-    {
-      id: 1,
-      nome: "A Cliente 2",
-      contato: "987654321",
-      qtdPedidos: 34,
-      dataCriacao: "2023-10-01",
-    },
-    {
-      id: 2,
-      nome: "B Cliente 1",
-      contato: "123456789",
-      qtdPedidos: 12,
-      dataCriacao: "2023-10-02",
-    },
-    {
-      id: 3,
-      nome: "C Cliente 3",
-      contato: "456789123",
-      qtdPedidos: 56,
-      dataCriacao: "2023-10-03",
-    },
-    {
-      id: 4,
-      nome: "D Cliente 4",
-      contato: "789123456",
-      qtdPedidos: 23,
-      dataCriacao: "2023-10-04",
-    },
-    {
-      id: 5,
-      nome: "E Cliente 5",
-      contato: "321654987",
-      qtdPedidos: 45,
-      dataCriacao: "2023-10-05",
-    },
-  ];
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const response: ClienteResponse[] = await listarClientes();
+        console.log("Clientes:", response);
+        setClientes(response);
+      } catch (error) {
+        console.error("Erro ao listar clientes:", error);
+      }
+    };
+    fetchClientes();
+  }, []);
 
   const clientesOrdenados = useMemo(() => {
     const todosClientes = [...clientes];
@@ -69,12 +49,13 @@ export default function Cliente() {
     if (filter === "Recente") {
       return todosClientes.sort(
         (a, b) =>
-          new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime()
+          new Date(b.criadoEm ?? 0).getTime() -
+          new Date(a.criadoEm ?? 0).getTime()
       );
     }
 
     return todosClientes;
-  }, [filter]);
+  }, [filter, clientes]);
 
   return (
     <div className="relative flex flex-col w-full min-h-screen">
@@ -105,16 +86,22 @@ export default function Cliente() {
 
       {/* Lista de clientes */}
       <div className="flex flex-col gap-4 p-4 w-full">
-        {clientesOrdenados.map((cliente) => (
-          <Link key={cliente.id} href={`clientes/${cliente.id}`}>
-            <CardCustomer
-              key={cliente.id}
-              nome={cliente.nome}
-              contato={cliente.contato}
-              qtdPedidos={cliente.qtdPedidos}
-            />
-          </Link>
-        ))}
+        {clientes.length === 0 ? (
+          <p className="text-center text-gray-500">
+            Nenhum cliente encontrado.
+          </p>
+        ) : (
+          clientesOrdenados.map((cliente) => (
+            <Link key={cliente.id} href={`clientes/${cliente.id}`}>
+              <CardCustomer
+                nome={cliente.nome}
+                sobrenome={cliente.sobrenome}
+                contato={cliente.contato?.celular ?? "Não informado"}
+                qtdPedidos={cliente.qtdPedidos}
+              />
+            </Link>
+          ))
+        )}
       </div>
     </div>
   );
