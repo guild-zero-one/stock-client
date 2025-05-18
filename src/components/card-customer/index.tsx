@@ -2,12 +2,14 @@ import { Person, ShoppingBagOutlined } from "@mui/icons-material";
 
 type CardCustomerProps = {
   nome: string;
+  sobrenome: string;
   contato: string;
   qtdPedidos: number;
 };
 
 export default function CardCustomer({
   nome,
+  sobrenome,
   contato,
   qtdPedidos,
 }: CardCustomerProps) {
@@ -20,7 +22,9 @@ export default function CardCustomer({
 
       {/* Info */}
       <div className="flex flex-col w-full gap-2">
-        <p className="text-sm text-text-default">{nome}</p>
+        <p className="flex flex-row text-sm text-text-default">
+          {nome} {sobrenome ?? ""}
+        </p>
         <p className="text-sm text-text-secondary">{contato}</p>
       </div>
 
