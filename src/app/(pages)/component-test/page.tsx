@@ -5,16 +5,18 @@ import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
-import CategoriesMenu from "@/components/categories-menu";
-import { Marca } from "@/models/Fornecedor/Fornecedor";
+
+import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import { todasMarcas } from "@/api/spring/services/FornecedorService";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
 import Link from "next/link";
+import Modal from "@/components/modal-popup";
 
 export default function ComponentTest() {
 
-  const [categories, setCategories] = useState<Marca[]>([]);
+  const [categories, setCategories] = useState<Fornecedor[]>([]);
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
     const fecthData = async () => {
@@ -27,6 +29,8 @@ export default function ComponentTest() {
     fecthData();
   }, []);
 
+  const handleOpen = () => setModal(true);
+  const handleClose = () => setModal(false);
   return (
     <>
       <main className="bg-white-default p-4 w-[100%] h-dvh">
@@ -40,19 +44,19 @@ export default function ComponentTest() {
               <h2 className="text-text-secondary">Header Componente</h2>
 
               <Header title="Produtos" subtitle="Navegar">
-              
-                  <DropdownAdd>
-                   
-                    <Link href={"#"}>
-                      <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
-                    </Link>
 
-                    <Link href={"#"}>
-                      <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
-                    </Link>
+                <DropdownAdd>
 
-                  </DropdownAdd>
-                
+                  <Link href={"#"}>
+                    <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
+                  </Link>
+
+                  <Link href={"#"}>
+                    <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+                  </Link>
+
+                </DropdownAdd>
+
               </Header>
 
 
@@ -64,8 +68,7 @@ export default function ComponentTest() {
               <Input type="text"
                 name="nome"
                 label="Nome"
-                showIcon={true}
-                inputSize="small" iconSymbol={<FaceIcon />} />
+                size="small" iconSymbol={<FaceIcon />} />
             </div>
 
             {/* Button */}
@@ -103,30 +106,19 @@ export default function ComponentTest() {
                 </Button>
               </div>
             </div>
-
           </div>
         </div>
+
+        <Button
+          label={"Abrir Modal"}
+          size="default"
+          variant="filled"
+          onClick={handleOpen}
+        />
+
+        <Modal open={modal} onClose={()=> handleClose()}/>
       </main>
 
-      <div className="gap-2 bg-pink-default p-4 border border-gray-dark rounded-t-3xl w-full h-[75vh]">
-        <div className="flex flex-col flex-1 gap-3 h-full overflow-y-auto scrollbar-minimal">
-
-          {categories.map((category) => (
-            <CategoriesMenu
-              key={category.id}
-              name={category.name}
-              image={category.image}
-              description={category.description}
-              quantity={category.quantity}
-
-              onClick={() => {
-                alert(`Você clicou na categoria ${category.name}`)
-              }}
-            />
-          ))}
-
-        </div>
-      </div>
     </>
 
   );
