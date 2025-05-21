@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Header from "@/components/header";
 import AddCircle from '@mui/icons-material/AddCircle';
 import Input from "@/components/input";
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 
 import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import { todasMarcas } from "@/api/spring/services/FornecedorService";
@@ -116,7 +117,28 @@ export default function ComponentTest() {
           onClick={handleOpen}
         />
 
-        <Modal open={modal} onClose={()=> handleClose()}/>
+        <Modal open={modal}
+          onClose={() => handleClose()}
+          icon={<AssignmentTurnedInIcon />}
+          title={
+            <>
+              Titulo
+            </>
+          }
+          body={
+            <>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere, natus eligendi saepe delectus blanditiis nam ea ad quibusdam alias totam. At veritatis soluta voluptate alias porro pariatur magnam laborum a.
+              </p>
+            </>
+          }
+          footer={
+            <>
+              <Button label="Seguir" fullWidth />
+              <Button label="Cancelar" fullWidth variant="outlined" />
+            </>
+          }
+        />
       </main>
 
     </>
