@@ -65,7 +65,7 @@ export default function Input({
     };
     return (
         <div>
-            <div className={`relative flex border ${inputStyleClasses[status]} rounded focus-within:border-pink-default items-center px-4 gap-4`}>
+            <div className={`relative flex border ${inputStyleClasses[status]} rounded focus-within:border-pink-default items-center px-4 gap-4 bg-white`}>
 
                 {/* Icone do input */}
                 {iconSymbol && (

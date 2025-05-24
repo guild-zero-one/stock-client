@@ -10,7 +10,7 @@ interface ProductsListItemProps {
 export default function ProductsListItem({ produto, imagem }: ProductsListItemProps) {
   
   return (
-    <div className="flex flex-col bg-white p-2 border border-gray-dark rounded w-full min-h-[35vh]">
+    <div className="flex flex-col bg-white p-2 border border-gray-dark rounded w-full min-h-[45vh]">
       <div className="flex-1 w-full grow">
         {imagem ? (
           <img src={imagem.urlImagem} alt={produto.nome} className="w-full h-full object-cover" />

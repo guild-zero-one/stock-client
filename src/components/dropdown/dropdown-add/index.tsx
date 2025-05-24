@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import AddCircle from "@mui/icons-material/AddCircle";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 type DropdownAddProps = {
   children?: React.ReactNode;
@@ -31,7 +31,7 @@ export default function DropdownAdd({ children }: DropdownAddProps) {
     <div className="relative flex" ref={dropdownRef}>
       {/* Botão que ativa o dropdown */}
       <button className="flex items-center rounded-md focus:outline-none w-fit h-fit hover:scale-145 transition-transform duration-300 cursor-pointer" onClick={toggleDropdown}>
-        <AddCircle />
+        <MoreVertIcon />
       </button>
 
       {/* Lista da Lista */}
