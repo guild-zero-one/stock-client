@@ -1,22 +1,22 @@
 import { CalendarMonth, ShoppingBagOutlined } from "@mui/icons-material";
 
 type CardOrderProps = {
-  numero: number;
+  index: number;
   nome: string;
   sobrenome: string;
   valorPedido: number;
-  dataCriacao: string;
+  criadoEm: Date;
 };
 
 export default function CardOrder({
-  numero,
+  index,
   nome,
   sobrenome,
   valorPedido,
-  dataCriacao,
+  criadoEm,
 }: CardOrderProps) {
   return (
-    <div className="flex justify-between items-center w-full shadow-sm rounded-sm p-4 gap-4">
+    <div className="flex justify-between items-center w-full shadow-md/20 rounded-sm p-4 gap-4">
       {/* Icon */}
       <div className="flex items-center bg-pink-default p-2 rounded-lg">
         <ShoppingBagOutlined fontSize="large" className="text-white" />
@@ -26,7 +26,7 @@ export default function CardOrder({
       <div className="flex flex-col w-full gap-1">
         {/* Numero Pedido */}
         <p className="text-[10px] text-text-secondary uppercase">
-          PEDIDO {numero}
+          PEDIDO {index}
         </p>
         {/* Nome Cliente */}
         <h2 className="flex flex-row text-sm text-text-default">
@@ -37,10 +37,12 @@ export default function CardOrder({
           R$ {valorPedido}
         </p>
         {/* Data Pedido */}
-        <div className="flex items-center text-xs text-text-secondary gap-1">
-          <CalendarMonth fontSize="small" />
-          <p>{dataCriacao}</p>
-        </div>
+        {criadoEm && (
+          <div className="flex items-center text-sm text-text-secondary gap-1">
+            <CalendarMonth fontSize="inherit" />
+            <p>{criadoEm.toDateString()}</p>
+          </div>
+        )}
       </div>
     </div>
   );
