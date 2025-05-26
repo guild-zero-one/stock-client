@@ -11,16 +11,18 @@ import Link from "next/link";
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Filter from "@/components/filter";
-import CardCustomer from "@/components/card-customer";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
 import DropdownItem from "@/components/dropdown/dropdown-item";
+import CustomersList from "@/components/customers-list";
 
 import AddCircle from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function Cliente() {
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
+
   const [filter, setFilter] = useState<string>("Pedidos");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -36,7 +38,13 @@ export default function Cliente() {
   }, []);
 
   const clientesOrdenados = useMemo(() => {
-    const todosClientes = [...clientes];
+    let todosClientes = [...clientes];
+
+    if (searchTerm) {
+      todosClientes = todosClientes.filter((cliente) =>
+        cliente.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
     if (filter === "Nome") {
       return todosClientes.sort((a, b) => a.nome.localeCompare(b.nome));
@@ -55,10 +63,10 @@ export default function Cliente() {
     }
 
     return todosClientes;
-  }, [filter, clientes]);
+  }, [filter, clientes, searchTerm]);
 
   return (
-    <div className="relative flex flex-col w-full min-h-screen">
+    <div className="relative flex flex-col w-full min-h-screen bg-white-default">
       <Header title="Todos" subtitle="Meus clientes">
         <DropdownAdd>
           <Link href={"clientes/adicionar"}>
@@ -73,9 +81,9 @@ export default function Cliente() {
           name="search"
           label="Pesquisar"
           type="text"
-          showIcon
           iconSymbol={<SearchIcon />}
-          inputSize="small"
+          size="small"
+          handleChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
@@ -85,23 +93,11 @@ export default function Cliente() {
       </div>
 
       {/* Lista de clientes */}
-      <div className="flex flex-col gap-4 p-4 w-full">
-        {clientes.length === 0 ? (
-          <p className="text-center text-gray-500">
-            Nenhum cliente encontrado.
-          </p>
-        ) : (
-          clientesOrdenados.map((cliente) => (
-            <Link key={cliente.id} href={`clientes/${cliente.id}`}>
-              <CardCustomer
-                nome={cliente.nome}
-                sobrenome={cliente.sobrenome}
-                contato={cliente.contato?.celular ?? "Não informado"}
-                qtdPedidos={cliente.qtdPedidos}
-              />
-            </Link>
-          ))
-        )}
+      <div className="flex-1 overflow-y-auto">
+        <CustomersList
+          clientes={clientesOrdenados}
+          uri={(cliente) => `/clientes/${cliente.id}`}
+        />
       </div>
     </div>
   );
