@@ -14,7 +14,7 @@ export default function CardCustomer({
   qtdPedidos,
 }: CardCustomerProps) {
   return (
-    <div className="flex justify-between items-center w-full shadow-sm rounded-sm p-4 gap-4">
+    <div className="flex justify-between items-center w-full shadow-md/20 rounded-sm p-4 gap-4">
       {/* Icon */}
       <div className="flex items-center bg-pink-default p-2 rounded-lg">
         <Person fontSize="large" className="text-white" />

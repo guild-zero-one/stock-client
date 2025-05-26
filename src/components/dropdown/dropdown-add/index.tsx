@@ -14,7 +14,10 @@ export default function DropdownAdd({ children }: DropdownAddProps) {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
       setIsOpen(false);
     }
   };
@@ -30,7 +33,12 @@ export default function DropdownAdd({ children }: DropdownAddProps) {
   return (
     <div className="relative flex" ref={dropdownRef}>
       {/* Botão que ativa o dropdown */}
-      <button className="flex items-center rounded-md focus:outline-none w-fit h-fit hover:scale-145 transition-transform duration-300 cursor-pointer" onClick={toggleDropdown}>
+      <button
+        title="Botão de Adicionar"
+        type="button"
+        className="flex items-center rounded-md focus:outline-none w-fit h-fit hover:scale-145 transition-transform duration-300 cursor-pointer"
+        onClick={toggleDropdown}
+      >
         <AddCircle />
       </button>
 
