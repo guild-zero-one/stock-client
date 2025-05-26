@@ -7,13 +7,27 @@ import { useRouter } from "next/navigation";
 import { criarCliente } from "@/api/spring/services/ClienteService";
 import { criarContato } from "@/api/spring/services/ContatoService";
 
+import axios, { AxiosError } from "axios";
+
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Button from "@/components/button";
+import Toast from "@/components/toast";
 
 import Person from "@mui/icons-material/Person";
 
 export default function AdicionarCliente() {
+  const [toast, setToast] = useState<null | "success" | "error" | "conflict">(
+    null
+  );
+
+  const showToast = (type: "success" | "error" | "conflict") => {
+    setToast(null);
+    setTimeout(() => {
+      setToast(type);
+    }, 10);
+  };
+
   const [cliente, setCliente] = useState({
     nome: "",
     sobrenome: "",
@@ -42,6 +56,24 @@ export default function AdicionarCliente() {
     }));
   };
 
+  const toastMap = {
+    success: {
+      title: "Cliente adicionado com sucesso",
+      message: "Você será redirecionado para a lista de clientes.",
+      type: "success",
+    },
+    conflict: {
+      title: "Erro ao criar cliente",
+      message: "Cliente já cadastrado.",
+      type: "error",
+    },
+    error: {
+      title: "Erro ao criar cliente",
+      message: "Verique as informações e tente novamente.",
+      type: "error",
+    },
+  } as const;
+
   const router = useRouter();
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -50,22 +82,33 @@ export default function AdicionarCliente() {
       const clienteResponse = await criarCliente(cliente);
       const contatoResponse = await criarContato(clienteResponse.id, contato);
 
-      // Adicionar modal de sucesso
-      console.log(
-        "Cliente criado com sucesso:",
-        clienteResponse,
-        contatoResponse
-      );
+      showToast("success");
+
       setTimeout(() => {
         router.push("/clientes");
-      }, 2000);
+      }, 3000);
     } catch (error) {
-      console.error("Erro criar usuário:", error);
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 400) {
+          showToast("error");
+          return;
+        }
+        if (status === 409) {
+          showToast("conflict");
+          return;
+        }
+      }
+      showToast("error");
     }
   };
 
   return (
     <div className="relative flex flex-col bg-white-default w-full min-h-screen">
+      {/* Toast */}
+      {toast && <Toast {...toastMap[toast]} />}
+
       <Header title="Cliente" subtitle="Adicionar" />
 
       {/* Adicionar Imagem */}
@@ -88,29 +131,29 @@ export default function AdicionarCliente() {
           <Input
             label="Nome"
             name="nome"
-            inputSize="small"
+            size="small"
             handleChange={handleCliente}
           />
           <Input
             label="Sobrenome"
             name="sobrenome"
-            inputSize="small"
+            size="small"
             handleChange={handleCliente}
           />
         </div>
         <Input
           label="Telefone"
           name="celular"
-          inputSize="small"
+          size="small"
           handleChange={handleContato}
         />
         <Input
           label="E-mail"
           name="email"
-          inputSize="small"
+          size="small"
           handleChange={handleCliente}
         />
-        <Button label="Adicionar" variant="outlined" fullWidth />
+        <Button type="submit" label="Adicionar" variant="outlined" fullWidth />
       </form>
     </div>
   );

@@ -20,10 +20,20 @@ import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Button from "@/components/button";
+import Toast from "@/components/toast";
 
 import Person from "@mui/icons-material/Person";
 
 export default function DetalheCliente() {
+  const [toast, setToast] = useState<null | "success" | "error">(null);
+
+  const showToast = (type: "success" | "error") => {
+    setToast(null);
+    setTimeout(() => {
+      setToast(type);
+    }, 10);
+  };
+
   const { clienteId } = useParams();
 
   const [cliente, setCliente] = useState({
@@ -78,6 +88,19 @@ export default function DetalheCliente() {
 
   const router = useRouter();
 
+  const toastMap = {
+    success: {
+      title: "Cliente atualizado com sucesso",
+      message: "Você será redirecionado para a lista de clientes.",
+      type: "success",
+    },
+    error: {
+      title: "Erro ao atualizar cliente",
+      message: "Verique as informações e tente novamente.",
+      type: "error",
+    },
+  } as const;
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -89,28 +112,35 @@ export default function DetalheCliente() {
         await editarContato(clienteResponse.contato.id, contato);
       }
 
-      // Adicionar modal de sucesso
+      showToast("success");
+
+      setTimeout(() => {
+        router.push("/clientes");
+      }, 3000);
     } catch (error) {
-      console.error("Erro criar usuário:", error);
+      showToast("error");
     }
   };
 
   const handleDesativar = async () => {
     try {
       await desativarCliente(clienteId);
-      alert("Cliente desativado com sucesso!");
+
+      showToast("success");
 
       setTimeout(() => {
         router.push("/clientes");
-      }, 2000);
+      }, 3000);
     } catch (error) {
-      console.error("Erro ao desativar cliente:", error);
-      alert("Erro ao desativar cliente");
+      showToast("error");
     }
   };
 
   return (
     <div className="relative flex flex-col bg-white-default w-full min-h-screen">
+      {/* Toast */}
+      {toast && <Toast {...toastMap[toast]} />}
+
       <Header title="Cliente" subtitle="Detalhes" />
 
       {/* Adicionar Imagem */}
@@ -133,14 +163,14 @@ export default function DetalheCliente() {
           <Input
             label="Nome"
             name="nome"
-            inputSize="small"
+            size="small"
             handleChange={handleCliente}
             value={cliente.nome}
           />
           <Input
             label="Sobrenome"
             name="sobrenome"
-            inputSize="small"
+            size="small"
             handleChange={handleCliente}
             value={cliente.sobrenome}
           />
@@ -148,14 +178,14 @@ export default function DetalheCliente() {
         <Input
           label="Telefone"
           name="celular"
-          inputSize="small"
+          size="small"
           handleChange={handleContato}
           value={contato.celular}
         />
         <Input
           label="E-mail"
           name="email"
-          inputSize="small"
+          size="small"
           handleChange={handleCliente}
           value={cliente.email}
         />
@@ -165,7 +195,7 @@ export default function DetalheCliente() {
           fullWidth
           onClick={handleDesativar}
         />
-        <Button label="Editar" fullWidth />
+        <Button type="submit" label="Editar" fullWidth />
       </form>
     </div>
   );
