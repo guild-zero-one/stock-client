@@ -15,9 +15,9 @@ import DropdownItem from "@/components/dropdown/dropdown-item";
 
 import SearchIcon from "@mui/icons-material/Search";
 import AddCircle from "@mui/icons-material/AddCircle";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Estoque() {
-
 
     const [inputPesquisar, setInputPesquisar] = useState("");
     const [marcas, setMarcas] = useState<Fornecedor[]>([]);
@@ -26,6 +26,7 @@ export default function Estoque() {
         const { value } = event.target;
         setInputPesquisar(value);
     };
+
     useEffect(() => {
         const fetchMarcas = async () => {
             const marcas = await todasMarcas();
@@ -57,7 +58,7 @@ export default function Estoque() {
 
             {/* Grid */}
             <div className="flex flex-col gap-4 p-4 w-full">
-                <Input name="search" label="Pesquisar" type="text" iconSymbol={<SearchIcon />} size="small" handleChange={handleSearchChange} />
+                <Input name="search" label="Pesquisar" type="text" iconSymbol={<SearchIcon />} handleChange={handleSearchChange} />
             </div>
 
             <div className="bottom-0 absolute flex flex-col bg-pink-secondary p-4 pb-0 rounded-t-2xl w-full h-[80%] max-h-[85%]">
@@ -75,7 +76,7 @@ export default function Estoque() {
                         marcasFiltradas.map((marca) => <MenuBrand key={marca.id} name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />)
                     ) : (
                         <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
-                            <h2 className="text-2xl">Nenhuma marca encontrada :( </h2>
+                            <h2 className="italic">Nenhuma marca encontrada</h2>
                         </div>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import AddCircle from "@mui/icons-material/AddCircle";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 type DropdownAddProps = {
   children?: React.ReactNode;
@@ -14,10 +14,7 @@ export default function DropdownAdd({ children }: DropdownAddProps) {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setIsOpen(false);
     }
   };
@@ -33,13 +30,8 @@ export default function DropdownAdd({ children }: DropdownAddProps) {
   return (
     <div className="relative flex" ref={dropdownRef}>
       {/* Botão que ativa o dropdown */}
-      <button
-        title="Botão de Adicionar"
-        type="button"
-        className="flex items-center rounded-md focus:outline-none w-fit h-fit hover:scale-145 transition-transform duration-300 cursor-pointer"
-        onClick={toggleDropdown}
-      >
-        <AddCircle />
+      <button className="flex items-center rounded-md focus:outline-none w-fit h-fit hover:scale-145 transition-transform duration-300 cursor-pointer" onClick={toggleDropdown}>
+        <MoreVertIcon />
       </button>
 
       {/* Lista da Lista */}
