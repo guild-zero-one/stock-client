@@ -18,6 +18,9 @@ import BadgeInline from "@/components/badge-inline";
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import Switch from "@/components/switch";
+import Button from "@/components/button";
+import Accordion from "@/components/accordion";
 
 const ProdutoPage = () => {
   const { marcaId } = useParams();
@@ -26,6 +29,8 @@ const ProdutoPage = () => {
   const [marca, setMarca] = useState<Fornecedor>();
   const [produto, setProduto] = useState<Produto>();
   const [imagem, setImagem] = useState<ImagemProduto>();
+
+  const [catalogo, setCatalogo] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,12 +55,16 @@ const ProdutoPage = () => {
   const handleCatalogo = () => {
     return produto?.catalogo ? " Habilitado" : " Desabilitado"
   }
+
+  const switchCatalogo = () => {
+    setCatalogo(!produto?.catalogo)
+  }
   return (
     <div className="w-full">
       {produto && marca && <Header title="Detalhes" subtitle={produto.nome} />}
 
       {/* Grid */}
-      <div className="grid mx-auto px-4">
+      <div className="gap-4 grid mx-auto px-2 pb-1">
 
         {imagem?.urlImagem ? (
           <img
@@ -70,9 +79,10 @@ const ProdutoPage = () => {
         )}
 
 
-        {/* Card */}
+        {/* Card Descrição */}
         <div className="flex flex-col gap-2 bg-white p-4 border border-gray-dark rounded-xl">
-          {/* Text */}
+
+          {/* Produto Nome, Valor e Marca*/}
           <div className="flex justify-between items-center w-full h-fit">
             <div className="flex flex-col">
               <span className="text-text-secondary text-xs/1">{marca?.nome}</span>
@@ -83,6 +93,7 @@ const ProdutoPage = () => {
             </div>
           </div>
 
+          {/* Produto Unidades, Pedidos, Catalogo e ID  */}
           <div className="flex flex-col gap-1 text-text-secondary text-sm">
             <div className="flex gap-1">
               <Inventory2OutlinedIcon fontSize="small" />
@@ -108,8 +119,41 @@ const ProdutoPage = () => {
               <span className="text-text-desactive text-xs">{`Código ${produto?.id}`}</span>
             </div>
           </div>
-
         </div>
+
+        {/* Card Entiqueta */}
+        <div className="flex flex-col gap-2 bg-white p-4 border border-gray-dark rounded-xl">
+          <Accordion title="Entiquetas">
+          <p>Pe</p>
+          </Accordion>
+        </div>
+
+        {/* Descrição Avançada */}
+        <div className="flex flex-col gap-2 bg-white p-4 border border-gray-dark rounded-xl">
+          <Accordion title="Descrição Avançada">
+            <div className="w-full">
+              <div className="flex gap-1 text-sm">
+                <ShoppingBagOutlinedIcon fontSize="small" />
+                <BadgeInline>{1}</BadgeInline>
+                <span>Unidades em Estoque</span>
+              </div>
+            </div>
+          </Accordion>
+        </div>
+
+        <footer className="flex justify-between w-full">
+          <div>
+            <p className="text-text-secondary text-xs">Exibição do catalogo</p>
+            <Switch
+              id="catalogo"
+              onChange={() => switchCatalogo()}
+              checked={produto?.catalogo}
+            />
+          </div>
+          <div>
+            <Button label="Editar Produto" />
+          </div>
+        </footer>
       </div>
 
     </div>
