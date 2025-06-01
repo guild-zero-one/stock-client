@@ -19,6 +19,7 @@ import DropdownItem from "@/components/dropdown/dropdown-item";
 import AddCircle from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import SearchIcon from "@mui/icons-material/Search";
+import Link from "next/link";
 
 export default function ProdutosPage() {
 
@@ -56,7 +57,9 @@ export default function ProdutosPage() {
     <div className="flex flex-col w-full min-h-dvh">
       <Header title="Estoque" subtitle={fornecedor?.nome ?? "Carregando..."}>
         <DropdownAdd>
-          <DropdownItem text="Editar Marca" icon={<EditIcon />} />
+          <Link href={`/estoque/marcas/${marcaId}/editar`}>
+            <DropdownItem text="Editar Marca" icon={<EditIcon />} />
+          </Link>
           <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
         </DropdownAdd>
       </Header>
