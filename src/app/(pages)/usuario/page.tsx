@@ -3,7 +3,7 @@
 import Header from "@/components/header";
 import type { Usuario } from "@/models/Usuario/Usuario";
 import { useEffect, useState } from "react";
-import { editarUsuario, usuarioAutenticado } from "@/api/spring/services/UsuarioService";
+import { editarUsuario, loggout, usuarioAutenticado } from "@/api/spring/services/UsuarioService";
 import PersonIcon from '@mui/icons-material/Person';
 import Button from "@/components/button";
 import { useRouter } from "next/navigation";
@@ -36,11 +36,18 @@ export default function Usuario() {
             setUsuarioEditado({ ...usuario });
         }
     }
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("email");
-        router.push("/login");
+    const handleLogout = async () => {
+        try {
+            localStorage.removeItem("token");
+            localStorage.removeItem("email");
+            await loggout();
+        } catch (error) {
+            console.error("Erro ao fazer logout:", error);
+        } finally {
+            router.push("/login");
+        }
     };
+
 
     const inative = () => {
         return editar ? false : true;
@@ -89,14 +96,7 @@ export default function Usuario() {
                         disabled={inative()}
                         handleChange={handleUsuarioEditado("sobrenome")}
                     />
-                    <Input
-                        label="Apelido"
-                        name="apelido"
-                        iconSymbol={<PersonIcon />}
-                        value={editar ? usuarioEditado?.apelido ?? "" : usuario?.apelido ?? ""}
-                        disabled={inative()}
-                        handleChange={handleUsuarioEditado("apelido")}
-                    />
+
                     <Input
                         label="Email"
                         name="email"
@@ -125,8 +125,8 @@ export default function Usuario() {
                         <>
                             <div className="flex flex-col gap-2">
                                 <Button label="Editar perfil" fullWidth onClick={() => setEditar(!editar)} />
-                                <Button label="Encerrar Sessão" fullWidth variant="outlined" onClick={handleLogout} />
                                 <Button label="Alterar Senha" fullWidth variant="outlined" />
+                                <Button label="Encerrar Sessão" fullWidth variant="outlined" onClick={handleLogout} />
                             </div>
                         </>
                     )}
