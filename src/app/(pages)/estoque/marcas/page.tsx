@@ -15,7 +15,6 @@ import DropdownItem from "@/components/dropdown/dropdown-item";
 
 import SearchIcon from "@mui/icons-material/Search";
 import AddCircle from "@mui/icons-material/AddCircle";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Estoque() {
 
@@ -50,7 +49,7 @@ export default function Estoque() {
         <div className="relative flex flex-col w-full min-h-screen">
             <Header title="Estoque" subtitle="Marca">
                 <DropdownAdd>
-                    <Link href={"#"}>
+                    <Link href={"./marcas/criar"}>
                         <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
                     </Link>
                 </DropdownAdd>
