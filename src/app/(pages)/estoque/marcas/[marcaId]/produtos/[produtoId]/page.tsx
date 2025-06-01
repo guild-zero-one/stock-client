@@ -95,27 +95,27 @@ const ProdutoPage = () => {
 
           {/* Produto Unidades, Pedidos, Catalogo e ID  */}
           <div className="flex flex-col gap-1 text-text-secondary text-sm">
-            <div className="flex gap-1">
-              <Inventory2OutlinedIcon fontSize="small" />
-              <BadgeInline>{produto?.quantidade}</BadgeInline>
+            <div className="flex items-center gap-1">
+              <Inventory2OutlinedIcon fontSize="medium" />
+              <BadgeInline value={produto?.quantidade} />
               <span>Unidades em Estoque</span>
             </div>
 
-            <div className="flex gap-1">
-              <ShoppingBagOutlinedIcon fontSize="small" />
-              <BadgeInline>10</BadgeInline>
+            <div className="flex items-center gap-1">
+              <ShoppingBagOutlinedIcon fontSize="medium" />
+              <BadgeInline value={1} />
               <span>Pedidos Pedentes</span>
             </div>
 
-            <div className="flex gap-1">
-              <LocalOfferOutlinedIcon fontSize="small" />
+            <div className="flex items-center gap-1">
+              <LocalOfferOutlinedIcon fontSize="medium" />
               <span>Catalogo
                 <span className={`${produto?.catalogo ? "text-ok-default" : "text-error-default"}`}>
                   {handleCatalogo()}
                 </span>
               </span>
             </div>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1">
               <span className="text-text-desactive text-xs">{`Código ${produto?.id}`}</span>
             </div>
           </div>
@@ -124,19 +124,60 @@ const ProdutoPage = () => {
         {/* Card Entiqueta */}
         <div className="flex flex-col gap-2 bg-white p-4 border border-gray-dark rounded-xl">
           <Accordion title="Entiquetas">
-          <p>Pe</p>
+            <p>Pe</p>
           </Accordion>
         </div>
 
         {/* Descrição Avançada */}
         <div className="flex flex-col gap-2 bg-white p-4 border border-gray-dark rounded-xl">
           <Accordion title="Descrição Avançada">
-            <div className="w-full">
-              <div className="flex gap-1 text-sm">
-                <ShoppingBagOutlinedIcon fontSize="small" />
-                <BadgeInline>{1}</BadgeInline>
-                <span>Unidades em Estoque</span>
+            <div className="flex flex-col gap-2 w-full">
+
+              {/*  Vendas*/}
+              <div className="flex flex-col gap-1 w-full text-text-secondary">
+                <h3 className="text-text-secondary text-sm">Vendas</h3>
+
+                {/* Por Mês */}
+                <div className="flex items-center gap-1 px-2 text-sm">
+                  <ShoppingBagOutlinedIcon fontSize="medium" />
+                  <BadgeInline value={0} />
+                  <span>Unidades em Estoque</span>
+                </div>
+
+                {/* Por Total */}
+                <div className="flex items-center gap-1 px-2 text-sm">
+                  <ShoppingBagOutlinedIcon fontSize="medium" />
+                  <BadgeInline value={1} />
+                  <span>Unidades em Estoque</span>
+                </div>
               </div>
+
+              {/*  Validade*/}
+              <div className="flex flex-col gap-1 w-full text-text-secondary">
+                <h3 className="text-text-secondary text-sm">Validade</h3>
+
+                {/* Por Mês */}
+                <div className="flex items-center gap-1 px-2 text-sm">
+                  <ShoppingBagOutlinedIcon fontSize="medium" />
+                  <BadgeInline value={0} />
+                  <span>Até 6 Meses</span>
+                </div>
+
+                {/* Por Total */}
+                <div className="flex items-center gap-1 px-2 text-sm">
+                  <ShoppingBagOutlinedIcon fontSize="medium" />
+                  <BadgeInline value={1} />
+                  <span>Entre 6 e 12 Meses</span>
+                </div>
+
+                {/* Por Total */}
+                <div className="flex items-center gap-1 px-2 text-sm">
+                  <ShoppingBagOutlinedIcon fontSize="medium" />
+                  <BadgeInline value={1} />
+                  <span>Mais de 12 Meses</span>
+                </div>
+              </div>
+
             </div>
           </Accordion>
         </div>
