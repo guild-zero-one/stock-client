@@ -6,21 +6,15 @@ import { listarClientes } from "@/api/spring/services/ClienteService";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 
-import Link from "next/link";
-
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Filter from "@/components/filter";
-import DropdownAdd from "@/components/dropdown/dropdown-add";
-import DropdownItem from "@/components/dropdown/dropdown-item";
 import CustomersList from "@/components/customers-list";
 
-import AddCircle from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 
-export default function Cliente() {
+export default function EscolherCliente() {
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
-
   const [filter, setFilter] = useState<string>("Pedidos");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -42,7 +36,9 @@ export default function Cliente() {
 
     if (searchTerm) {
       todosClientes = todosClientes.filter((cliente) =>
-        cliente.nome.toLowerCase().includes(searchTerm.toLowerCase())
+        `${cliente.nome} ${cliente.sobrenome}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
       );
     }
 
@@ -67,13 +63,7 @@ export default function Cliente() {
 
   return (
     <div className="relative flex flex-col w-full min-h-screen bg-white-default">
-      <Header title="Todos" subtitle="Meus clientes">
-        <DropdownAdd>
-          <Link href={"clientes/adicionar"}>
-            <DropdownItem text="Adicionar Cliente" icon={<AddCircle />} />
-          </Link>
-        </DropdownAdd>
-      </Header>
+      <Header title="Escolher Cliente" subtitle="Adicionar Pedido"></Header>
 
       {/* Pesquisar */}
       <div className="flex flex-col gap-4 p-4 w-full">
@@ -93,12 +83,10 @@ export default function Cliente() {
       </div>
 
       {/* Lista de clientes */}
-      <div className="flex-1 overflow-y-auto">
-        <CustomersList
-          clientes={clientesOrdenados}
-          uri={(cliente) => `/clientes/${cliente.id}`}
-        />
-      </div>
+      <CustomersList
+        clientes={clientesOrdenados}
+        uri={(cliente) => `/pedidos/clientes/${cliente.id}`}
+      />
     </div>
   );
 }
