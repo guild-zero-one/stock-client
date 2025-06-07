@@ -54,9 +54,9 @@ export default function Pedido() {
 
   return (
     <div className="relative flex flex-col w-full min-h-screen bg-white-default">
-      <Header title="Todos" subtitle="Pedidos">
+      <Header title="Todos" subtitle="Pedidos" backRouter="/">
         <DropdownAdd>
-          <Link href={"pedidos/adicionar/clientes"}>
+          <Link href={"pedidos/clientes"}>
             <DropdownItem text="Adicionar Pedido" icon={<AddCircle />} />
           </Link>
         </DropdownAdd>
@@ -75,18 +75,24 @@ export default function Pedido() {
 
       {/* Lista de pedidos */}
       <div className="flex flex-col gap-2 p-4 w-full">
-        {pedidos.map((pedido, index) => (
-          <Link key={pedido.id} href={`/pedidos/detalhes/${pedido.id}`}>
-            <CardOrder
-              key={pedido.id}
-              index={index + 1}
-              nome={pedido.cliente.nome}
-              sobrenome={pedido.cliente.sobrenome}
-              valorPedido={calcularValorPedido(pedido.itens)}
-              criadoEm={pedido.criadoEm}
-            />
-          </Link>
-        ))}
+        {pedidos.length === 0 ? (
+          <div className="text-center text-gray-500">
+            Nenhum pedido encontrado :(
+          </div>
+        ) : (
+          pedidos.map((pedido, index) => (
+            <Link key={pedido.id} href={`/pedidos/detalhes/${pedido.id}`}>
+              <CardOrder
+                key={pedido.id}
+                index={index + 1}
+                nome={pedido.cliente.nome}
+                sobrenome={pedido.cliente.sobrenome}
+                valorPedido={calcularValorPedido(pedido.itens)}
+                criadoEm={pedido.criadoEm}
+              />
+            </Link>
+          ))
+        )}
       </div>
     </div>
   );

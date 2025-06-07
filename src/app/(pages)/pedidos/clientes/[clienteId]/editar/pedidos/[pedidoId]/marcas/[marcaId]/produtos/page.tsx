@@ -6,7 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
 import { buscarClientePorId } from "@/api/spring/services/ClienteService";
-import { criarPedido } from "@/api/spring/services/PedidoVendaService";
+import {
+  buscarPedidoPorId,
+  editarPedido,
+} from "@/api/spring/services/PedidoVendaService";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 import { Produto } from "@/models/Produto/Produto";
@@ -21,7 +24,7 @@ import Toast from "@/components/toast";
 import SearchIcon from "@mui/icons-material/Search";
 import { AssignmentTurnedInOutlined } from "@mui/icons-material";
 
-export default function EscolherProduto() {
+export default function EditarEscolherProduto() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [cliente, setCliente] = useState<ClienteResponse | null>(null);
   const [inputPesquisar, setInputPesquisar] = useState("");
@@ -40,7 +43,7 @@ export default function EscolherProduto() {
 
   const toastMap = {
     success: {
-      title: "Pedido adicionado com sucesso",
+      title: "Produto adicionado com sucesso",
       message: "Você será redirecionado para os detalhes do pedido.",
       type: "success",
     },
@@ -51,7 +54,7 @@ export default function EscolherProduto() {
     },
   } as const;
 
-  const { marcaId, clienteId } = useParams();
+  const { marcaId, clienteId, pedidoId } = useParams();
 
   useEffect(() => {
     const fetchFornecedor = async () => {
@@ -77,22 +80,44 @@ export default function EscolherProduto() {
 
   const router = useRouter();
 
-  const adicionarPedido = async () => {
+  const editar = async () => {
     if (!produtoSelecionado) return;
 
-    const pedido = {
-      idUsuario: Number(clienteId),
-      itens: [
-        {
-          idProduto: produtoSelecionado?.id,
-          quantidade: 1,
-          precoUnitario: produtoSelecionado?.precoUnitario,
-        },
-      ],
-    };
-
     try {
-      const response = await criarPedido(pedido);
+      const pedido = await buscarPedidoPorId(pedidoId);
+
+      console.log("Pedido Original:", pedido);
+
+      const itens = pedido.itens.map((item) => ({
+        idProduto: item.idProduto,
+        quantidade: item.quantidade,
+        precoUnitario: item.precoUnitario,
+      }));
+
+      const index = itens.findIndex(
+        (item) => item.idProduto === produtoSelecionado.id
+      );
+
+      if (index >= 0) {
+        itens[index].quantidade += 1;
+      } else {
+        itens.push({
+          idProduto: produtoSelecionado.id,
+          quantidade: 1,
+          precoUnitario: produtoSelecionado.precoUnitario,
+        });
+      }
+
+      const pedidoAtualizado = {
+        idUsuario: Number(clienteId),
+        itens: itens,
+      };
+
+      console.log("Pedido Atualizado:", pedidoAtualizado);
+
+      const response = await editarPedido(pedidoId, pedidoAtualizado);
+
+      console.log("Resposta do Pedido Atualizado:", response);
 
       showToast("success");
 
@@ -158,10 +183,10 @@ export default function EscolherProduto() {
         body={
           <div className="flex flex-col gap-4">
             <p>
-              Deseja adicionar pedido para
-              <b className="text-pink-default"> {cliente?.nome} </b>
-              com o produto inicial sendo
-              <b className="text-pink-default"> {produtoSelecionado?.nome}</b>?
+              Deseja adicionar o produto
+              <b className="text-pink-default"> {produtoSelecionado?.nome} </b>
+              para o pedido do
+              <b className="text-pink-default"> {cliente?.nome}</b>?
             </p>
 
             <div className="flex flex-col gap-2">
@@ -173,11 +198,7 @@ export default function EscolherProduto() {
                   setModalAberto(false);
                 }}
               ></Button>
-              <Button
-                fullWidth
-                label="Adicionar"
-                onClick={adicionarPedido}
-              ></Button>
+              <Button fullWidth label="Adicionar" onClick={editar}></Button>
             </div>
           </div>
         }
