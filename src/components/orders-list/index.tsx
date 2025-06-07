@@ -28,24 +28,28 @@ export default function OrdersList({
   return (
     <div className="flex flex-col min-h-screen bg-white-default relative">
       <div className="flex-grow overflow-y-auto p-4 pb-24 flex flex-col gap-6">
-        {Object.entries(produtosPorMarca).map(([marca, lista]) => (
-          <div key={marca} className="flex flex-col gap-4">
-            <DetailBrand marca={marca} quantidadeMarca={lista.length} />
+        {Object.keys(produtosPorMarca).length === 0 ? (
+          <p className="text-center text-gray-500">Sem produtos no pedido :(</p>
+        ) : (
+          Object.entries(produtosPorMarca).map(([marca, lista]) => (
+            <div key={marca} className="flex flex-col gap-4">
+              <DetailBrand marca={marca} quantidadeMarca={lista.length} />
 
-            {lista.map((item, index) => (
-              <CardProduct
-                key={index}
-                produtoId={item.produto.id}
-                nome={item.produto.nome}
-                precoUnitario={item.item.precoUnitario}
-                quantidade={item.item.quantidade}
-                imagemUrl={item.produto.imagens[0]?.urlImagem ?? ""}
-                atualizar={atualizar}
-                deletar={deletar}
-              />
-            ))}
-          </div>
-        ))}
+              {lista.map((item, index) => (
+                <CardProduct
+                  key={index}
+                  produtoId={item.produto.id}
+                  nome={item.produto.nome}
+                  precoUnitario={item.item.precoUnitario}
+                  quantidade={item.item.quantidade}
+                  imagemUrl={item.produto.imagens[0]?.urlImagem ?? ""}
+                  atualizar={atualizar}
+                  deletar={deletar}
+                />
+              ))}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

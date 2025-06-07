@@ -40,7 +40,14 @@ export default function CardOrder({
         {criadoEm && (
           <div className="flex items-center text-sm text-text-secondary gap-1">
             <CalendarMonth fontSize="inherit" />
-            <p>{criadoEm.toDateString()}</p>
+            <p>
+              {" "}
+              {new Date(criadoEm).toLocaleString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </p>
           </div>
         )}
       </div>
