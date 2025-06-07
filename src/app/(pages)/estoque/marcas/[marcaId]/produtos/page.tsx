@@ -60,7 +60,10 @@ export default function ProdutosPage() {
           <Link href={`/estoque/marcas/${marcaId}/editar`}>
             <DropdownItem text="Editar Marca" icon={<EditIcon />} />
           </Link>
-          <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+
+          <Link href={`/estoque/marcas/${marcaId}/produtos/criar`}>
+            <DropdownItem text="Adicionar Produto" icon={<AddCircle />} />
+          </Link>
         </DropdownAdd>
       </Header>
 
