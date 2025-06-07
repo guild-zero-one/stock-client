@@ -6,4 +6,5 @@ export interface Fornecedor {
   imagemUrl: string;
   descricao: string;
   produtos: Produto[];
+  cnpj: string;
 }

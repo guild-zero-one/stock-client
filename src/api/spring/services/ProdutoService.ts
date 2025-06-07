@@ -1,4 +1,4 @@
-import { Produto } from "@/models/Produto/Produto";
+import { Produto, ProdutoCreate } from "@/models/Produto/Produto";
 import api from "../api";
 
 const router = "/produtos";
@@ -36,3 +36,14 @@ export const produtoPorMarca = async (marcaId: number) => {
     throw error;
   }
 };
+
+export const cadastrarProduto = async (produto: ProdutoCreate) => {
+  try {
+    const response = await api.post<Produto>(router, produto);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao cadastrar produto:", error);
+    throw error;
+  }
+};
+

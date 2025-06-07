@@ -1,10 +1,16 @@
 export interface Produto {
   id: number;
   nome: string;
-  desc: string;
-  valorVenda: number;
-  precoUnitario: number;
+  sku: string;
+  descricao: string;
+  tag: string;
   quantidade: number;
+  precoUnitario: number;
+  valorVenda: number;
   catalogo: boolean;
   fornecedorId: number;
 }
+
+export type ProdutoCreate = Omit<Produto, 'id' | 'descricao'>;
+
+
