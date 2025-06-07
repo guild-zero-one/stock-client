@@ -23,9 +23,12 @@ import Button from "@/components/button";
 import Toast from "@/components/toast";
 
 import Person from "@mui/icons-material/Person";
+import Modal from "@/components/modal-popup";
+import { PersonRemoveOutlined } from "@mui/icons-material";
 
 export default function DetalheCliente() {
   const [toast, setToast] = useState<null | "success" | "error">(null);
+  const [modalAberto, setModalAberto] = useState(false);
 
   const showToast = (type: "success" | "error") => {
     setToast(null);
@@ -104,9 +107,10 @@ export default function DetalheCliente() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const clienteResponse = await editarCliente(clienteId, cliente);
+      await editarCliente(clienteId, cliente);
+      const clienteResponse = await buscarClientePorId(clienteId);
 
-      if (!clienteResponse.contato) {
+      if (clienteResponse.contato === null) {
         await criarContato(clienteResponse.id, contato);
       } else {
         await editarContato(clienteResponse.contato.id, contato);
@@ -157,6 +161,39 @@ export default function DetalheCliente() {
         </div>
       </div>
 
+      <Modal
+        open={modalAberto}
+        icon={<PersonRemoveOutlined fontSize="inherit" />}
+        onClose={() => {
+          setModalAberto(false);
+        }}
+        title={<p>Desativar Cliente</p>}
+        body={
+          <div className="flex flex-col gap-4">
+            <span className="flex flex-col gap-1">
+              <p className=" text-center">Deseja desativar este cliente?</p>
+              <p className="text-pink-default font-bold">
+                Essa ação é irreversível e não poderá ser desfeita.
+              </p>
+            </span>
+
+            <span className="flex flex-col gap-2">
+              <Button
+                label="Cancelar"
+                variant="outlined"
+                fullWidth
+                onClick={() => setModalAberto(false)}
+              />
+              <Button
+                label="Desativar Cliente"
+                fullWidth
+                onClick={handleDesativar}
+              />
+            </span>
+          </div>
+        }
+      />
+
       {/* Adicionar Cliente */}
       <form onSubmit={handleUpdate} className="flex flex-col gap-4 p-4 w-full">
         <div className="flex gap-2">
@@ -193,7 +230,7 @@ export default function DetalheCliente() {
           label="Excluir"
           variant="outlined"
           fullWidth
-          onClick={handleDesativar}
+          onClick={() => setModalAberto(true)}
         />
         <Button type="submit" label="Editar" fullWidth />
       </form>

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { criarCliente } from "@/api/spring/services/ClienteService";
 import { criarContato } from "@/api/spring/services/ContatoService";
 
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
@@ -80,7 +80,7 @@ export default function AdicionarCliente() {
     e.preventDefault();
     try {
       const clienteResponse = await criarCliente(cliente);
-      const contatoResponse = await criarContato(clienteResponse.id, contato);
+      await criarContato(clienteResponse.id, contato);
 
       showToast("success");
 
