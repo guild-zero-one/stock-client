@@ -48,3 +48,26 @@ export const criarPedido = async (pedido: PedidoRequest) => {
     throw error;
   }
 };
+
+export const editarPedido = async (id: ParamValue, pedido: PedidoRequest) => {
+  try {
+    const response = await api.put<PedidoResponse>(`${router}/${id}`, pedido);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao editar pedido:", error);
+    throw error;
+  }
+};
+
+export const alterarStatusPedido = async (id: ParamValue, status: string) => {
+  try {
+    const response = await api.patch<PedidoResponse>(
+      `${router}/status/${id}`,
+      status
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao alterar status do pedido:", error);
+    throw error;
+  }
+};
