@@ -28,8 +28,12 @@ export default function Cliente() {
     const fetchClientes = async () => {
       try {
         const response: ClienteResponse[] = await listarClientes();
-        console.log("Clientes:", response);
-        setClientes(response);
+
+        const clientesFiltrados = response.filter((cliente) =>
+          cliente.permissao.includes("COMUM")
+        );
+
+        setClientes(clientesFiltrados);
       } catch (error) {
         console.error("Erro ao listar clientes:", error);
       }

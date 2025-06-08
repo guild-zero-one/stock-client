@@ -28,8 +28,10 @@ export const produtoPorId = async (id: number) => {
 // Listar produto por marca
 export const produtoPorMarca = async (marcaId: number) => {
   try {
-    const response = await api.get<Produto[]>(`${router}/fornecedor/${marcaId}`);
-    console.log(response.data)
+    const response = await api.get<Produto[]>(
+      `${router}/fornecedor/${marcaId}`
+    );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Erro ao listar produto:", error);
@@ -47,3 +49,12 @@ export const cadastrarProduto = async (produto: ProdutoCreate) => {
   }
 };
 
+export const atualizarProduto = async (id: number, produto: Produto) => {
+  try {
+    const response = await api.patch<Produto>(`${router}/${id}`, produto);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar produto:", error);
+    throw error;
+  }
+};

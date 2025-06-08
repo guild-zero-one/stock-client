@@ -12,7 +12,7 @@ interface ListaClientesProps {
 export default function CustomersList({ clientes, uri }: ListaClientesProps) {
   if (clientes.length === 0) {
     return (
-      <p className="text-center text-gray-500">Nenhum cliente encontrado.</p>
+      <p className="text-center text-gray-500">Nenhum cliente encontrado :(</p>
     );
   }
 
