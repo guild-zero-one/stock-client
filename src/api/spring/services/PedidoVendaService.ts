@@ -62,8 +62,7 @@ export const editarPedido = async (id: ParamValue, pedido: PedidoRequest) => {
 export const alterarStatusPedido = async (id: ParamValue, status: string) => {
   try {
     const response = await api.patch<PedidoResponse>(
-      `${router}/status/${id}`,
-      status
+      `${router}/status/${id}?status=${status}`
     );
     return response.data;
   } catch (error) {
