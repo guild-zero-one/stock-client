@@ -1,19 +1,27 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 import Link from "next/link";
 
 import { buscarClientePorId } from "@/api/spring/services/ClienteService";
 import { buscarPedidoDetalhadoPorId } from "@/api/spring/services/PedidoHasClienteService";
-import { alterarStatusPedido } from "@/api/spring/services/PedidoVendaService";
+import {
+  alterarStatusPedido,
+  editarPedido,
+} from "@/api/spring/services/PedidoVendaService";
+import { cadastrarVenda } from "@/api/spring/services/VendaService";
+import {
+  atualizarProduto,
+  produtoPorId,
+} from "@/api/spring/services/ProdutoService";
 
 import { PedidoHasProduto } from "@/models/Pedido/PedidoHasProduto";
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 
 import Header from "@/components/header";
-import FooterOrder from "@/components/footer";
+import Footer from "@/components/footer";
 import DetailOrder from "@/components/detail-order";
 import OrdersList from "@/components/orders-list";
 import DropdownAdd from "@/components/dropdown/dropdown-add";
@@ -38,7 +46,17 @@ export default function DetalhePedido() {
     null
   );
   const [toast, setToast] = useState<
-    "successCancel" | "errorCancel" | "successFinalize" | "errorFinalize" | null
+    | "successCancel"
+    | "errorCancel"
+    | "successFinalize"
+    | "errorFinalize"
+    | "successSave"
+    | "errorSave"
+    | "quantityError"
+    | null
+  >(null);
+  const [customQuantityMessage, setCustomQuantityMessage] = useState<
+    string | null
   >(null);
   const [desconto, setDesconto] = useState<number>(0);
 
@@ -47,7 +65,15 @@ export default function DetalhePedido() {
   };
 
   const showToast = (
-    type: "successCancel" | "errorCancel" | "successFinalize" | "errorFinalize"
+    type:
+      | "successCancel"
+      | "errorCancel"
+      | "successFinalize"
+      | "errorFinalize"
+      | "successSave"
+      | "errorSave"
+      | "quantityError"
+      | null
   ) => {
     setToast(null);
     setTimeout(() => {
@@ -56,6 +82,16 @@ export default function DetalhePedido() {
   };
 
   const toastMap = {
+    successSave: {
+      title: "Pedido atualizado com sucesso",
+      message: "Você será redirecionado para os detalhes do pedido.",
+      type: "success",
+    },
+    errorSave: {
+      title: "Erro ao atualizar pedido",
+      message: "Verique as informações e tente novamente.",
+      type: "error",
+    },
     successCancel: {
       title: "Pedido cancelado com sucesso",
       message: "Você será redirecionado para os detalhes do pedido.",
@@ -74,6 +110,13 @@ export default function DetalhePedido() {
     errorFinalize: {
       title: "Erro ao finalizar pedido",
       message: "Verique as informações e tente novamente.",
+      type: "error",
+    },
+    quantityError: {
+      title: "Erro de quantidade",
+      message:
+        customQuantityMessage ||
+        "Quantidade insuficiente em estoque para finalizar o pedido. ",
       type: "error",
     },
   } as const;
@@ -129,30 +172,115 @@ export default function DetalhePedido() {
     0
   );
 
-  const finalizarPedido = async () => {
-    if (!pedido) return;
+  const router = useRouter();
 
-    setModalTipo("finalizar");
+  const finalizarPedido = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const checarEstoque = async () => {
+      const produtos = await Promise.all(
+        (pedido?.itens || []).map((item) => produtoPorId(item.produto.id))
+      );
+
+      for (let i = 0; i < produtos.length; i++) {
+        const produto = produtos[i];
+        const item = pedido?.itens[i];
+        if (produto && item) {
+          if (produto.quantidade < item.item.quantidade) {
+            setCustomQuantityMessage(
+              `Estoque insuficiente para o produto: ${produto.nome}.`
+            );
+            throw new Error(
+              "Quantidade insuficiente em estoque do produto: " + produto.nome
+            );
+          }
+        }
+      }
+    };
+
+    const venda = {
+      desconto: desconto,
+      pagamentoRealizado: true,
+      pedidos: [Number(pedidoId)],
+    };
 
     try {
+      setModalAberto(false);
+
+      await checarEstoque();
+
+      await Promise.all(
+        (pedido?.itens || []).map(async (item) => {
+          const produto = await produtoPorId(item.produto.id);
+          if (produto) {
+            const quantidadeAtualizada =
+              produto.quantidade - item.item.quantidade;
+            produto.quantidade = quantidadeAtualizada;
+            await atualizarProduto(produto.id, produto);
+          }
+        })
+      );
+
       await alterarStatusPedido(pedidoId, "CONCLUIDO");
+      await cadastrarVenda(venda);
+
       showToast("successFinalize");
+
+      setTimeout(() => {
+        router.push(`/pedidos`);
+      }, 3000);
     } catch (error) {
-      showToast("errorFinalize");
+      if (
+        error instanceof Error &&
+        error.message.includes("Quantidade insuficiente")
+      ) {
+        showToast("quantityError");
+      } else {
+        showToast("errorFinalize");
+      }
     }
   };
 
   const cancelarPedido = async () => {
-    if (!pedido) return;
-
-    setModalTipo("cancelar");
-    setModalAberto(true);
-
     try {
+      setModalAberto(false);
+
       await alterarStatusPedido(pedidoId, "CANCELADO");
+
       showToast("successCancel");
+
+      setTimeout(() => {
+        router.push(`/pedidos`);
+      }, 3000);
     } catch (error) {
       showToast("errorCancel");
+    }
+  };
+
+  const pendentePedido = async () => {
+    try {
+      setModalAberto(false);
+
+      const pedidoAtualizado = {
+        idUsuario: Number(pedido?.idUsuario),
+        itens: pedido?.itens
+          ? pedido.itens.map((item) => ({
+              idProduto: item.produto.id,
+              quantidade: item.item.quantidade,
+              precoUnitario: item.item.precoUnitario,
+            }))
+          : [],
+      };
+
+      await editarPedido(pedidoId, pedidoAtualizado);
+
+      showToast("successSave");
+
+      setTimeout(() => {
+        router.push(`/pedidos`);
+      }, 3000);
+    } catch (error) {
+      showToast("errorSave");
     }
   };
 
@@ -234,7 +362,7 @@ export default function DetalhePedido() {
             </div>
           ) : (
             <form
-              onSubmit={finalizarPedido}
+              onSubmit={(e) => finalizarPedido(e)}
               className="flex justify-center flex-col gap-2"
             >
               <p className="w-full text-center">Deseja finalizar o pedido?</p>
@@ -251,7 +379,7 @@ export default function DetalhePedido() {
 
               <div className="flex flex-col gap-2">
                 <Button
-                  onClick={() => setModalAberto(false)}
+                  onClick={pendentePedido}
                   fullWidth
                   label="Pendente"
                   variant="outlined"
@@ -263,7 +391,7 @@ export default function DetalhePedido() {
         }
       />
 
-      <FooterOrder
+      <Footer
         total={total ?? 0}
         onCancel={() => {
           setModalTipo("cancelar");
