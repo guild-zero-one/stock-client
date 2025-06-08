@@ -16,7 +16,7 @@ export default function CardOrder({
   criadoEm,
 }: CardOrderProps) {
   return (
-    <div className="flex justify-between items-center w-full shadow-md/20 rounded-sm p-4 gap-4">
+    <div className="flex justify-between items-center w-full shadow-md/10 rounded-sm p-4 gap-4">
       {/* Icon */}
       <div className="flex items-center bg-pink-default p-2 rounded-lg">
         <ShoppingBagOutlined fontSize="large" className="text-white" />
@@ -34,7 +34,7 @@ export default function CardOrder({
         </h2>
         {/* Valor Pedido */}
         <p className="text-sm text-text-secondary font-bold">
-          R$ {valorPedido}
+          R$ {valorPedido.toFixed(0)}
         </p>
         {/* Data Pedido */}
         {criadoEm && (

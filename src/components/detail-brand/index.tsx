@@ -23,7 +23,7 @@ export default function DetailBrand({
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between px-4 py-2 text-gray-m-dark">
+        <div className="flex items-center justify-between text-gray-m-dark">
           <KeyboardArrowDownIcon fontSize="inherit" />
         </div>
       </div>
