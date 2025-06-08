@@ -16,13 +16,7 @@ export const login = async (user: UsuarioLogin) => {
 
 export const usuarioAutenticado = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await api.get(`${router}/autenticado`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    console.log("Usuario encontrado: ", response.data)
+    const response = await api.get(`${router}/autenticado`);
     return response.data;
   } catch (error) {
     console.error("Deu ruim: ", error);
@@ -59,3 +53,16 @@ export const editarUsuario = async (id: number, usuarioEditado: Usuario) => {
     throw error
   }
 }
+
+export const loggout = async () => {
+  try {
+    const response = await api.post(`${router}/logout`);
+    return response;
+  }
+  catch (error) {
+    console.error("Erro ao encerrar sessão: ", error);
+    throw error
+  }
+}
+
+
