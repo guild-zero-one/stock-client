@@ -84,15 +84,24 @@ export default function EditarEscolherProduto() {
     if (!produtoSelecionado) return;
 
     try {
+      setModalAberto(false);
+
       const pedido = await buscarPedidoPorId(pedidoId);
 
-      console.log("Pedido Original:", pedido);
+      const itensMap = new Map();
+      pedido.itens.forEach((item) => {
+        if (itensMap.has(item.idProduto)) {
+          const existente = itensMap.get(item.idProduto);
+          itensMap.set(item.idProduto, {
+            ...existente,
+            quantidade: existente.quantidade + item.quantidade,
+          });
+        } else {
+          itensMap.set(item.idProduto, { ...item });
+        }
+      });
 
-      const itens = pedido.itens.map((item) => ({
-        idProduto: item.idProduto,
-        quantidade: item.quantidade,
-        precoUnitario: item.precoUnitario,
-      }));
+      const itens = Array.from(itensMap.values());
 
       const index = itens.findIndex(
         (item) => item.idProduto === produtoSelecionado.id
@@ -104,7 +113,7 @@ export default function EditarEscolherProduto() {
         itens.push({
           idProduto: produtoSelecionado.id,
           quantidade: 1,
-          precoUnitario: produtoSelecionado.precoUnitario,
+          precoUnitario: produtoSelecionado.valorVenda,
         });
       }
 
@@ -113,11 +122,7 @@ export default function EditarEscolherProduto() {
         itens: itens,
       };
 
-      console.log("Pedido Atualizado:", pedidoAtualizado);
-
       const response = await editarPedido(pedidoId, pedidoAtualizado);
-
-      console.log("Resposta do Pedido Atualizado:", response);
 
       showToast("success");
 

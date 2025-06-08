@@ -86,12 +86,14 @@ export default function EscolherProduto() {
         {
           idProduto: produtoSelecionado?.id,
           quantidade: 1,
-          precoUnitario: produtoSelecionado?.precoUnitario,
+          precoUnitario: produtoSelecionado?.valorVenda,
         },
       ],
     };
 
     try {
+      setModalAberto(false);
+
       const response = await criarPedido(pedido);
 
       showToast("success");
