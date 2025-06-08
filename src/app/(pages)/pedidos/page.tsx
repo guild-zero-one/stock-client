@@ -21,6 +21,7 @@ import CardOrder from "@/components/card-order";
 
 export default function Pedido() {
   const [pedidos, setPedidos] = useState<PedidoHasCliente[]>([]);
+  const [status, setStatus] = useState<string[]>(["PENDENTE"]);
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -52,6 +53,10 @@ export default function Pedido() {
     );
   }
 
+  const pedidosFiltrados = pedidos.filter((pedido) =>
+    status.includes(pedido.status)
+  );
+
   return (
     <div className="relative flex flex-col w-full min-h-screen bg-white-default">
       <Header title="Todos" subtitle="Pedidos" backRouter="/">
@@ -75,12 +80,12 @@ export default function Pedido() {
 
       {/* Lista de pedidos */}
       <div className="flex flex-col gap-2 p-4 w-full">
-        {pedidos.length === 0 ? (
+        {pedidosFiltrados.length === 0 ? (
           <div className="text-center text-gray-500">
             Nenhum pedido encontrado :(
           </div>
         ) : (
-          pedidos.map((pedido, index) => (
+          pedidosFiltrados.map((pedido, index) => (
             <Link key={pedido.id} href={`/pedidos/detalhes/${pedido.id}`}>
               <CardOrder
                 key={pedido.id}
