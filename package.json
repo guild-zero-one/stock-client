@@ -14,9 +14,11 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@tailwindcss/postcss": "^4.1.4",
+    "apexcharts": "^4.7.0",
     "axios": "^1.8.4",
     "next": "15.3.0",
     "react": "^19.0.0",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0",
     "tailwind-scrollbar-hide": "^2.0.0"
   },
