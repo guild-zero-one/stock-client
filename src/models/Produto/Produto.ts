@@ -11,6 +11,8 @@ export interface Produto {
   fornecedorId: number;
 }
 
-export type ProdutoCreate = Omit<Produto, 'id' | 'descricao'>;
+export type ProdutoCreate = Omit<Produto, 'id' | 'descricao'> & {
+  imagem?: File;
+};
 
 

@@ -17,10 +17,62 @@ import ResumoProdutos from "./adicionarProdutos";
 export default function CriarProduto() {
 
     const [newProduto, setNewProduto] = useState<Partial<ProdutoCreate>>({});
-    const [produtos, setProdutos] = useState<ProdutoCreate[]>([]);
+    const [produtos, setProdutos] = useState<ProdutoCreate[]>([
+        {
+            nome: "Perfume Malbec",
+            sku: "PRF-MAL-001",
+            tag: "perfume",
+            quantidade: 10,
+            precoUnitario: 59.9,
+            valorVenda: 79.9,
+            catalogo: true,
+            fornecedorId: 1,
+        },
+        {
+            nome: "Creme Hidratante Nativa SPA",
+            sku: "CRM-NAT-002",
+            tag: "hidratante",
+            quantidade: 25,
+            precoUnitario: 19.5,
+            valorVenda: 29.9,
+            catalogo: true,
+            fornecedorId: 2,
+        },
+        {
+            nome: "Esmalte Vermelho Luxo",
+            sku: "ESM-VRM-003",
+            tag: "esmalte",
+            quantidade: 40,
+            precoUnitario: 4.5,
+            valorVenda: 8.9,
+            catalogo: false,
+            fornecedorId: 3,
+        },
+        {
+            nome: "Loção Corporal Cuide-se Bem",
+            sku: "LOC-CUI-004",
+            tag: "loção",
+            quantidade: 15,
+            precoUnitario: 15.0,
+            valorVenda: 22.0,
+            catalogo: true,
+            fornecedorId: 1,
+        },
+        {
+            nome: "Batom Matte Rosa",
+            sku: "BAT-MAT-005",
+            tag: "batom",
+            quantidade: 30,
+            precoUnitario: 9.9,
+            valorVenda: 14.9,
+            catalogo: false,
+            fornecedorId: 2,
+        }
+    ]);
     const [marcas, setMarcas] = useState<Fornecedor[]>([])
     const { marcaId } = useParams();
     const [showProdList, setShowProdList] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -95,10 +147,29 @@ export default function CriarProduto() {
 
                     <div className="flex justify-between">
                         <div className="flex justify-center items-center border border-gray-dark rounded w-36 h-36 text-gray-300 text-6xl">
-                            <ImageIcon fontSize="inherit" />
+                            {newProduto.imagem ? (
+                                <img
+                                    src={URL.createObjectURL(newProduto.imagem)}
+                                    alt="Pré-visualização da imagem"
+                                    className="rounded w-full h-full object-cover"
+                                />
+                            ) : (
+                                <ImageIcon fontSize="inherit" />
+                            )}
                         </div>
 
-                        <ButtonFile onSelect={(file) => console.log(file)} label="Adicionar Imagem" accept="image/*" />
+                        <ButtonFile
+                            onSelect={(file) => {
+                                setNewProduto((prev) => ({
+                                    ...prev,
+                                    imagem: file ?? undefined,
+                                }));
+                            }}
+                            label="Adicionar Imagem"
+                            accept="image/*"
+                        />
+
+
                     </div>
 
                     {/* Inputs */}
