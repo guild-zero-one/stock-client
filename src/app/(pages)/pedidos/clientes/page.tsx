@@ -23,9 +23,13 @@ export default function EscolherCliente() {
       try {
         const response: ClienteResponse[] = await listarClientes();
 
-        const clientesFiltrados = response.filter((cliente) =>
-          cliente.permissao.includes("COMUM")
-        );
+        const clientesFiltrados = response
+          .filter((cliente) =>
+            cliente.permissao && cliente.permissao.includes
+              ? cliente.permissao.includes("COMUM")
+              : false
+          )
+          .filter((cliente) => cliente.ativo ?? true);
 
         setClientes(clientesFiltrados);
       } catch (error) {

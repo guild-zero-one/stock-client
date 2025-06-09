@@ -43,6 +43,7 @@ export default function DetalheCliente() {
     nome: "",
     sobrenome: "",
     email: "",
+    permissao: "COMUM",
   });
 
   const [contato, setContato] = useState({
@@ -60,6 +61,7 @@ export default function DetalheCliente() {
           nome: response.nome || "",
           sobrenome: response.sobrenome || "",
           email: response.email || "",
+          permissao: response.permissao || "COMUM",
         });
 
         setContato({
@@ -128,6 +130,8 @@ export default function DetalheCliente() {
 
   const handleDesativar = async () => {
     try {
+      setModalAberto(false);
+
       await desativarCliente(clienteId);
 
       showToast("success");
