@@ -198,10 +198,15 @@ export default function DetalhePedido() {
       }
     };
 
+    const hoje = new Date();
+
+    const dataVenda = hoje.toISOString().slice(0, 10);
+
     const venda = {
       desconto: desconto,
       pagamentoRealizado: true,
       pedidos: [Number(pedidoId)],
+      dataVenda: dataVenda,
     };
 
     try {
@@ -221,6 +226,16 @@ export default function DetalhePedido() {
         })
       );
 
+      await editarPedido(pedidoId, {
+        idUsuario: Number(pedido?.idUsuario),
+        itens: pedido?.itens
+          ? pedido.itens.map((item) => ({
+              idProduto: item.produto.id,
+              quantidade: item.item.quantidade,
+              precoUnitario: item.item.precoUnitario,
+            }))
+          : [],
+      });
       await alterarStatusPedido(pedidoId, "CONCLUIDO");
       await cadastrarVenda(venda);
 
