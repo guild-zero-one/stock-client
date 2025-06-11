@@ -1,6 +1,6 @@
 import api from "../api";
 
-const router = "/imagens/produto";
+const router = "/imagens";
 
 export const todasImagens = async () => {
   try {
@@ -14,7 +14,7 @@ export const todasImagens = async () => {
 
 export const imagensPorProduto = async (produtoId: number) => {
   try {
-    const response = await api.get(`${router}/${produtoId}`);
+    const response = await api.get(`${router}/produto/${produtoId}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar imagens por produto:", error);
@@ -28,8 +28,8 @@ export const cadastrarImagem = async (produtoId: number, imagem: File) => {
   formData.append(
     "dados",
     JSON.stringify({
-      imagemPrincipal: true,
-      produtoId: produtoId,
+      "imagemPrincipal": true,
+      "produtoId": produtoId,
     })
   );
 
