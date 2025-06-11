@@ -104,6 +104,12 @@ export default function ProdutoPage() {
     if (!produto || !file) return;
     try {
       await cadastrarImagem(produto.id, file);
+
+      showToast("success");
+
+      setTimeout(() => {
+        router.push(`/estoque/marcas/${produtoId}/produtos`);
+      }, 1000);
     } catch (error) {
       console.error("Erro ao adicionar imagem:", error);
     }
