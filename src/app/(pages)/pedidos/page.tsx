@@ -22,6 +22,7 @@ import CardOrder from "@/components/card-order";
 export default function Pedido() {
   const [pedidos, setPedidos] = useState<PedidoHasCliente[]>([]);
   const [status, setStatus] = useState<string[]>(["PENDENTE"]);
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -53,8 +54,11 @@ export default function Pedido() {
     );
   }
 
-  const pedidosFiltrados = pedidos.filter((pedido) =>
-    status.includes(pedido.status)
+  const pedidosFiltrados = pedidos.filter(
+    (pedido) =>
+      status.includes(pedido.status) &&
+      (!search ||
+        pedido.cliente?.nome?.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -75,6 +79,8 @@ export default function Pedido() {
           type="text"
           iconSymbol={<SearchIcon />}
           size="small"
+          value={search}
+          handleChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
