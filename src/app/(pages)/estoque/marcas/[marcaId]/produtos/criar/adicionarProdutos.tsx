@@ -1,7 +1,7 @@
 import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import AccordionProductList from "@/components/accordion/accordion-item";
 import Accordion from "@/components/accordion/products-accordion";
-import FooterOrder from "@/components/footer-order";
+import FooterOrder from "@/components/footer";
 import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import { ProdutoCreate } from "@/models/Produto/Produto";
 import { useParams } from "next/navigation";
