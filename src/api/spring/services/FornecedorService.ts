@@ -1,4 +1,4 @@
-import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
+import { Fornecedor, FornecedorCreate } from "@/models/Fornecedor/Fornecedor";
 import api from "../api";
 
 const router = "/fornecedores";
@@ -7,7 +7,6 @@ const router = "/fornecedores";
 export const todasMarcas = async () => {
   try {
     const response = await api.get<Paginacao<Fornecedor>>(router);
-    console.log("resposta: ", response.data)
     return response.data.content;
   } catch (error) {
     console.error("Erro ao listar marcas:", error);
@@ -33,6 +32,16 @@ export const produtosPorMarca = async (id: number) => {
     return response.data.produtos;
   } catch (error) {
     console.error("Erro ao listar produtos por marca:", error);
+    throw error;
+  }
+};
+
+export const criarFornecedor = async (fornecedor: FornecedorCreate) => {
+  try {
+    const response = await api.post<Fornecedor>(`${router}`, fornecedor);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar fornecedor:", error);
     throw error;
   }
 };
