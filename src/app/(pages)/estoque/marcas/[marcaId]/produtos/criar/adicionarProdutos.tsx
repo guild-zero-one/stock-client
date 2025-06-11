@@ -1,13 +1,18 @@
 import { marcaPorId } from "@/api/spring/services/FornecedorService";
 import AccordionProductList from "@/components/accordion/accordion-item";
 import Accordion from "@/components/accordion/products-accordion";
-import FooterOrder from "@/components/footer";
+import FooterProductList from "@/components/footer-product-list";
 import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
 import { ProdutoCreate } from "@/models/Produto/Produto";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ResumoProdutos({ produtos }: { produtos: ProdutoCreate[] }) {
+interface ResumoProps {
+    produtos: ProdutoCreate[];
+    showProdList: boolean;
+    setShowProdList: (value: boolean) => void;
+}
+export default function ResumoProdutos({ produtos, showProdList, setShowProdList } : ResumoProps){
 
     const [marcas, setMarcas] = useState<Fornecedor[]>([]);
 
@@ -51,9 +56,8 @@ export default function ResumoProdutos({ produtos }: { produtos: ProdutoCreate[]
 
             </div>
 
-        <FooterOrder total={0} onConfirm={function (): void {
-                throw new Error("Function not implemented.");
-            } } />
+            <FooterProductList total={0} onAdd={() => setShowProdList(false)} />
+
         </div>
     );
 }

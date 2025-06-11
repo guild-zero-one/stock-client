@@ -137,7 +137,9 @@ export default function CriarProduto() {
 
     return (
         showProdList ? (
-            <ResumoProdutos produtos={produtos} />
+            <ResumoProdutos produtos={produtos}
+                showProdList={showProdList}
+                setShowProdList={setShowProdList} />
         ) : (
             <main className="relative flex flex-col w-full min-h-screen">
                 <Header title="Adicionar" subtitle="Produto" />
