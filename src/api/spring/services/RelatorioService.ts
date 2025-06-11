@@ -41,7 +41,7 @@ export const faturamentoUltimos6Meses = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Erro ao listar quantidade produtos últimos 6 meses:", error);
+    console.error("Erro ao listar valores vendas últimos 6 meses:", error);
     throw error;
   }
 };
@@ -53,7 +53,7 @@ export const quantidadePedidosUltimos6Meses = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Erro ao listar valores vendas últimos 6 meses:", error);
+    console.error("Erro ao listar quantidade produtos últimos 6 meses:", error);
     throw error;
   }
 };

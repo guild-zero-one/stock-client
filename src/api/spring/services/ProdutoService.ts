@@ -25,13 +25,22 @@ export const produtoPorId = async (id: number) => {
   }
 };
 
+export const produtoPorSku = async (sku: string) => {
+  try {
+    const response = await api.get<Produto>(`${router}/sku?sku=${sku}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao listar produto por sku:", error);
+    throw error;
+  }
+};
+
 // Listar produto por marca
 export const produtoPorMarca = async (marcaId: number) => {
   try {
     const response = await api.get<Produto[]>(
       `${router}/fornecedor/${marcaId}`
     );
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Erro ao listar produto:", error);

@@ -8,3 +8,9 @@ export interface Fornecedor {
   produtos: Produto[];
   cnpj: string;
 }
+
+export interface FornecedorCreate {
+  nome: string;
+  descricao: string;
+  cnpj: string;
+}
