@@ -6,13 +6,15 @@ const router = "/usuarios";
 
 export const login = async (user: UsuarioLogin) => {
   try {
-    const response = await api.post(`${router}/login`, user)
+    const response = await api.post(`${router}/login`, user);
     return response.data;
-  } catch (error) {
-    console.error("Erro ao realizar o login:", error);
+  } catch (error: any) {
+    console.error("Erro ao realizar o login:", error.response || error);
+    console.log("URL chamada:", `${router}/login`);
     throw error;
   }
 };
+
 
 export const usuarioAutenticado = async () => {
   try {
