@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: process.env.SPRING_API_URL,
   withCredentials: true,
   timeout: 10000, //10 Segundos
   headers: {
