@@ -1,60 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { jwtVerify } from 'jose'
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value
-  const path = request.nextUrl.pathname
+  const token = request.cookies.get("token")?.value;
+  const path = request.nextUrl.pathname;
 
-  const publicPaths = ['/login', '/_next', '/favicon.ico']
-  const protectedPaths = [
-    '/estoque',
-    '/clientes',
-    '/pedidos',
-    '/relatorio',
-    '/usuario',
-    '/dashboard',
-    '/',
-  ]
+  const publicPaths = ["/login", "/_next", "/favicon.ico"];
+  const protectedPaths = ["/estoque", "/clientes", "/pedidos", "/relatorio", "/usuario", "/dashboard", "/"];
 
-  const isPublicPath = publicPaths.some((publicPath) => path.startsWith(publicPath))
-  const isProtectedPath = protectedPaths.some((protectedPath) =>
-    path.startsWith(protectedPath)
-  )
+  const isPublicPath = publicPaths.some((publicPath) => path.startsWith(publicPath));
+  const isProtectedPath = protectedPaths.some((protectedPath) => path.startsWith(protectedPath));
 
   // Se for rota pública → segue normal
   if (isPublicPath) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
   // Se não for rota protegida → segue normal
   if (!isProtectedPath) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
   // A partir daqui, só entra quem precisa de autenticação
   if (!token) {
-    console.error('Token não encontrado.')
-    return NextResponse.redirect(new URL('/login', request.url))
+    console.error("Token não encontrado.");
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-    const { payload } = await jwtVerify(token, secret)
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-    console.log('Usuário autenticado:', payload)
+    await jwtVerify(token, secret);
 
-    // Evita que usuário autenticado volte pro login
-    if (path === '/login') {
-      return NextResponse.redirect(new URL('/', request.url))
+    if (path === "/login") {
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
-    return NextResponse.next()
+    return NextResponse.next();
   } catch (err) {
-    console.error('Token inválido ou expirado:', err)
-    return NextResponse.redirect(new URL('/login', request.url))
+    console.error("Token inválido ou expirado.");
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 }
 
 export const config = {
-  matcher: ['/((?!_next|favicon.ico).*)'], // intercepta tudo, mas decide dentro
-}
+  matcher: ["/((?!_next|favicon.ico).*)"],
+};
