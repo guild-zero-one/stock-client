@@ -15,6 +15,9 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "SimLady",
   description: "SimLady - Gestão de Estoque",
+  icons: {
+    icon: "/simlady.svg",
+  },
 };
 
 export default function RootLayout({
