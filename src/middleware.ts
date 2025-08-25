@@ -5,11 +5,23 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const path = request.nextUrl.pathname;
 
-  const publicPaths = ["/login", "/_next", "/favicon.ico"];
-  const protectedPaths = ["/estoque", "/clientes", "/pedidos", "/relatorio", "/usuario", "/dashboard", "/"];
+  const publicPaths = ["/login", "/_next", "/favicon.ico", "simlady.svg"];
+  const protectedPaths = [
+    "/estoque",
+    "/clientes",
+    "/pedidos",
+    "/relatorio",
+    "/usuario",
+    "/dashboard",
+    "/",
+  ];
 
-  const isPublicPath = publicPaths.some((publicPath) => path.startsWith(publicPath));
-  const isProtectedPath = protectedPaths.some((protectedPath) => path.startsWith(protectedPath));
+  const isPublicPath = publicPaths.some(publicPath =>
+    path.startsWith(publicPath)
+  );
+  const isProtectedPath = protectedPaths.some(protectedPath =>
+    path.startsWith(protectedPath)
+  );
 
   // Se for rota pública → segue normal
   if (isPublicPath) {
