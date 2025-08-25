@@ -1,56 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-export function middleware(request: NextRequest) {
-    const jwt = request.cookies.get('token');
-    const isAuth = jwt !== undefined;
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get("token")?.value;
+  const path = request.nextUrl.pathname;
 
-    if (!isAuth) {
-        console.error("token não encontrado.")
-    }
-    console.log("token recuperado: ", jwt)
+  const publicPaths = ["/login", "/_next", "/favicon.ico", "simlady.svg"];
+  const protectedPaths = [
+    "/estoque",
+    "/clientes",
+    "/pedidos",
+    "/relatorio",
+    "/usuario",
+    "/dashboard",
+    "/",
+  ];
 
-    const protectedPaths = [
-        '/estoque',         // Rota principal de estoque
-        '/estoque/.*',      // Qualquer sub-rota dentro de /estoque
-      
-        '/clientes',        // Rota principal de clientes
-        '/clientes/.*',     // Qualquer sub-rota dentro de /clientes
-        
-        '/pedidos',         // Rota principal de pedidos
-        '/pedidos/.*',      // Qualquer sub-rota dentro de /pedidos
-      
-        '/relatorio',       // Rota principal de relatorio
-        '/relatorio/.*',    // Qualquer sub-rota dentro de /relatorio
-      
-        '/usuario',          // Rota principal de perfil
-        '/usuario/.*',       // Qualquer sub-rota dentro de /perfil
-      
-        '/dashboard',        // Rota principal de dashboard
-        '/'
-      ];
-      
-    const path = request.nextUrl.pathname;
+  const isPublicPath = publicPaths.some(publicPath =>
+    path.startsWith(publicPath)
+  );
+  const isProtectedPath = protectedPaths.some(protectedPath =>
+    path.startsWith(protectedPath)
+  );
 
-    // Definir um conjunto de rotas públicas
-    const publicPaths = ['/login', '/_next', '/favicon.ico'];
+  // Se for rota pública → segue normal
+  if (isPublicPath) {
+    return NextResponse.next();
+  }
 
-    // Permitir acesso livre às rotas públicas
-    const isPublicPath = publicPaths.some((publicPath) => path.startsWith(publicPath));
+  // Se não for rota protegida → segue normal
+  if (!isProtectedPath) {
+    return NextResponse.next();
+  }
 
+  // A partir daqui, só entra quem precisa de autenticação
+  if (!token) {
+    console.error("Token não encontrado.");
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
-    if (isPublicPath) {
-        return NextResponse.next();
-    }
-    
-    // Redirecionar usuários não autenticados que tentam acessar rotas privadas
-    if (!isAuth && protectedPaths.some((protectedPath) => path.startsWith(protectedPath))) {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-    // Se o usuário estiver autenticado e tentar acessar /login, redireciona para o painel ou raiz
-    if (isAuth && path === '/login') {
-        return NextResponse.redirect(new URL('/', request.url));
+    await jwtVerify(token, secret);
+
+    if (path === "/login") {
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
-    return NextResponse.next(); // Continua o processamento normalmente
+    return NextResponse.next();
+  } catch (err) {
+    console.error("Token inválido ou expirado.");
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 }
+
+export const config = {
+  matcher: ["/((?!_next|favicon.ico).*)"],
+};

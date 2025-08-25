@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { criarCliente } from "@/api/spring/services/ClienteService";
 import { criarContato } from "@/api/spring/services/ContatoService";
+import { aplicarMascaraTelefone, removerMascaraTelefone } from "@/utils/masks";
 
 import axios from "axios";
 
@@ -42,7 +43,7 @@ export default function AdicionarCliente() {
 
   const handleCliente = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCliente((prevCliente) => ({
+    setCliente(prevCliente => ({
       ...prevCliente,
       [name]: value,
     }));
@@ -50,10 +51,26 @@ export default function AdicionarCliente() {
 
   const handleContato = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setContato((prevContato) => ({
-      ...prevContato,
-      [name]: value,
-    }));
+
+    if (name === "celular") {
+      if (value.length < contato.celular.length) {
+        setContato(prevContato => ({
+          ...prevContato,
+          [name]: value,
+        }));
+      } else {
+        const valorComMascara = aplicarMascaraTelefone(value);
+        setContato(prevContato => ({
+          ...prevContato,
+          [name]: valorComMascara,
+        }));
+      }
+    } else {
+      setContato(prevContato => ({
+        ...prevContato,
+        [name]: value,
+      }));
+    }
   };
 
   const toastMap = {
@@ -80,7 +97,14 @@ export default function AdicionarCliente() {
     e.preventDefault();
     try {
       const clienteResponse = await criarCliente(cliente);
-      await criarContato(clienteResponse.id, contato);
+
+      if (contato.celular.trim().length > 0) {
+        // Remove a máscara antes de enviar para o banco
+        const contatoSemMascara = {
+          celular: removerMascaraTelefone(contato.celular),
+        };
+        await criarContato(clienteResponse.id, contatoSemMascara);
+      }
 
       showToast("success");
 
@@ -142,10 +166,12 @@ export default function AdicionarCliente() {
           />
         </div>
         <Input
-          label="Telefone"
+          label="Celular"
           name="celular"
           size="small"
+          value={contato.celular}
           handleChange={handleContato}
+          maxLength={15}
         />
         <Input
           label="E-mail"

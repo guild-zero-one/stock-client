@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
+import { aplicarMascaraTelefone } from "@/utils/masks";
 
 import CardCustomer from "../card-customer";
 
@@ -18,12 +19,16 @@ export default function CustomersList({ clientes, uri }: ListaClientesProps) {
 
   return (
     <div className="flex flex-col gap-4 p-4 w-full">
-      {clientes.map((cliente) => (
+      {clientes.map(cliente => (
         <Link key={cliente.id} href={uri(cliente)}>
           <CardCustomer
             nome={cliente.nome}
             sobrenome={cliente.sobrenome}
-            contato={cliente.contato?.celular ?? "Não informado"}
+            contato={
+              cliente.contato?.celular
+                ? aplicarMascaraTelefone(cliente.contato.celular)
+                : "Celular não informado"
+            }
             qtdPedidos={cliente.qtdPedidos}
           />
         </Link>
