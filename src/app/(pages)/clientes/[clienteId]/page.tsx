@@ -14,6 +14,7 @@ import {
   criarContato,
   editarContato,
 } from "@/api/spring/services/ContatoService";
+import { aplicarMascaraTelefone, removerMascaraTelefone } from "@/utils/masks";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 
@@ -30,14 +31,16 @@ export default function DetalheCliente() {
   const [toast, setToast] = useState<null | "success" | "error">(null);
   const [modalAberto, setModalAberto] = useState(false);
 
+  const { clienteId } = useParams();
+  const id = Array.isArray(clienteId) ? clienteId[0] : clienteId;
+  const router = useRouter();
+
   const showToast = (type: "success" | "error") => {
     setToast(null);
     setTimeout(() => {
       setToast(type);
     }, 10);
   };
-
-  const { clienteId } = useParams();
 
   const [cliente, setCliente] = useState({
     nome: "",
@@ -51,11 +54,11 @@ export default function DetalheCliente() {
   });
 
   useEffect(() => {
-    if (!clienteId) return;
+    if (!id) return;
 
     const fetchClientes = async () => {
       try {
-        const response: ClienteResponse = await buscarClientePorId(clienteId);
+        const response: ClienteResponse = await buscarClientePorId(id);
 
         setCliente({
           nome: response.nome || "",
@@ -69,15 +72,16 @@ export default function DetalheCliente() {
         });
       } catch (error) {
         console.error("Erro ao buscar cliente:", error);
+        showToast("error");
       }
     };
 
     fetchClientes();
-  }, [clienteId]);
+  }, [id]);
 
   const handleCliente = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCliente((prevCliente) => ({
+    setCliente(prevCliente => ({
       ...prevCliente,
       [name]: value,
     }));
@@ -85,13 +89,27 @@ export default function DetalheCliente() {
 
   const handleContato = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setContato((prevContato) => ({
-      ...prevContato,
-      [name]: value,
-    }));
-  };
 
-  const router = useRouter();
+    if (name === "celular") {
+      if (value.length < contato.celular.length) {
+        setContato(prevContato => ({
+          ...prevContato,
+          [name]: value,
+        }));
+      } else {
+        const valorComMascara = aplicarMascaraTelefone(value);
+        setContato(prevContato => ({
+          ...prevContato,
+          [name]: valorComMascara,
+        }));
+      }
+    } else {
+      setContato(prevContato => ({
+        ...prevContato,
+        [name]: value,
+      }));
+    }
+  };
 
   const toastMap = {
     success: {
@@ -108,14 +126,24 @@ export default function DetalheCliente() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await editarCliente(clienteId, cliente);
-      const clienteResponse = await buscarClientePorId(clienteId);
+    if (!id) {
+      showToast("error");
+      return;
+    }
 
-      if (clienteResponse.contato === null) {
-        await criarContato(clienteResponse.id, contato);
+    try {
+      await editarCliente(id, cliente);
+
+      const clienteAtualizado = await buscarClientePorId(id);
+
+      const contatoSemMascara = {
+        celular: removerMascaraTelefone(contato.celular),
+      };
+
+      if (!clienteAtualizado.contato) {
+        await criarContato(clienteAtualizado.id, contatoSemMascara);
       } else {
-        await editarContato(clienteResponse.contato.id, contato);
+        await editarContato(clienteAtualizado.contato.id, contatoSemMascara);
       }
 
       showToast("success");
@@ -124,22 +152,24 @@ export default function DetalheCliente() {
         router.push("/clientes");
       }, 3000);
     } catch (error) {
+      console.error("Erro na atualização:", error);
       showToast("error");
     }
   };
 
   const handleDesativar = async () => {
+    if (!id) return;
+
     try {
       setModalAberto(false);
-
-      await desativarCliente(clienteId);
-
+      await desativarCliente(id);
       showToast("success");
 
       setTimeout(() => {
         router.push("/clientes");
       }, 3000);
     } catch (error) {
+      console.error("Erro ao desativar:", error);
       showToast("error");
     }
   };
@@ -222,6 +252,7 @@ export default function DetalheCliente() {
           size="small"
           handleChange={handleContato}
           value={contato.celular}
+          maxLength={15}
         />
         <Input
           label="E-mail"
