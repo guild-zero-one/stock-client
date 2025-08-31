@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
-import peopleImage from "@/assets/images/people.jpg";
+
 
 import { usuarioAutenticado } from "@/api/spring/services/UsuarioService";
 import { quantidadePedidosEmAberto } from "@/api/spring/services/RelatorioService";
@@ -49,7 +49,7 @@ export default function Home() {
       {/* Banner */}
       <header className="relative h-[45vh] text-white">
         {/* Imagem de fundo */}
-        <Image className="z-0 object-center object-cover" src={peopleImage} alt="Pessoas" fill priority />
+        <Image className="z-0 object-center object-cover" src="/people.jpg" alt="Pessoas" fill priority />
 
         {/* Filtro de cor */}
         <div className="absolute inset-0 bg-pink-default/65" />

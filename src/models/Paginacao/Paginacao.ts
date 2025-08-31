@@ -1,4 +1,4 @@
-interface Paginacao<T> {
+export interface Paginacao<T> {
   content: T[];
   totalElements: number;
   totalPages: number;

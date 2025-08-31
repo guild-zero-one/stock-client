@@ -38,7 +38,6 @@ export default function ProductsOrdersList({
 
       if (produtoComImagens) {
         setProdutosComImagens(produtoComImagens);
-        console.log(produtoComImagens);
       }
     };
 

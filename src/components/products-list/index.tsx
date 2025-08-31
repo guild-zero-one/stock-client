@@ -31,7 +31,6 @@ export default function ProductsList({ produtos, fornecedor }: ProductsListProps
   
       if (produtoComImagens) {
         setProdutosComImagens(produtoComImagens);
-        console.log(produtoComImagens);
       }
     };
   
@@ -50,12 +49,10 @@ export default function ProductsList({ produtos, fornecedor }: ProductsListProps
   return (
     <div className="gap-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {produtosComImagens.map((produto) => {
-        console.log("produto: ", produto);
         const imagemPrincipal = produto.imagens?.find(
           (img: ImagemProduto) => img.imagemPrincipal === true
         );
 
-        console.log("principal: ", imagemPrincipal);
         return (
           <Link href={`/estoque/marcas/${fornecedor.id}/produtos/${produto.id}`} key={produto.id}>
             <ProductListItem produto={produto} imagem={imagemPrincipal} />

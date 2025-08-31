@@ -1,4 +1,5 @@
 import { Fornecedor, FornecedorCreate } from "@/models/Fornecedor/Fornecedor";
+import { Paginacao } from "@/models/Paginacao/Paginacao";
 import api from "../api";
 
 const router = "/fornecedores";
@@ -7,10 +8,10 @@ const router = "/fornecedores";
 export const todasMarcas = async () => {
   try {
     const response = await api.get<Paginacao<Fornecedor>>(router);
-    return response.data.content;
+    return response.data.content || [];
   } catch (error) {
     console.error("Erro ao listar marcas:", error);
-    throw error;
+    return [];
   }
 };
 
@@ -42,6 +43,16 @@ export const criarFornecedor = async (fornecedor: FornecedorCreate) => {
     return response.data;
   } catch (error) {
     console.error("Erro ao criar fornecedor:", error);
+    throw error;
+  }
+};
+
+export const atualizarFornecedor = async (id: number, fornecedor: FornecedorCreate) => {
+  try {
+    const response = await api.patch<Fornecedor>(`${router}/${id}`, fornecedor);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar fornecedor:", error);
     throw error;
   }
 };

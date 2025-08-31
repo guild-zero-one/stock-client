@@ -28,9 +28,12 @@ export default function Estoque() {
 
     useEffect(() => {
         const fetchMarcas = async () => {
-            const marcas = await todasMarcas();
-            if (marcas) {
-                setMarcas(marcas);
+            try {
+                const marcas = await todasMarcas();
+                setMarcas(marcas || []);
+            } catch (error) {
+                console.error("Erro ao carregar marcas:", error);
+                setMarcas([]);
             }
         };
 
@@ -47,9 +50,9 @@ export default function Estoque() {
 
     return (
         <div className="relative flex flex-col w-full min-h-screen">
-            <Header title="Estoque" subtitle="Marca">
+            <Header backRouter="/" title="Estoque" subtitle="Marca">
                 <DropdownAdd>
-                    <Link href={"./marcas/criar"}>
+                    <Link href={"./marcas/adicionar"}>
                         <DropdownItem text="Adicionar Marca" icon={<AddCircle />} />
                     </Link>
                 </DropdownAdd>
@@ -66,16 +69,26 @@ export default function Estoque() {
                 </div>
                 <div className="flex flex-col flex-1 gap-2 w-full overflow-y-auto scrollbar-minimal">
                     {inputPesquisar.length === 0 ? (
-                        marcas.map((marca) => (
+                        marcas.length > 0 ? (
+                            marcas.map((marca) => (
+                                <Link key={marca.id} href={`./marcas/${marca.id}/produtos`}>
+                                    <MenuBrand name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
+                                <h2>Nenhuma marca cadastrada :(</h2>
+                            </div>
+                        )
+                    ) : marcasFiltradas.length > 0 ? (
+                        marcasFiltradas.map((marca) => (
                             <Link key={marca.id} href={`./marcas/${marca.id}/produtos`}>
                                 <MenuBrand name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />
                             </Link>
                         ))
-                    ) : marcasFiltradas.length > 0 ? (
-                        marcasFiltradas.map((marca) => <MenuBrand key={marca.id} name={marca.nome} image={marca.imagemUrl} description={marca.descricao} />)
                     ) : (
                         <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
-                            <h2 className="italic">Nenhuma marca encontrada</h2>
+                            <h2>Nenhuma marca encontrada :(</h2>
                         </div>
                     )}
                 </div>

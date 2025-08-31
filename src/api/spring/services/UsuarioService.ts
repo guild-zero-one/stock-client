@@ -10,7 +10,6 @@ export const login = async (user: UsuarioLogin) => {
     return response.data;
   } catch (error: any) {
     console.error("Erro ao realizar o login:", error.response || error);
-    console.log("URL chamada:", `${router}/login`);
     throw error;
   }
 };

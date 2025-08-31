@@ -13,4 +13,5 @@ export interface FornecedorCreate {
   nome: string;
   descricao: string;
   cnpj: string;
+  imagemUrl?: string;
 }
