@@ -133,7 +133,7 @@ export default function AdicionarCliente() {
       {/* Toast */}
       {toast && <Toast {...toastMap[toast]} />}
 
-      <Header title="Cliente" subtitle="Adicionar" />
+      <Header backRouter="/clientes" title="Cliente" subtitle="Adicionar" />
 
       {/* Adicionar Imagem */}
       <div className="flex justify-between gap-4 p-4 w-full">

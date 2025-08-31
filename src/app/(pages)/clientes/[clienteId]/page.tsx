@@ -179,7 +179,7 @@ export default function DetalheCliente() {
       {/* Toast */}
       {toast && <Toast {...toastMap[toast]} />}
 
-      <Header title="Cliente" subtitle="Detalhes" />
+      <Header backRouter="/clientes" title="Cliente" subtitle="Detalhes" />
 
       {/* Adicionar Imagem */}
       <div className="flex justify-between gap-4 p-4 w-full">

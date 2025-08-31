@@ -75,7 +75,7 @@ export default function Cliente() {
 
   return (
     <div className="relative flex flex-col w-full min-h-screen bg-white-default">
-      <Header title="Todos" subtitle="Meus clientes">
+      <Header backRouter="/" title="Todos" subtitle="Meus clientes">
         <DropdownAdd>
           <Link href={"clientes/adicionar"}>
             <DropdownItem text="Adicionar Cliente" icon={<AddCircle />} />
