@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -9,7 +9,7 @@ import { criarFornecedor } from "@/api/spring/services/FornecedorService";
 import axios from "axios";
 
 import Button from "@/components/button";
-// import ButtonFile from "@/components/button-file";
+import { ButtonImageSearch, ButtonImageSearchRef } from "@/components/button-image-search";
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Toast from "@/components/toast";
@@ -31,6 +31,15 @@ export default function CriarMarca() {
   const [descricao, setDescricao] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [urlImagem, setUrlImagem] = useState("");
+  const [showNameValidation, setShowNameValidation] = useState(false);
+  const buttonImageSearchRef = useRef<ButtonImageSearchRef>(null);
+
+  const handleImageError = () => {
+    // Chamar a função de fallback do componente
+    if (buttonImageSearchRef.current) {
+      buttonImageSearchRef.current.handleImageError();
+    }
+  };
 
   const toastMap = {
     success: {
@@ -63,7 +72,7 @@ export default function CriarMarca() {
         imagemUrl: urlImagem,
       };
 
-      const response = await criarFornecedor(fornecedor);
+      await criarFornecedor(fornecedor);
 
       showToast("success");
 
@@ -105,20 +114,23 @@ export default function CriarMarca() {
               <img
                 src={urlImagem}
                 alt="Pré-visualização da imagem"
-                className="rounded w-full h-full object-cover"
+                className="rounded w-full h-full object-contain object-center"
+                onError={handleImageError}
               />
             ) : (
               <ImageIcon fontSize="inherit" />
             )}
           </div>
 
-          {/* Botão de arquivo comentado por enquanto */}
-          {/* <ButtonFile
-            id="imagem-marca"
-            onSelect={setImagem}
+          {/* Botão para adicionar imagem */}
+          <ButtonImageSearch
+            ref={buttonImageSearchRef}
+            onSelect={setUrlImagem}
             label="Adicionar Imagem"
-            accept="image/*"
-          /> */}
+            searchTerm={nome}
+            type={"Marca"}
+            onValidationError={() => setShowNameValidation(true)}
+          />
           
         </div>
         {/* Inputs */}
@@ -126,8 +138,16 @@ export default function CriarMarca() {
           <Input
             label="Nome"
             name="marca-name"
-            handleChange={(e) => setNome(e.target.value)}
+            handleChange={(e) => {
+              setNome(e.target.value);
+              if (showNameValidation && e.target.value.trim()) {
+                setShowNameValidation(false);
+              }
+            }}
             value={nome}
+            showHelper={showNameValidation}
+            status={showNameValidation ? "error" : "default"}
+            messageHelper="Nome da marca é obrigatório para buscar imagens"
           />
           <Input
             label="Descrição"
@@ -140,12 +160,6 @@ export default function CriarMarca() {
             name="marca-cnpj"
             handleChange={(e) => setCnpj(e.target.value)}
             value={cnpj}
-          />
-          <Input
-            label="URL da Imagem"
-            name="marca-url-imagem"
-            handleChange={(e) => setUrlImagem(e.target.value)}
-            value={urlImagem}
           />
         </div>
 
