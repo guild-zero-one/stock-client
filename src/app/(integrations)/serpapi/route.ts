@@ -5,6 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
+    const page = searchParams.get("ijn") || "0";
 
     if (!query) {
       return NextResponse.json(
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
       engine: "google_images",
       q: query,
       location: "Brazil",
+      ijn: page, // Página de resultados (0, 1, 2, etc)
       api_key: process.env.SERPAPI_API_KEY,
     });
 
