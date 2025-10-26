@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { marcaPorId } from "@/api/spring/services/FornecedorService";
+import { marcaPorId } from "@/api/spring/services/MarcaService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
 import { buscarClientePorId } from "@/api/spring/services/ClienteService";
 import { criarPedido } from "@/api/spring/services/PedidoVendaService";
@@ -51,19 +51,19 @@ export default function EscolherProduto() {
     },
   } as const;
 
-  const { marcaId, clienteId } = useParams();
+  const { marcaId: idMarca, clienteId } = useParams();
 
   useEffect(() => {
     const fetchFornecedor = async () => {
-      const fornecedor = await marcaPorId(Number(marcaId));
+      const fornecedor = await marcaPorId(idMarca as string);
       if (fornecedor) {
-        const produtos = await produtoPorMarca(Number(marcaId));
-        setProdutos(produtos);
+        const produtos = await produtoPorMarca(idMarca as string);
+        setProdutos(produtos.content ?? []);
       }
     };
 
     fetchFornecedor();
-  }, [marcaId]);
+  }, [idMarca]);
 
   useEffect(() => {
     const fetchCliente = async () => {
@@ -81,7 +81,7 @@ export default function EscolherProduto() {
     if (!produtoSelecionado) return;
 
     const pedido = {
-      idUsuario: Number(clienteId),
+      idUsuario: clienteId as string,
       itens: [
         {
           idProduto: produtoSelecionado?.id,
@@ -109,7 +109,7 @@ export default function EscolherProduto() {
   const produtosFiltrados = useMemo(() => {
     const termo = inputPesquisar.trim().toLowerCase();
     if (!termo) return produtos;
-    return produtos.filter((produto) =>
+    return produtos.filter(produto =>
       produto.nome.toLowerCase().includes(termo)
     );
   }, [produtos, inputPesquisar]);
@@ -127,7 +127,7 @@ export default function EscolherProduto() {
           label="Pesquisar"
           iconSymbol={<SearchIcon />}
           size="small"
-          handleChange={(e) => setInputPesquisar(e.target.value)}
+          handleChange={e => setInputPesquisar(e.target.value)}
         />
       </div>
 
@@ -136,7 +136,7 @@ export default function EscolherProduto() {
         <div className="gap-4 grid grid-cols-1 px-4">
           <ProductsOrdersList
             produtos={produtosFiltrados}
-            onClick={(produto) => {
+            onClick={produto => {
               setProdutoSelecionado(produto);
               setModalAberto(true);
             }}

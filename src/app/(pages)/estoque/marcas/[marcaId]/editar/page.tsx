@@ -6,17 +6,20 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import ImageIcon from "@mui/icons-material/Image";
 
-import { marcaPorId, atualizarFornecedor } from "@/api/spring/services/FornecedorService";
-import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
+import {
+  marcaPorId,
+  atualizarFornecedor,
+} from "@/api/spring/services/MarcaService";
+import { Marca } from "@/models/Marca/Marca";
 
 import Button from "@/components/button";
-// import ButtonFile from "@/components/button-file";
 import Header from "@/components/header";
 import Input from "@/components/input";
 import Toast from "@/components/toast";
+import ModalSearchImage from "@/components/modal-search-image";
 
 export default function CriarMarca() {
-  const { marcaId } = useParams();
+  const { marcaId: idMarca } = useParams();
   const router = useRouter();
 
   const [toast, setToast] = useState<null | "success" | "error" | "conflict">(
@@ -30,10 +33,12 @@ export default function CriarMarca() {
     }, 10);
   };
 
-  const [marca, setMarca] = useState<Fornecedor>();
-  const [marcaEditada, setMarcaEditada] = useState<Fornecedor>();
+  const [marca, setMarca] = useState<Marca>();
+  const [marcaEditada, setMarcaEditada] = useState<Marca>();
   const [editar, setEditar] = useState(false);
   const [urlImagem, setUrlImagem] = useState("");
+  const [modal, setModal] = useState(false);
+  const [showNameValidation, setShowNameValidation] = useState(false);
 
   const inative = () => {
     return editar ? false : true;
@@ -61,12 +66,26 @@ export default function CriarMarca() {
     setEditar(false);
   };
 
+  const handleOpen = () => {
+    const nomeAtual = editar ? marcaEditada?.nome ?? "" : marca?.nome ?? "";
+    if (!nomeAtual.trim()) {
+      setShowNameValidation(true);
+      return;
+    }
+    setModal(true);
+  };
+  const handleClose = () => setModal(false);
+
+  const handleImageError = () => {
+    setUrlImagem("");
+  };
+
   useEffect(() => {
     atualizarMarca();
   }, []);
 
   const atualizarMarca = async () => {
-    const marca = await marcaPorId(Number(marcaId));
+    const marca = await marcaPorId(idMarca as string);
     if (marca) {
       setMarca(marca);
       setMarcaEditada({ ...marca });
@@ -75,8 +94,8 @@ export default function CriarMarca() {
   };
 
   const handleMarcaEditada =
-    (field: keyof Fornecedor) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setMarcaEditada((prev) =>
+    (field: keyof Marca) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setMarcaEditada(prev =>
         prev ? { ...prev, [field]: e.target.value } : prev
       );
     };
@@ -89,11 +108,14 @@ export default function CriarMarca() {
         ...marcaEditada,
         imagemUrl: urlImagem,
       };
-      
-      const response = await atualizarFornecedor(marcaEditada.id, fornecedorAtualizado);
-            
+
+      const response = await atualizarFornecedor(
+        marcaEditada.id,
+        fornecedorAtualizado
+      );
+
       showToast("success");
-      
+
       setTimeout(() => {
         router.push("/estoque/marcas");
       }, 3000);
@@ -129,30 +151,39 @@ export default function CriarMarca() {
               <img
                 src={urlImagem}
                 alt="Pré-visualização da imagem"
-                className="rounded w-full h-full object-cover"
+                className="rounded w-full h-full object-contain object-center"
+                onError={handleImageError}
               />
             ) : (
               <ImageIcon fontSize="inherit" />
             )}
           </div>
 
-          {/* Botão de arquivo comentado por enquanto */}
-          {/* <ButtonFile
-            id="imagem-marca"
-            onSelect={(file) => console.log(file)}
-            label="Adicionar Imagem"
-            accept="image/*"
-          /> */}
+          <Button
+            label={"Adicionar imagem"}
+            size="default"
+            variant="filled"
+            onClick={handleOpen}
+            disabled={inative()}
+          />
         </div>
 
         {/* Inputs */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <Input
             label="Nome"
             name="marca-name"
             disabled={inative()}
             value={editar ? marcaEditada?.nome ?? "" : marca?.nome ?? ""}
-            handleChange={handleMarcaEditada("nome")}
+            handleChange={e => {
+              handleMarcaEditada("nome")(e);
+              if (showNameValidation && e.target.value.trim()) {
+                setShowNameValidation(false);
+              }
+            }}
+            showHelper={showNameValidation}
+            status={showNameValidation ? "error" : "default"}
+            messageHelper="Nome da marca é obrigatório para buscar imagens"
           />
           <Input
             label="Descrição"
@@ -163,26 +194,16 @@ export default function CriarMarca() {
             }
             handleChange={handleMarcaEditada("descricao")}
           />
-          <Input
-            label="CNPJ"
-            name="marca-cnpj"
-            disabled={inative()}
-            value={editar ? marcaEditada?.cnpj ?? "" : marca?.cnpj ?? ""}
-            handleChange={handleMarcaEditada("cnpj")}
-          />
-          <Input
-            label="URL da Imagem"
-            name="marca-url-imagem"
-            disabled={inative()}
-            value={editar ? urlImagem : marca?.imagemUrl ?? ""}
-            handleChange={(e) => setUrlImagem(e.target.value)}
-          />
         </div>
 
         {/* Buttons */}
         {editar ? (
           <div className="flex flex-col gap-2">
-            <Button label="Confirmar alterações" fullWidth onClick={handleSalvar} />
+            <Button
+              label="Confirmar alterações"
+              fullWidth
+              onClick={handleSalvar}
+            />
             <Button
               label="Cancelar"
               fullWidth
@@ -202,6 +223,14 @@ export default function CriarMarca() {
           </>
         )}
       </div>
+
+      <ModalSearchImage
+        openModal={modal}
+        searchQuery={editar ? marcaEditada?.nome ?? "" : marca?.nome ?? ""}
+        extraQuery="marca logo"
+        onImageSelect={url => setUrlImagem(url)}
+        onClose={() => handleClose()}
+      />
     </main>
   );
 }

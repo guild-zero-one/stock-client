@@ -3,44 +3,39 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { marcaPorId } from "@/api/spring/services/FornecedorService";
+import { marcaPorId } from "@/api/spring/services/MarcaService";
 import {
   atualizarProduto,
   produtoPorId,
 } from "@/api/spring/services/ProdutoService";
-import {
-  cadastrarImagem,
-  imagensPorProduto,
-} from "@/api/spring/services/ImagenService";
+import { validateProductId } from "@/utils/uuidValidator";
 
-import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
+import { Marca } from "@/models/Marca/Marca";
 import { Produto, ProdutoCreate } from "@/models/Produto/Produto";
-import { ImagemProduto } from "@/models/Imagem/ImagemProduto";
 
 import Header from "@/components/header";
 import BadgeInline from "@/components/badge-inline";
 import Switch from "@/components/switch";
 import Button from "@/components/button";
-import Accordion from "@/components/accordion";
 import Input from "@/components/input";
-import ButtonFile from "@/components/button-file";
 import Modal from "@/components/modal-popup";
+import ModalSearchImage from "@/components/modal-search-image";
 import Toast from "@/components/toast";
 
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import { AssignmentTurnedInOutlined } from "@mui/icons-material";
 
 export default function ProdutoPage() {
-  const { produtoId, marcaId } = useParams();
+  const { produtoId, marcaId: idMarca } = useParams();
 
-  const [marca, setMarca] = useState<Fornecedor>();
+  const [marca, setMarca] = useState<Marca>();
   const [produto, setProduto] = useState<Produto>();
-  const [imagem, setImagem] = useState<ImagemProduto>();
 
   const [newProduto, setNewProduto] = useState<Partial<ProdutoCreate>>({});
   const [modalAberto, setModalAberto] = useState(false);
+  const [modalImagem, setModalImagem] = useState(false);
+  const [showNameValidation, setShowNameValidation] = useState(false);
   const [toast, setToast] = useState<"success" | "error" | null>(null);
 
   const router = useRouter();
@@ -67,52 +62,62 @@ export default function ProdutoPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const marca = await marcaPorId(Number(marcaId));
-      if (marca) setMarca(marca);
+      try {
+        const marca = await marcaPorId(idMarca as string);
+        if (marca) setMarca(marca);
 
-      const produto = await produtoPorId(Number(produtoId));
-      if (produto) {
-        setProduto(produto);
-
-        // Ao carregar o produto, inicializa o objeto de edição
-        setNewProduto({
-          nome: produto.nome,
-          sku: produto.sku,
-          quantidade: produto.quantidade,
-          precoUnitario: produto.precoUnitario,
-          valorVenda: produto.valorVenda,
-          catalogo: produto.catalogo,
-        });
-
-        // Carrega imagens do produto
-        const imagens = await imagensPorProduto(produto.id);
-        if (imagens) {
-          const imagemPrincipal =
-            imagens.find((img: ImagemProduto) => img.imagemPrincipal) ||
-            imagens[0];
-          setImagem(imagemPrincipal);
+        // Validação do produtoId antes de fazer a chamada
+        if (!validateProductId(produtoId as string)) {
+          console.error("ID do produto inválido:", produtoId);
+          showToast("error");
+          return;
         }
+
+        const produto = await produtoPorId(produtoId as string);
+        if (produto) {
+          setProduto(produto);
+
+          // Ao carregar o produto, inicializa o objeto de edição
+          setNewProduto({
+            nome: produto.nome,
+            sku: produto.sku,
+            descricao: produto.descricao,
+            quantidade: produto.quantidade,
+            precoUnitario: produto.precoUnitario,
+            valorVenda: produto.valorVenda,
+            catalogo: produto.catalogo,
+            imagemUrl: produto.imagemUrl,
+          });
+
+          // Carrega imagens do produto
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        showToast("error");
       }
     };
     fetchData();
-  }, [marcaId, produtoId]);
+  }, [idMarca, produtoId]);
 
   const handleCatalogo = () =>
     newProduto?.catalogo ? " Habilitado" : " Desabilitado";
 
-  const updateImagem = async (file: File | null) => {
-    if (!produto || !file) return;
-    try {
-      await cadastrarImagem(produto.id, file);
-
-      showToast("success");
-
-      setTimeout(() => {
-        router.push(`/estoque/marcas/${produtoId}/produtos`);
-      }, 1000);
-    } catch (error) {
-      console.error("Erro ao adicionar imagem:", error);
+  const handleOpenModalImagem = () => {
+    const nomeAtual = newProduto?.nome ?? produto?.nome ?? "";
+    if (!nomeAtual.trim()) {
+      setShowNameValidation(true);
+      return;
     }
+    setModalImagem(true);
+  };
+
+  const handleCloseModalImagem = () => setModalImagem(false);
+
+  const handleImageError = () => {
+    setNewProduto(prev => ({
+      ...prev,
+      imagemUrl: "",
+    }));
   };
 
   const updateProduto = async () => {
@@ -146,11 +151,12 @@ export default function ProdutoPage() {
       {/* Grid */}
       <div className="gap-4 grid mx-auto px-2 pb-1">
         {/* Imagem principal */}
-        {imagem?.urlImagem ? (
+        {newProduto?.imagemUrl || produto?.imagemUrl ? (
           <img
-            src={imagem.urlImagem}
+            src={newProduto?.imagemUrl || produto?.imagemUrl}
             alt="Imagem do produto"
             className="w-full object-contain"
+            onError={handleImageError}
           />
         ) : (
           <div className="flex justify-center items-center bg-gray-200 w-full h-80 animate-pulse">
@@ -209,27 +215,42 @@ export default function ProdutoPage() {
           <Input
             label="Nome"
             name="product-name"
-            handleChange={(e) =>
-              setNewProduto((prev) => ({ ...prev, nome: e.target.value }))
-            }
+            handleChange={e => {
+              setNewProduto(prev => ({ ...prev, nome: e.target.value }));
+              if (showNameValidation && e.target.value.trim()) {
+                setShowNameValidation(false);
+              }
+            }}
             value={newProduto?.nome ?? ""}
+            showHelper={showNameValidation}
+            status={showNameValidation ? "error" : "default"}
+            messageHelper="Nome do produto é obrigatório para buscar imagens"
           />
 
           <Input
             label="SKU"
             name="product-sku"
-            handleChange={(e) =>
-              setNewProduto((prev) => ({ ...prev, sku: e.target.value }))
+            handleChange={e =>
+              setNewProduto(prev => ({ ...prev, sku: e.target.value }))
             }
             value={newProduto?.sku ?? ""}
+          />
+
+          <Input
+            label="Descrição"
+            name="product-description"
+            handleChange={e =>
+              setNewProduto(prev => ({ ...prev, descricao: e.target.value }))
+            }
+            value={newProduto?.descricao ?? ""}
           />
 
           <div className="flex gap-2">
             <Input
               label="Preço Unitário"
               name="product-price"
-              handleChange={(e) =>
-                setNewProduto((prev) => ({
+              handleChange={e =>
+                setNewProduto(prev => ({
                   ...prev,
                   precoUnitario: Number(e.target.value),
                 }))
@@ -239,8 +260,8 @@ export default function ProdutoPage() {
             <Input
               label="Preço Venda"
               name="product-price"
-              handleChange={(e) =>
-                setNewProduto((prev) => ({
+              handleChange={e =>
+                setNewProduto(prev => ({
                   ...prev,
                   valorVenda: Number(e.target.value),
                 }))
@@ -250,8 +271,8 @@ export default function ProdutoPage() {
             <Input
               label="Quant."
               name="product-quant"
-              handleChange={(e) =>
-                setNewProduto((prev) => ({
+              handleChange={e =>
+                setNewProduto(prev => ({
                   ...prev,
                   quantidade: Number(e.target.value),
                 }))
@@ -300,7 +321,7 @@ export default function ProdutoPage() {
             <Switch
               id="catalogo"
               onChange={() =>
-                setNewProduto((prev) => ({
+                setNewProduto(prev => ({
                   ...prev,
                   catalogo: !prev.catalogo,
                 }))
@@ -309,11 +330,11 @@ export default function ProdutoPage() {
             />
           </div>
           <div className="flex gap-2">
-            <ButtonFile
-              id="adicionar-imagem"
-              onSelect={updateImagem}
-              label="Adicionar Imagem"
-              accept="image/*"
+            <Button
+              label="Buscar Imagem"
+              size="default"
+              variant="filled"
+              onClick={handleOpenModalImagem}
             />
             <Button
               label="Editar Produto"
@@ -322,6 +343,19 @@ export default function ProdutoPage() {
           </div>
         </footer>
       </div>
+
+      <ModalSearchImage
+        openModal={modalImagem}
+        searchQuery={newProduto?.nome ?? produto?.nome ?? ""}
+        extraQuery="produto"
+        onImageSelect={url => {
+          setNewProduto(prev => ({
+            ...prev,
+            imagemUrl: url,
+          }));
+        }}
+        onClose={handleCloseModalImagem}
+      />
     </div>
   );
 }

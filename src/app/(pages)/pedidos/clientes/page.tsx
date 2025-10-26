@@ -21,15 +21,16 @@ export default function EscolherCliente() {
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const response: ClienteResponse[] = await listarClientes();
+        const response = await listarClientes();
+        const clientes = response.content || [];
 
-        const clientesFiltrados = response
-          .filter((cliente) =>
+        const clientesFiltrados = clientes
+          .filter(cliente =>
             cliente.permissao && cliente.permissao.includes
               ? cliente.permissao.includes("COMUM")
               : false
           )
-          .filter((cliente) => cliente.ativo ?? true);
+          .filter(cliente => cliente.ativo ?? true);
 
         setClientes(clientesFiltrados);
       } catch (error) {
@@ -43,7 +44,7 @@ export default function EscolherCliente() {
     let todosClientes = [...clientes];
 
     if (searchTerm) {
-      todosClientes = todosClientes.filter((cliente) =>
+      todosClientes = todosClientes.filter(cliente =>
         `${cliente.nome} ${cliente.sobrenome}`
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
@@ -81,19 +82,19 @@ export default function EscolherCliente() {
           type="text"
           iconSymbol={<SearchIcon />}
           size="small"
-          handleChange={(e) => setSearchTerm(e.target.value)}
+          handleChange={e => setSearchTerm(e.target.value)}
         />
       </div>
 
       {/* Filtro */}
       <div className="flex flex-col gap-4 p-4 w-full">
-        <Filter onChangeFilter={(selected) => setFilter(selected)} />
+        <Filter onChangeFilter={selected => setFilter(selected)} />
       </div>
 
       {/* Lista de clientes */}
       <CustomersList
         clientes={clientesOrdenados}
-        uri={(cliente) => `/pedidos/clientes/${cliente.id}`}
+        uri={cliente => `/pedidos/clientes/${cliente.id}`}
       />
     </div>
   );

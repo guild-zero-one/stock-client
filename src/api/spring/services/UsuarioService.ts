@@ -1,4 +1,5 @@
 import { Usuario } from "@/models/Usuario/Usuario";
+import { Paginacao } from "@/models/Paginacao/Paginacao";
 import api from "../api";
 import { UsuarioLogin } from "@/models/Usuario/UsuarioLogin";
 
@@ -33,9 +34,11 @@ export const usuarioPorId = async (id: number) => {
     throw error;
   }
 };
-export const listarUsuarios = async () => {
+export const listarUsuarios = async (page: number = 0, size: number = 10) => {
   try {
-    const response = await api.get(`${router}`);
+    const response = await api.get<Paginacao<Usuario>>(
+      `${router}?pagina=${page}&tamanho=${size}`
+    );
     return response.data;
   } catch (error) {
     console.error("Deu ruim: ", error);

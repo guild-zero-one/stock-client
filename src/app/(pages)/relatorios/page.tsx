@@ -13,6 +13,8 @@ import {
   faturamentoUltimos6Meses,
 } from "@/api/spring/services/RelatorioService";
 
+import { Top3ProdutosResponse } from "@/models/Relatorio/Top3ProdutosResponse";
+
 import Header from "@/components/header";
 
 function ordenarAnoMes(keys: string[]) {
@@ -25,7 +27,9 @@ function ordenarAnoMes(keys: string[]) {
 
 export default function Dashboard() {
   const [kpiVendas, setKpiVendas] = useState(0);
-  const [kpiTop3Produtos, setKpiTop3Produtos] = useState<string[]>([]);
+  const [kpiTop3Produtos, setKpiTop3Produtos] = useState<
+    Top3ProdutosResponse[]
+  >([]);
   const [graphQuantidadePedidos, setGraphQuantidadePedidos] = useState<
     Record<string, number>
   >({});
@@ -64,9 +68,9 @@ export default function Dashboard() {
 
         setMesesDinamicos(mesesOrdenados);
 
-        const seriesQtdArray = mesesOrdenados.map((mes) => qtd6mes[mes] ?? 0);
+        const seriesQtdArray = mesesOrdenados.map(mes => qtd6mes[mes] ?? 0);
         const seriesFatArray = mesesOrdenados.map(
-          (mes) => Number(val6meses[mes]) ?? 0
+          mes => Number(val6meses[mes]) ?? 0
         );
 
         setGraphQtdSeries([{ name: "Qtd. Pedidos", data: seriesQtdArray }]);
@@ -159,8 +163,8 @@ export default function Dashboard() {
           <div className="bg-white shadow-lg w-full h-full rounded-lg p-2 g-0.5">
             <h3 className="text-xs">Top 3 Produtos</h3>
             {kpiTop3Produtos.map((produto, idx) => (
-              <div className="font-bold text-sm" key={produto}>
-                {idx + 1}. {produto}
+              <div className="font-bold text-sm" key={produto.id}>
+                {idx + 1}. {produto.nome}
               </div>
             ))}
           </div>

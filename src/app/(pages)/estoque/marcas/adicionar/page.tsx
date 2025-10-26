@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { criarFornecedor } from "@/api/spring/services/FornecedorService";
+import { criarMarca as criarMarcaService } from "@/api/spring/services/MarcaService";
 
 import axios from "axios";
 import Button from "@/components/button";
@@ -28,7 +28,6 @@ export default function CriarMarca() {
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [cnpj, setCnpj] = useState("");
   const [urlImagem, setUrlImagem] = useState("");
   const [showNameValidation, setShowNameValidation] = useState(false);
   const [modal, setModal] = useState(false);
@@ -66,14 +65,13 @@ export default function CriarMarca() {
     e.preventDefault();
 
     try {
-      const fornecedor = {
+      const marca = {
         nome,
         descricao,
-        cnpj,
         imagemUrl: urlImagem,
       };
 
-      await criarFornecedor(fornecedor);
+      await criarMarcaService(marca);
 
       showToast("success");
 
@@ -83,7 +81,6 @@ export default function CriarMarca() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
-
       }
       showToast("error");
     }
@@ -121,14 +118,13 @@ export default function CriarMarca() {
             variant="filled"
             onClick={handleOpen}
           />
-
         </div>
         {/* Inputs */}
         <div className="flex flex-col gap-4">
           <Input
             label="Nome"
             name="marca-name"
-            handleChange={(e) => {
+            handleChange={e => {
               setNome(e.target.value);
               if (showNameValidation && e.target.value.trim()) {
                 setShowNameValidation(false);
@@ -142,14 +138,8 @@ export default function CriarMarca() {
           <Input
             label="Descrição"
             name="marca-description"
-            handleChange={(e) => setDescricao(e.target.value)}
+            handleChange={e => setDescricao(e.target.value)}
             value={descricao}
-          />
-          <Input
-            label="CNPJ"
-            name="marca-cnpj"
-            handleChange={(e) => setCnpj(e.target.value)}
-            value={cnpj}
           />
         </div>
 
@@ -161,7 +151,7 @@ export default function CriarMarca() {
         openModal={modal}
         searchQuery={nome}
         extraQuery="marca logo"
-        onImageSelect={(url) => setUrlImagem(url)}
+        onImageSelect={url => setUrlImagem(url)}
         onClose={() => handleClose()}
       />
     </main>

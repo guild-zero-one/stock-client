@@ -1,18 +1,17 @@
 export interface Produto {
-  id: number;
+  id: string;
   nome: string;
   sku: string;
   descricao: string;
   tag: string;
   quantidade: number;
   precoUnitario: number;
-  valorVenda: number;
   catalogo: boolean;
-  fornecedorId: number;
+  valorVenda: number;
+  imagemUrl: string;
+  idMarca: string;
 }
 
-export type ProdutoCreate = Omit<Produto, 'id' | 'descricao'> & {
+export type ProdutoCreate = Omit<Produto, "id"> & {
   imagem?: File;
 };
-
-

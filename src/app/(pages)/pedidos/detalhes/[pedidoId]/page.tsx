@@ -11,14 +11,13 @@ import {
   alterarStatusPedido,
   editarPedido,
 } from "@/api/spring/services/PedidoVendaService";
-import { cadastrarVenda } from "@/api/spring/services/VendaService";
-import {
-  atualizarProduto,
-  produtoPorId,
-} from "@/api/spring/services/ProdutoService";
+import { finalizarPedido } from "@/api/spring/services/PedidoVendaService";
 
 import { PedidoHasProduto } from "@/models/Pedido/PedidoHasProduto";
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
+import { VendaResponse } from "@/models/Venda/VendaResponse";
+import { FinalizarPedidoRequest } from "@/models/Pedido/FinalizarPedidoRequest";
+import { PedidoItemRequest } from "@/models/PedidoItem/PedidoItemRequest";
 
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -53,6 +52,7 @@ export default function DetalhePedido() {
     | "successSave"
     | "errorSave"
     | "quantityError"
+    | "alreadyFinalized"
     | null
   >(null);
   const [customQuantityMessage, setCustomQuantityMessage] = useState<
@@ -73,6 +73,7 @@ export default function DetalhePedido() {
       | "successSave"
       | "errorSave"
       | "quantityError"
+      | "alreadyFinalized"
       | null
   ) => {
     setToast(null);
@@ -119,15 +120,48 @@ export default function DetalhePedido() {
         "Quantidade insuficiente em estoque para finalizar o pedido. ",
       type: "error",
     },
+    alreadyFinalized: {
+      title: "Pedido já finalizado",
+      message: "Este pedido já foi finalizado e não pode ser alterado.",
+      type: "error",
+    },
   } as const;
 
   const { pedidoId } = useParams();
+
+  const agruparItensDuplicados = (itens: any[]) => {
+    const itensAgrupados: Record<string, any> = {};
+
+    itens.forEach(item => {
+      const produtoId = item.produto.id;
+
+      if (itensAgrupados[produtoId]) {
+        itensAgrupados[produtoId].item.quantidade += item.item.quantidade;
+      } else {
+        itensAgrupados[produtoId] = { ...item };
+      }
+    });
+
+    return Object.values(itensAgrupados);
+  };
 
   useEffect(() => {
     const fetchPedido = async () => {
       try {
         const pedidoDetalhado = await buscarPedidoDetalhadoPorId(pedidoId);
-        setPedido(pedidoDetalhado);
+        console.log("Dados retornados do backend:", pedidoDetalhado);
+
+        // Agrupar itens duplicados vindos do backend
+        const pedidoComItensAgrupados = {
+          ...pedidoDetalhado,
+          itens: agruparItensDuplicados(pedidoDetalhado.itens),
+        };
+
+        console.log(
+          "Dados após agrupamento no frontend:",
+          pedidoComItensAgrupados
+        );
+        setPedido(pedidoComItensAgrupados);
 
         const cliente = await buscarClientePorId(pedidoDetalhado.idUsuario);
         setCliente(cliente);
@@ -142,7 +176,7 @@ export default function DetalhePedido() {
   const atualizarQuantidade = (produtoId: number, novaQtd: number) => {
     if (!pedido) return;
 
-    const novosItens = pedido.itens.map((item) =>
+    const novosItens = pedido.itens.map(item =>
       item.produto.id === produtoId
         ? {
             ...item,
@@ -161,7 +195,7 @@ export default function DetalhePedido() {
     if (!pedido) return;
 
     const novosItens = pedido.itens.filter(
-      (item) => item.produto.id !== produtoId
+      item => item.produto.id !== produtoId
     );
 
     setPedido({ ...pedido, itens: novosItens });
@@ -174,82 +208,89 @@ export default function DetalhePedido() {
 
   const router = useRouter();
 
-  const finalizarPedido = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Função auxiliar para converter itens para o formato de requisição
+  const converterItensParaRequisicao = (itens: any[]): PedidoItemRequest[] => {
+    console.log("Itens antes da conversão:", itens);
 
-    const checarEstoque = async () => {
-      const produtos = await Promise.all(
-        (pedido?.itens || []).map((item) => produtoPorId(item.produto.id))
-      );
+    // Agrupar itens por produto
+    const itensAgrupados: Record<string, PedidoItemRequest> = {};
 
-      for (let i = 0; i < produtos.length; i++) {
-        const produto = produtos[i];
-        const item = pedido?.itens[i];
-        if (produto && item) {
-          if (produto.quantidade < item.item.quantidade) {
-            setCustomQuantityMessage(
-              `Estoque insuficiente para o produto: ${produto.nome}.`
-            );
-            throw new Error(
-              "Quantidade insuficiente em estoque do produto: " + produto.nome
-            );
-          }
-        }
+    itens.forEach(item => {
+      const produtoId = item.produto.id;
+      const precoUnitario = item.item.precoUnitario;
+
+      if (itensAgrupados[produtoId]) {
+        // Se o produto já existe, somar a quantidade
+        itensAgrupados[produtoId].quantidade += item.item.quantidade;
+      } else {
+        // Se é um novo produto, adicionar ao acumulador
+        itensAgrupados[produtoId] = {
+          idProduto: produtoId,
+          quantidade: item.item.quantidade,
+          precoUnitario: precoUnitario,
+        };
       }
-    };
+    });
 
-    const hoje = new Date();
+    // Converter o objeto agrupado para array
+    const itensConvertidos = Object.values(itensAgrupados);
 
-    const dataVenda = hoje.toISOString().slice(0, 10);
+    console.log("Itens após conversão e agrupamento:", itensConvertidos);
+    return itensConvertidos;
+  };
 
-    const venda = {
-      desconto: desconto,
-      pagamentoRealizado: true,
-      pedidos: [Number(pedidoId)],
-      dataVenda: dataVenda,
-    };
-
+  const finalizarPedidoHandler = async (
+    pedidoId: string | string[],
+    finalizarPedidoRequest: FinalizarPedidoRequest
+  ) => {
     try {
+      console.log("Iniciando finalização do pedido:", pedidoId);
+      console.log("Dados do pedido para finalização:", finalizarPedidoRequest);
+
+      // Verificar se o pedido já está finalizado
+      if (pedido?.status === "CONCLUIDO" || pedido?.status === "FINALIZADO") {
+        console.log("Pedido já está finalizado, status:", pedido.status);
+        showToast("alreadyFinalized");
+        setModalAberto(false);
+        return;
+      }
+
+      // Fechar o modal primeiro
       setModalAberto(false);
 
-      await checarEstoque();
+      const pedidoAtualizado = {
+        idUsuario: pedido?.idUsuario as string,
+        itens: pedido?.itens ? converterItensParaRequisicao(pedido.itens) : [],
+      };
 
-      await Promise.all(
-        (pedido?.itens || []).map(async (item) => {
-          const produto = await produtoPorId(item.produto.id);
-          if (produto) {
-            const quantidadeAtualizada =
-              produto.quantidade - item.item.quantidade;
-            produto.quantidade = quantidadeAtualizada;
-            await atualizarProduto(produto.id, produto);
-          }
-        })
-      );
+      console.log("Atualizando pedido com dados:", pedidoAtualizado);
+      await editarPedido(pedidoId, pedidoAtualizado);
 
-      await editarPedido(pedidoId, {
-        idUsuario: Number(pedido?.idUsuario),
-        itens: pedido?.itens
-          ? pedido.itens.map((item) => ({
-              idProduto: item.produto.id,
-              quantidade: item.item.quantidade,
-              precoUnitario: item.item.precoUnitario,
-            }))
-          : [],
+      console.log("Chamando finalizarPedido com:", {
+        pedidoId,
+        finalizarPedidoRequest,
       });
-      await alterarStatusPedido(pedidoId, "CONCLUIDO");
-      await cadastrarVenda(venda);
+      const response = await finalizarPedido(pedidoId, finalizarPedidoRequest);
 
-      showToast("successFinalize");
+      console.log("Resposta da finalização:", response);
 
-      setTimeout(() => {
-        router.push(`/pedidos`);
-      }, 3000);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes("Quantidade insuficiente")
-      ) {
-        showToast("quantityError");
+      if (response) {
+        showToast("successFinalize");
+        setTimeout(() => {
+          router.push("/pedidos");
+        }, 2000);
+      } else {
+        console.error("Resposta vazia da finalização");
+        showToast("errorFinalize");
+      }
+    } catch (error: any) {
+      console.error("Erro na finalização do pedido:", error);
+      console.error("Status do erro:", error?.response?.status);
+      console.error("Dados do erro:", error?.response?.data);
+
+      if (error?.response?.status === 409) {
+        // Pedido já finalizado ou conflito de status
+        showToast("errorFinalize");
       } else {
         showToast("errorFinalize");
       }
@@ -260,13 +301,13 @@ export default function DetalhePedido() {
     try {
       setModalAberto(false);
 
-      await alterarStatusPedido(pedidoId, "CANCELADO");
+      await alterarStatusPedido(pedidoId as string, "CANCELADO");
 
       showToast("successCancel");
 
       setTimeout(() => {
         router.push(`/pedidos`);
-      }, 3000);
+      }, 2000);
     } catch (error) {
       showToast("errorCancel");
     }
@@ -277,15 +318,15 @@ export default function DetalhePedido() {
       setModalAberto(false);
 
       const pedidoAtualizado = {
-        idUsuario: Number(pedido?.idUsuario),
-        itens: pedido?.itens
-          ? pedido.itens.map((item) => ({
-              idProduto: item.produto.id,
-              quantidade: item.item.quantidade,
-              precoUnitario: item.item.precoUnitario,
-            }))
-          : [],
+        idUsuario: pedido?.idUsuario as string,
+        itens: pedido?.itens ? converterItensParaRequisicao(pedido.itens) : [],
       };
+
+      console.log(
+        "Corpo da requisição para editar pedido:",
+        JSON.stringify(pedidoAtualizado, null, 2)
+      );
+      console.log("ID do pedido:", pedidoId);
 
       await editarPedido(pedidoId, pedidoAtualizado);
 
@@ -294,8 +335,12 @@ export default function DetalhePedido() {
       setTimeout(() => {
         router.push(`/pedidos`);
       }, 3000);
-    } catch (error) {
-      showToast("errorSave");
+    } catch (error: any) {
+      if (error?.response?.status === 409) {
+        showToast("quantityError");
+      } else {
+        showToast("errorSave");
+      }
     }
   };
 
@@ -377,14 +422,24 @@ export default function DetalhePedido() {
             </div>
           ) : (
             <form
-              onSubmit={(e) => finalizarPedido(e)}
+              onSubmit={e => {
+                e.preventDefault();
+                if (!pedido) {
+                  showToast("errorFinalize");
+                  return;
+                }
+                finalizarPedidoHandler(pedidoId as string, {
+                  desconto,
+                  dataVenda: new Date(),
+                });
+              }}
               className="flex justify-center flex-col gap-2"
             >
               <p className="w-full text-center">Deseja finalizar o pedido?</p>
 
               <Input
                 iconSymbol={<SellOutlined />}
-                handleChange={(e) => {
+                handleChange={e => {
                   handleDesconto(e);
                 }}
                 label="Aplicar desconto"
@@ -413,6 +468,14 @@ export default function DetalhePedido() {
           setModalAberto(true);
         }}
         onConfirm={() => {
+          // Verificar se o pedido já está finalizado
+          if (
+            pedido?.status === "CONCLUIDO" ||
+            pedido?.status === "FINALIZADO"
+          ) {
+            showToast("alreadyFinalized");
+            return;
+          }
           setModalTipo("finalizar");
           setModalAberto(true);
         }}

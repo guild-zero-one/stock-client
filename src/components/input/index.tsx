@@ -17,6 +17,7 @@ type InputProps = {
   iconColor?: string;
   disabled?: boolean;
   size?: "small" | "default";
+  fullWidth?: boolean;
   status?: "default" | "success" | "info" | "error";
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   maxLength?: number;
@@ -34,6 +35,7 @@ export default function Input({
   disabled = false,
   size = "default",
   status = "default",
+  fullWidth = false,
   handleChange = () => {},
   maxLength,
 }: InputProps) {
@@ -66,7 +68,11 @@ export default function Input({
   return (
     <div>
       <div
-        className={`relative flex border ${inputStyleClasses[status]} rounded focus-within:border-pink-default ${value ? 'border-pink-default' : ''} items-center px-4 gap-4 bg-white`}
+        className={`relative flex border ${
+          inputStyleClasses[status]
+        } rounded focus-within:border-pink-default ${
+          value ? "border-pink-default" : ""
+        } items-center px-4 gap-4 bg-white`}
       >
         {/* Icone do input */}
         {iconSymbol && <div className={`text-${iconColor}`}>{iconSymbol}</div>}
@@ -81,7 +87,7 @@ export default function Input({
           placeholder=" "
           className={`peer border border-gray-dark focus:border-pink-default rounded focus:outline-none w-full bg-white border-none ${sizeClasses} ${
             disabled ? "text-gray-400" : "inherit"
-          }`}
+          } ${fullWidth ? "w-full" : ""}`}
         />
 
         {/* Label do input */}

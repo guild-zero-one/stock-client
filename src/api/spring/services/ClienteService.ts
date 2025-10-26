@@ -4,12 +4,15 @@ import { ParamValue } from "next/dist/server/request/params";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 import { ClienteRequest } from "@/models/Cliente/ClienteRequest";
+import { Paginacao } from "@/models/Paginacao/Paginacao";
 
 const router = "/usuarios";
 
-export const listarClientes = async () => {
+export const listarClientes = async (page: number = 0, size: number = 10) => {
   try {
-    const response = await api.get<ClienteResponse[]>(`${router}/clientes`);
+    const response = await api.get<Paginacao<ClienteResponse>>(
+      `${router}/clientes?pagina=${page}&tamanho=${size}`
+    );
     return response.data;
   } catch (error) {
     console.error("Erro ao listar clientes:", error);
@@ -42,10 +45,7 @@ export const editarCliente = async (
   cliente: ClienteRequest
 ) => {
   try {
-    const response = await api.patch<ClienteResponse>(
-      `${router}/${id}`,
-      cliente
-    );
+    const response = await api.put<ClienteResponse>(`${router}/${id}`, cliente);
     return response.data;
   } catch (error) {
     console.error("Erro ao atualizar cliente:", error);
@@ -55,10 +55,20 @@ export const editarCliente = async (
 
 export const desativarCliente = async (id: ParamValue) => {
   try {
-    const response = await api.patch(`${router}/desativar/${id}`);
+    const response = await api.patch(`${router}/${id}/desativar`);
     return response.data;
   } catch (error) {
     console.error("Erro ao desativar cliente:", error);
+    throw error;
+  }
+};
+
+export const ativarCliente = async (id: ParamValue) => {
+  try {
+    const response = await api.patch(`${router}/${id}/ativar`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao ativar cliente:", error);
     throw error;
   }
 };

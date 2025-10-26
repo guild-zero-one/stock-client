@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { criarCliente } from "@/api/spring/services/ClienteService";
-import { criarContato } from "@/api/spring/services/ContatoService";
 import { aplicarMascaraTelefone, removerMascaraTelefone } from "@/utils/masks";
 
 import axios from "axios";
@@ -33,41 +32,30 @@ export default function AdicionarCliente() {
     nome: "",
     sobrenome: "",
     email: "",
-    senha: "12345678",
-    permissao: "COMUM",
-  });
-
-  const [contato, setContato] = useState({
     celular: "",
+    senha: "",
+    permissao: "COMUM",
   });
 
   const handleCliente = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCliente(prevCliente => ({
-      ...prevCliente,
-      [name]: value,
-    }));
-  };
-
-  const handleContato = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
 
     if (name === "celular") {
-      if (value.length < contato.celular.length) {
-        setContato(prevContato => ({
-          ...prevContato,
+      if (value.length < cliente.celular.length) {
+        setCliente(prevCliente => ({
+          ...prevCliente,
           [name]: value,
         }));
       } else {
         const valorComMascara = aplicarMascaraTelefone(value);
-        setContato(prevContato => ({
-          ...prevContato,
+        setCliente(prevCliente => ({
+          ...prevCliente,
           [name]: valorComMascara,
         }));
       }
     } else {
-      setContato(prevContato => ({
-        ...prevContato,
+      setCliente(prevCliente => ({
+        ...prevCliente,
         [name]: value,
       }));
     }
@@ -96,15 +84,13 @@ export default function AdicionarCliente() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const clienteResponse = await criarCliente(cliente);
+      // Remove a máscara antes de enviar para o banco
+      const clienteParaEnvio = {
+        ...cliente,
+        celular: removerMascaraTelefone(cliente.celular),
+      };
 
-      if (contato.celular.trim().length > 0) {
-        // Remove a máscara antes de enviar para o banco
-        const contatoSemMascara = {
-          celular: removerMascaraTelefone(contato.celular),
-        };
-        await criarContato(clienteResponse.id, contatoSemMascara);
-      }
+      const clienteResponse = await criarCliente(clienteParaEnvio);
 
       showToast("success");
 
@@ -135,42 +121,40 @@ export default function AdicionarCliente() {
 
       <Header backRouter="/clientes" title="Cliente" subtitle="Adicionar" />
 
-      {/* Adicionar Imagem */}
+      {/* Icone e nome do cliente */}
       <div className="flex justify-between gap-4 p-4 w-full">
         <div className="flex items-center bg-pink-default p-4 rounded-lg">
           <Person fontSize="large" className="text-white" />
         </div>
 
-        <div className="flex items-center flex-col gap-2">
-          <Button label="Adicionar Imagem" />
+        <div className="flex items-end flex-col gap-2 ">
+          <p className="text-sm font-bold">Adicionar Cliente</p>
           <p className="text-xs text-text-secondary">
-            Nenhuma imagem selecionada
+            Adicione um novo cliente para começar a usar o sistema.
           </p>
         </div>
       </div>
 
       {/* Adicionar Cliente */}
       <form onSubmit={handleCreate} className="flex flex-col gap-4 p-4 w-full">
-        <div className="flex gap-2">
-          <Input
-            label="Nome"
-            name="nome"
-            size="small"
-            handleChange={handleCliente}
-          />
-          <Input
-            label="Sobrenome"
-            name="sobrenome"
-            size="small"
-            handleChange={handleCliente}
-          />
-        </div>
+        <Input
+          label="Nome"
+          name="nome"
+          size="small"
+          handleChange={handleCliente}
+        />
+        <Input
+          label="Sobrenome"
+          name="sobrenome"
+          size="small"
+          handleChange={handleCliente}
+        />
         <Input
           label="Celular"
           name="celular"
           size="small"
-          value={contato.celular}
-          handleChange={handleContato}
+          value={cliente.celular}
+          handleChange={handleCliente}
           maxLength={15}
         />
         <Input

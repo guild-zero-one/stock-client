@@ -6,8 +6,8 @@ import { useParams } from "next/navigation";
 
 import Link from "next/link";
 
-import { Fornecedor } from "@/models/Fornecedor/Fornecedor";
-import { todasMarcas } from "@/api/spring/services/FornecedorService";
+import { Marca } from "@/models/Marca/Marca";
+import { todasMarcas } from "@/api/spring/services/MarcaService";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
@@ -18,7 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 export default function EscolherMarca() {
   const [inputPesquisar, setInputPesquisar] = useState("");
 
-  const [marcas, setMarcas] = useState<Fornecedor[]>([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
 
   const { clienteId } = useParams();
 
@@ -26,7 +26,7 @@ export default function EscolherMarca() {
     const fetchMarcas = async () => {
       try {
         const resultado = await todasMarcas();
-        if (resultado) setMarcas(resultado);
+        if (resultado) setMarcas(resultado.content ?? []);
       } catch (error) {
         console.error("Erro ao buscar marcas:", error);
       }
@@ -38,7 +38,7 @@ export default function EscolherMarca() {
   const marcasFiltradas = useMemo(() => {
     const termo = inputPesquisar.trim().toLowerCase();
     if (!termo) return marcas;
-    return marcas.filter((marca) => marca.nome.toLowerCase().includes(termo));
+    return marcas.filter(marca => marca.nome.toLowerCase().includes(termo));
   }, [marcas, inputPesquisar]);
 
   return (
@@ -53,7 +53,7 @@ export default function EscolherMarca() {
           type="text"
           iconSymbol={<SearchIcon />}
           size="small"
-          handleChange={(e) => setInputPesquisar(e.target.value)}
+          handleChange={e => setInputPesquisar(e.target.value)}
         />
       </div>
 
@@ -67,7 +67,7 @@ export default function EscolherMarca() {
 
         {marcasFiltradas.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {marcasFiltradas.map((marca) => (
+            {marcasFiltradas.map(marca => (
               <Link
                 key={marca.id}
                 href={`/pedidos/clientes/${clienteId}/marcas/${marca.id}/produtos`}

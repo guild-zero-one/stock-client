@@ -1,6 +1,6 @@
 import { PedidoItemRequest } from "../PedidoItem/PedidoItemRequest";
 
 export interface PedidoRequest {
-  idUsuario: number;
+  idUsuario: string;
   itens: PedidoItemRequest[];
 }

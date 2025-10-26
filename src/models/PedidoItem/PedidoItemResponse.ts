@@ -1,6 +1,6 @@
 export interface PedidoItemResponse {
   id: number;
-  idProduto: number;
+  idProduto: string;
   quantidade: number;
   precoUnitario: number;
 }

@@ -48,13 +48,13 @@ export default function CardProduct({
           <h2 className="text-xs text-text-default font-bold">{nome}</h2>
           <div className="flex flex-col gap-1">
             <p className="text-text-secondary text-xs">
-              Preço Unit.: R$ {precoUnitario.toFixed(0)}
+              Preço Unit.: R$ {Number(precoUnitario).toFixed(0)}
             </p>
             <p className="text-text-secondary text-xs">
               Quantidade: {quantidade}
             </p>
             <p className="text-text-secondary text-xs">
-              Subtotal: R$ {(precoUnitario * quantidade).toFixed(0)}
+              Subtotal: R$ {(Number(precoUnitario) * quantidade).toFixed(0)}
             </p>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function CardProduct({
         {atualizar && (
           <InputNumber
             value={quantidade}
-            onChange={(novaQtd) => atualizar(produtoId, novaQtd)}
+            onChange={novaQtd => atualizar(produtoId, novaQtd)}
             min={1}
             max={99}
             step={1}
