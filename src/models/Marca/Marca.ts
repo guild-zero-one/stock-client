@@ -13,3 +13,6 @@ export interface MarcaCreate {
   descricao: string;
   imagemUrl?: string;
 }
+
+// Alias for Marca - used in some parts of the codebase
+export type Fornecedor = Marca;
