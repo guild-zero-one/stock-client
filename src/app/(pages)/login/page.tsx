@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { login } from "@/api/spring/services/UsuarioService";
 
 import Image from "next/image";
-import peopleImage from "@/assets/images/people.jpg";
 
 import Input from "@/components/input";
 import Button from "@/components/button";
@@ -71,7 +70,7 @@ export default function Home() {
       {/* Banner */}
       <header className="relative h-[100vh] text-white">
         {/* Imagem de fundo */}
-        <Image className="z-0 object-center object-cover" src={peopleImage} alt="Pessoas" fill priority />
+        <Image className="z-0 object-center object-cover" src="/people.jpg" alt="Pessoas" fill priority />
 
         {/* Filtro de cor */}
         <div className="absolute inset-0 bg-pink-default/65" />

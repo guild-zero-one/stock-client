@@ -24,12 +24,13 @@ export default function CustomersList({ clientes, uri }: ListaClientesProps) {
           <CardCustomer
             nome={cliente.nome}
             sobrenome={cliente.sobrenome}
-            contato={
-              cliente.contato?.celular
-                ? aplicarMascaraTelefone(cliente.contato.celular)
+            celular={
+              cliente.celular
+                ? aplicarMascaraTelefone(cliente.celular)
                 : "Celular não informado"
             }
             qtdPedidos={cliente.qtdPedidos}
+            ativo={cliente.ativo}
           />
         </Link>
       ))}

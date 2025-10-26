@@ -1,12 +1,17 @@
 import { Produto, ProdutoCreate } from "@/models/Produto/Produto";
+import { Paginacao } from "@/models/Paginacao/Paginacao";
+import { validateProductId } from "@/utils/uuidValidator";
+
 import api from "../api";
 
 const router = "/produtos";
 
-// Listar Todos produtos
-export const todosProdutos = async () => {
+// Listar Todos produtos com paginação
+export const todosProdutos = async (page: number = 0, size: number = 10) => {
   try {
-    const response = await api.get<Produto[]>(router);
+    const response = await api.get<Paginacao<Produto>>(
+      `${router}?pagina=${page}&tamanho=${size}`
+    );
     return response.data;
   } catch (error) {
     console.error("Erro ao listar produtos:", error);
@@ -15,8 +20,15 @@ export const todosProdutos = async () => {
 };
 
 // Listar produto por ID
-export const produtoPorId = async (id: number) => {
+export const produtoPorId = async (id: string) => {
   try {
+    // Validação do ID do produto
+    if (!validateProductId(id)) {
+      throw new Error(
+        `ID do produto inválido: ${id}. Esperado um UUID válido.`
+      );
+    }
+
     const response = await api.get<Produto>(`${router}/${id}`);
     return response.data;
   } catch (error) {
@@ -27,19 +39,26 @@ export const produtoPorId = async (id: number) => {
 
 export const produtoPorSku = async (sku: string) => {
   try {
-    const response = await api.get<Produto>(`${router}/sku?sku=${sku}`);
+    const response = await api.get<Produto>(`${router}/buscar?sku=${sku}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return null;
+    }
     console.error("Erro ao listar produto por sku:", error);
     throw error;
   }
 };
 
-// Listar produto por marca
-export const produtoPorMarca = async (marcaId: number) => {
+// Listar produto por marca com paginação
+export const produtoPorMarca = async (
+  idMarca: string,
+  page: number = 0,
+  size: number = 10
+) => {
   try {
-    const response = await api.get<Produto[]>(
-      `${router}/fornecedor/${marcaId}`
+    const response = await api.get<Paginacao<Produto>>(
+      `${router}/marca/${idMarca}?pagina=${page}&tamanho=${size}`
     );
     return response.data;
   } catch (error) {
@@ -58,9 +77,9 @@ export const cadastrarProduto = async (produto: ProdutoCreate) => {
   }
 };
 
-export const atualizarProduto = async (id: number, produto: Produto) => {
+export const atualizarProduto = async (id: string, produto: Produto) => {
   try {
-    const response = await api.patch<Produto>(`${router}/${id}`, produto);
+    const response = await api.put<Produto>(`${router}/${id}`, produto);
     return response.data;
   } catch (error) {
     console.error("Erro ao atualizar produto:", error);

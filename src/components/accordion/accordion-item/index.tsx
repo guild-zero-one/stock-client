@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface AccordionProductListProps {
   produtos: ProdutoCreate[];
   onChangeQuantidade: (index: number, value: number) => void;
-  onDeleteProduto: (sku: string) => void;
+  onDeleteProduto: (index: number) => void;
 }
 
 export default function AccordionProductList({
@@ -21,16 +21,16 @@ export default function AccordionProductList({
       {produtos.length > 0 ? (
         <ul className="flex flex-col gap-2">
           {produtos.map((produto, index) => (
-            <li key={index}>
+            <li key={`${produto.nome}-${produto.idMarca}-${index}`}>
               <div className="flex place-items-center gap-2 p-4 border border-gray-dark rounded-2xl w-full h-46">
                 <div className="flex justify-between place-items-center gap-2 w-full h-full">
                   <div className="flex justify-center place-items-center border border-gray-dark rounded w-36 h-36">
-                    {produto.imagem ? (
+                    {produto.imagemUrl ? (
                       <img
                         src={
-                          typeof produto.imagem === "string"
-                            ? produto.imagem
-                            : URL.createObjectURL(produto.imagem)
+                          typeof produto.imagemUrl === "string"
+                            ? produto.imagemUrl
+                            : URL.createObjectURL(produto.imagemUrl)
                         }
                         alt={produto.nome}
                         className="w-full h-full object-cover"
@@ -53,11 +53,11 @@ export default function AccordionProductList({
                   <div className="flex flex-col justify-between items-end h-full">
                     <DeleteIcon
                       className="text-text-secondary"
-                      onClick={() => onDeleteProduto(produto.sku)}
+                      onClick={() => onDeleteProduto(index)}
                     />
                     <InputNumber
                       value={produto.quantidade}
-                      onChange={(value) => onChangeQuantidade(index, value)}
+                      onChange={value => onChangeQuantidade(index, value)}
                     />
                   </div>
                 </div>

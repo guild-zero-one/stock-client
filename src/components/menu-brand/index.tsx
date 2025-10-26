@@ -26,7 +26,7 @@ export default function CategoriesMenu({ name, image, description, onClick = () 
 
         {/* Imagem Categoria */}
         <div className="flex justify-center items-center w-full h-full">
-          <img className="w-full h-full object-contain" src={image} alt="Imagem da categoria" />
+          <img className="w-full h-full object-cover rounded-xl" src={image} alt="Imagem da categoria" />
         </div>
       </div>
     </div>

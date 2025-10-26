@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { marcaPorId } from "@/api/spring/services/FornecedorService";
+import { marcaPorId } from "@/api/spring/services/MarcaService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
 import { buscarClientePorId } from "@/api/spring/services/ClienteService";
 import {
@@ -13,6 +13,7 @@ import {
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 import { Produto } from "@/models/Produto/Produto";
+import { PedidoRequest } from "@/models/Pedido/PedidoRequest";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
@@ -54,19 +55,19 @@ export default function EditarEscolherProduto() {
     },
   } as const;
 
-  const { marcaId, clienteId, pedidoId } = useParams();
+  const { marcaId: idMarca, clienteId, pedidoId } = useParams();
 
   useEffect(() => {
     const fetchFornecedor = async () => {
-      const fornecedor = await marcaPorId(Number(marcaId));
+      const fornecedor = await marcaPorId(idMarca as string);
       if (fornecedor) {
-        const produtos = await produtoPorMarca(Number(marcaId));
-        setProdutos(produtos);
+        const produtos = await produtoPorMarca(idMarca as string);
+        setProdutos(produtos.content ?? []);
       }
     };
 
     fetchFornecedor();
-  }, [marcaId]);
+  }, [idMarca]);
 
   useEffect(() => {
     const fetchCliente = async () => {
@@ -89,7 +90,7 @@ export default function EditarEscolherProduto() {
       const pedido = await buscarPedidoPorId(pedidoId);
 
       const itensMap = new Map();
-      pedido.itens.forEach((item) => {
+      pedido.itens.forEach(item => {
         if (itensMap.has(item.idProduto)) {
           const existente = itensMap.get(item.idProduto);
           itensMap.set(item.idProduto, {
@@ -104,7 +105,7 @@ export default function EditarEscolherProduto() {
       const itens = Array.from(itensMap.values());
 
       const index = itens.findIndex(
-        (item) => item.idProduto === produtoSelecionado.id
+        item => item.idProduto === produtoSelecionado.id
       );
 
       if (index >= 0) {
@@ -118,11 +119,14 @@ export default function EditarEscolherProduto() {
       }
 
       const pedidoAtualizado = {
-        idUsuario: Number(clienteId),
+        idUsuario: clienteId as string,
         itens: itens,
       };
 
-      const response = await editarPedido(pedidoId, pedidoAtualizado);
+      const response = await editarPedido(
+        pedidoId,
+        pedidoAtualizado as PedidoRequest
+      );
 
       showToast("success");
 
@@ -137,7 +141,7 @@ export default function EditarEscolherProduto() {
   const produtosFiltrados = useMemo(() => {
     const termo = inputPesquisar.trim().toLowerCase();
     if (!termo) return produtos;
-    return produtos.filter((produto) =>
+    return produtos.filter(produto =>
       produto.nome.toLowerCase().includes(termo)
     );
   }, [produtos, inputPesquisar]);
@@ -155,7 +159,7 @@ export default function EditarEscolherProduto() {
           label="Pesquisar"
           iconSymbol={<SearchIcon />}
           size="small"
-          handleChange={(e) => setInputPesquisar(e.target.value)}
+          handleChange={e => setInputPesquisar(e.target.value)}
         />
       </div>
 
@@ -164,7 +168,7 @@ export default function EditarEscolherProduto() {
         <div className="gap-4 grid grid-cols-1 px-4">
           <ProductsOrdersList
             produtos={produtosFiltrados}
-            onClick={(produto) => {
+            onClick={produto => {
               setProdutoSelecionado(produto);
               setModalAberto(true);
             }}

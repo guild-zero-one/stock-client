@@ -1,4 +1,4 @@
-import { Fornecedor } from "../Fornecedor/Fornecedor";
+import { Fornecedor } from "../Marca/Marca";
 import { ProdutoHasImagens } from "../Produto/ProdutoHasImagens";
 import { PedidoItemResponse } from "./PedidoItemResponse";
 

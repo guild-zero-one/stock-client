@@ -30,6 +30,47 @@ export const aplicarMascaraTelefone = (valor: string): string => {
 };
 
 /**
+ * Aplica máscara de telefone de forma inteligente, removendo caracteres de trás para frente
+ * @param valor - String atual com máscara
+ * @param novoValor - String nova sendo digitada
+ * @returns String formatada com a máscara aplicada corretamente
+ */
+export const aplicarMascaraTelefoneInteligente = (
+  valor: string,
+  novoValor: string
+): string => {
+  // Se está apagando (novo valor é menor que o anterior)
+  if (novoValor.length < valor.length) {
+    // Remove apenas o último caractere numérico
+    const apenasDigitos = valor.replace(/\D/g, "");
+    const novosDigitos = apenasDigitos.slice(0, -1);
+    
+    if (novosDigitos.length === 0) {
+      return "";
+    } else if (novosDigitos.length === 1) {
+      return `(${novosDigitos}`;
+    } else if (novosDigitos.length === 2) {
+      return `(${novosDigitos})`;
+    } else if (novosDigitos.length <= 6) {
+      return `(${novosDigitos.slice(0, 2)}) ${novosDigitos.slice(2)}`;
+    } else if (novosDigitos.length <= 10) {
+      return `(${novosDigitos.slice(0, 2)}) ${novosDigitos.slice(
+        2,
+        6
+      )}-${novosDigitos.slice(6)}`;
+    } else {
+      return `(${novosDigitos.slice(0, 2)}) ${novosDigitos.slice(
+        2,
+        7
+      )}-${novosDigitos.slice(7, 11)}`;
+    }
+  } else {
+    // Se está digitando, aplica a máscara normal
+    return aplicarMascaraTelefone(novoValor);
+  }
+};
+
+/**
  * Remove a máscara de telefone, retornando apenas os números
  * @param valor - String com máscara de telefone
  * @returns String contendo apenas números

@@ -17,6 +17,7 @@ type InputProps = {
   iconColor?: string;
   disabled?: boolean;
   size?: "small" | "default";
+  fullWidth?: boolean;
   status?: "default" | "success" | "info" | "error";
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   maxLength?: number;
@@ -34,6 +35,7 @@ export default function Input({
   disabled = false,
   size = "default",
   status = "default",
+  fullWidth = false,
   handleChange = () => {},
   maxLength,
 }: InputProps) {
@@ -66,7 +68,11 @@ export default function Input({
   return (
     <div>
       <div
-        className={`relative flex border ${inputStyleClasses[status]} rounded focus-within:border-pink-default items-center px-4 gap-4 bg-white`}
+        className={`relative flex border ${
+          inputStyleClasses[status]
+        } rounded focus-within:border-pink-default ${
+          value ? "border-pink-default" : ""
+        } items-center px-4 gap-4 bg-white`}
       >
         {/* Icone do input */}
         {iconSymbol && <div className={`text-${iconColor}`}>{iconSymbol}</div>}
@@ -78,26 +84,27 @@ export default function Input({
           onChange={handleChange}
           disabled={disabled}
           maxLength={maxLength}
+          placeholder=" "
           className={`peer border border-gray-dark focus:border-pink-default rounded focus:outline-none w-full bg-white border-none ${sizeClasses} ${
             disabled ? "text-gray-400" : "inherit"
-          }`}
+          } ${fullWidth ? "w-full" : ""}`}
         />
 
         {/* Label do input */}
         <label
           htmlFor={name}
           className={`
-                        absolute ${iconSpace} z-1 top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all pointer-events-none ${
-            disabled ? "text-gray-400" : "inherit"
+                        absolute ${iconSpace} z-1 top-0 text-xs -translate-y-1/2 bg-white leading-none transition-all duration-200 ease-in-out pointer-events-none ${
+            disabled ? "text-gray-400" : "text-pink-default"
           }
 
-                        // Classes para o placeholder do input
+                        // Classes para quando o placeholder está visível (input vazio)
                         peer-placeholder-shown:text-sm
                         peer-placeholder-shown:top-1/2
                         peer-placeholder-shown:-translate-y-1/2
                         peer-placeholder-shown:text-gray-m-dark
 
-                        // Classes para o label do input
+                        // Classes para quando o input tem foco
                         peer-focus:text-xs
                         peer-focus:top-0
                         peer-focus:-translate-y-1/2
@@ -110,7 +117,7 @@ export default function Input({
       {/* Mensagem de ajuda do input */}
       {showHelper && (
         <span
-          className={`text-xs ${helperStatusClass[status]} flex items-center gap-1 ml-4 mt-1`}
+          className={`text-xs ${helperStatusClass[status]} flex items-center gap-1 mt-1`}
         >
           {helperSymbol[status]} {messageHelper}
         </span>

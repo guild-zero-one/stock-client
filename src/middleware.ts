@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const path = request.nextUrl.pathname;
 
-  const publicPaths = ["/login", "/_next", "/favicon.ico", "simlady.svg"];
+  const publicPaths = ["/login", "/_next", "/favicon.ico", "/simlady.svg", "/people.jpg", "/serpapi"];
   const protectedPaths = [
     "/estoque",
     "/clientes",
@@ -33,7 +33,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // A partir daqui, só entra quem precisa de autenticação
   if (!token) {
     console.error("Token não encontrado.");
     return NextResponse.redirect(new URL("/login", request.url));

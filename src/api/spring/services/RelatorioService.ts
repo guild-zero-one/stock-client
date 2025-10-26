@@ -1,5 +1,7 @@
 import api from "../api";
 
+import { Top3ProdutosResponse } from "@/models/Relatorio/Top3ProdutosResponse";
+
 const router = "/relatorios";
 
 export const quantidadePedidosEmAberto = async () => {
@@ -26,7 +28,9 @@ export const totalVendasMensal = async () => {
 
 export const top3ProdutosMes = async () => {
   try {
-    const response = await api.get<string[]>(`${router}/top3-produtos-mes`);
+    const response = await api.get<Top3ProdutosResponse[]>(
+      `${router}/vendas-por-produto`
+    );
     return response.data;
   } catch (error) {
     console.error("Erro ao listar top 3 produtos:", error);

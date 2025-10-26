@@ -32,7 +32,7 @@ export default function Modal({
             ></div>
 
             {/* Modal Card */}
-            <div className="top-1/2 left-1/2 z-50 fixed flex flex-col bg-white shadow-md p-4 w-[95vw] max-h-[70vh] -translate-x-1/2 -translate-y-1/2">
+            <div className="top-1/2 left-1/2 z-50 fixed flex flex-col bg-white shadow-md p-4 w-[95vw] max-h-[90vh] overflow-visible -translate-x-1/2 -translate-y-1/2">
 
                 {/* Modal Head */}
                 <header className="flex justify-end w-full text-gray-dark text-2xl">
@@ -47,23 +47,26 @@ export default function Modal({
                 </header>
 
                 {/* Modal Body */}
-                <main className="flex flex-col place-items-center mb-4 w-full grow">
-                    
+                <main className="flex flex-col mb-4 w-full grow">
                     {/* Icon */}
-                    <div className="text-pink-default text-9xl">
-                        {icon && isValidElement(icon) &&
-                            cloneElement(icon, {
-                                fontSize: icon.props.fontSize || "inherit",
-                            })}
-                    </div>
+                    {icon && (
+                        <div className="text-pink-default text-9xl flex justify-center">
+                            {isValidElement(icon) &&
+                                cloneElement(icon, {
+                                    fontSize: icon.props.fontSize || "inherit",
+                                })}
+                        </div>
+                    )}
 
                     {/* Título */}
-                    <div className="font-lexend text-2xl">
-                        {title}
-                    </div>
+                    {title && (
+                        <div className="font-lexend text-2xl text-center mb-2">
+                            {title}
+                        </div>
+                    )}
 
-                    {/* Descrição */}
-                    <div className="w-full text-text-secondary text-sm">
+                    {/* Body com scroll controlado */}
+                    <div className="w-full text-text-secondary text-sm" style={{ maxHeight: '60vh', overflowY: 'hidden' }}>
                         {body}
                     </div>
                 </main>

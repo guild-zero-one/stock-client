@@ -89,10 +89,10 @@ export default function Toast({
   return (
     <div
       className={`
-        w-full absolute z-50 flex p-4 shadow-lg rounded-b-2xl 
+        w-full fixed top-0 left-0 z-50 flex p-4 shadow-lg rounded-b-2xl 
         transition-all duration-500 ease-in-out transform
         ${variantClass} 
-        ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}
+        ${show ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"}
       `}
     >
       <div className="flex items-center justify-between w-full">

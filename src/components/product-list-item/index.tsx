@@ -1,23 +1,17 @@
-import { ImagemProduto } from "@/models/Imagem/ImagemProduto";
 import { Produto } from "@/models/Produto/Produto";
-
 import InventoryIcon from "@mui/icons-material/Inventory";
 
 interface ProductsListItemProps {
   produto: Produto;
-  imagem: ImagemProduto | undefined;
 }
 
-export default function ProductsListItem({
-  produto,
-  imagem,
-}: ProductsListItemProps) {
+export default function ProductsListItem({ produto }: ProductsListItemProps) {
   return (
     <div className="flex flex-col bg-white p-2 border border-gray-dark rounded w-full min-h-[45vh]">
       <div className="flex-1 w-full grow">
-        {imagem ? (
+        {produto.imagemUrl ? (
           <img
-            src={imagem.urlImagem}
+            src={produto.imagemUrl}
             alt={produto.nome}
             className="w-full h-full object-cover"
           />

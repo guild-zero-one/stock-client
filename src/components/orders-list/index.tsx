@@ -42,7 +42,7 @@ export default function OrdersList({
                   nome={item.produto.nome}
                   precoUnitario={item.item.precoUnitario}
                   quantidade={item.item.quantidade}
-                  imagemUrl={item.produto.imagens[0]?.urlImagem ?? ""}
+                  imagemUrl={item.produto.imagemUrl ?? ""}
                   atualizar={atualizar}
                   deletar={deletar}
                 />

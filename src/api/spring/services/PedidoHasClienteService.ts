@@ -2,8 +2,8 @@ import { PedidoHasProduto } from "@/models/Pedido/PedidoHasProduto";
 import { PedidoItemHasProduto } from "@/models/PedidoItem/PedidoItemHasProduto";
 
 import { buscarPedidoPorId } from "./PedidoVendaService";
-import { listarProdutoComImagensPorId } from "./ProdutoHasImagensService";
-import { marcaPorId } from "./FornecedorService";
+import { produtoPorId } from "./ProdutoService";
+import { marcaPorId } from "./MarcaService";
 
 import { ParamValue } from "next/dist/server/request/params";
 
@@ -13,9 +13,9 @@ export const buscarPedidoDetalhadoPorId = async (
   const pedidoResponse = await buscarPedidoPorId(pedidoId);
 
   const itensDetalhados: PedidoItemHasProduto[] = await Promise.all(
-    pedidoResponse.itens.map(async (item) => {
-      const produto = await listarProdutoComImagensPorId(item.idProduto);
-      const fornecedor = await marcaPorId(produto.fornecedorId);
+    pedidoResponse.itens.map(async item => {
+      const produto = await produtoPorId(item.idProduto);
+      const fornecedor = await marcaPorId(produto.idMarca);
 
       return {
         item,

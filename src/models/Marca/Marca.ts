@@ -1,16 +1,15 @@
 import { Produto } from "../Produto/Produto";
 
-export interface Fornecedor {
-  id: number;
+export interface Marca {
+  id: string;
   nome: string;
   imagemUrl: string;
   descricao: string;
   produtos: Produto[];
-  cnpj: string;
 }
 
-export interface FornecedorCreate {
+export interface MarcaCreate {
   nome: string;
   descricao: string;
-  cnpj: string;
+  imagemUrl?: string;
 }
