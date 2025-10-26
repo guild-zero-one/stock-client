@@ -173,7 +173,7 @@ export default function DetalhePedido() {
     fetchPedido();
   }, [pedidoId]);
 
-  const atualizarQuantidade = (produtoId: number, novaQtd: number) => {
+  const atualizarQuantidade = (produtoId: string, novaQtd: number) => {
     if (!pedido) return;
 
     const novosItens = pedido.itens.map(item =>
@@ -191,7 +191,7 @@ export default function DetalhePedido() {
     setPedido({ ...pedido, itens: novosItens });
   };
 
-  const deletarItem = (produtoId: number) => {
+  const deletarItem = (produtoId: string) => {
     if (!pedido) return;
 
     const novosItens = pedido.itens.filter(

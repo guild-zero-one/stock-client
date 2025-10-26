@@ -7,8 +7,8 @@ import CardProduct from "@/components/card-product";
 
 interface OrdersListProps {
   pedido: PedidoHasProduto;
-  atualizar?: (produtoId: number, novaQtd: number) => void;
-  deletar?: (produtoId: number) => void;
+  atualizar?: (produtoId: string, novaQtd: number) => void;
+  deletar?: (produtoId: string) => void;
 }
 
 export default function OrdersList({

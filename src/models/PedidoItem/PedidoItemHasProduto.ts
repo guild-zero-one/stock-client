@@ -1,9 +1,9 @@
-import { Fornecedor } from "../Marca/Marca";
-import { ProdutoHasImagens } from "../Produto/ProdutoHasImagens";
+import { Marca } from "../Marca/Marca";
+import { Produto } from "../Produto/Produto";
 import { PedidoItemResponse } from "./PedidoItemResponse";
 
 export interface PedidoItemHasProduto {
   item: PedidoItemResponse;
-  produto: ProdutoHasImagens;
-  fornecedor: Fornecedor;
+  produto: Produto;
+  fornecedor: Marca;
 }

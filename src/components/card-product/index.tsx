@@ -9,11 +9,11 @@ import { Delete, ImageOutlined } from "@mui/icons-material";
 interface CardProductProps {
   nome: string;
   quantidade: number;
-  produtoId: number;
+  produtoId: string;
   precoUnitario: number;
   imagemUrl: string;
-  atualizar?: (produtoId: number, novaQtd: number) => void;
-  deletar?: (produtoId: number) => void;
+  atualizar?: (produtoId: string, novaQtd: number) => void;
+  deletar?: (produtoId: string) => void;
 }
 
 export default function CardProduct({
