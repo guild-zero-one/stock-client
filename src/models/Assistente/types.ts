@@ -24,9 +24,18 @@ export interface AlertasData {
     produtos_analisados?: number;
     produtos_prioritarios?: number;
   };
+  Resumo?: {
+    Total_Criticos?: number;
+    Total_Atencao?: number;
+    Produtos_Analisados?: number;
+    Produtos_Prioritarios?: number;
+  };
   alertas_criticos?: any[];
+  Alertas_Criticos?: any[];
   alertas_atencao?: any[];
+  Alertas_Atencao?: any[];
   recomendacoes_gerais?: string[];
+  Recomendacoes_Gerais?: string[];
 }
 
 export interface ActionData {

@@ -162,12 +162,9 @@ export function FinancialCharts({
       y: {
         formatter: (val: number, opts: any) => {
           const status = statusData[opts.seriesIndex];
-          return [
-            `Quantidade: ${status.quantidade}`,
-            `Valor: R$ ${status.valor.toLocaleString("pt-BR", {
-              minimumFractionDigits: 2,
-            })}`,
-          ];
+          return `Quantidade: ${status.quantidade}\nValor: R$ ${status.valor.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}`;
         },
       },
     },
