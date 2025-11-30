@@ -6,48 +6,57 @@ import dynamic from "next/dynamic";
 
 const ApexCharts = dynamic(() => import("react-apexcharts"), { ssr: false });
 
+// Hook para detectar tamanho da tela
+function useWindowSize() {
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 1024,
+    height: typeof window !== "undefined" ? window.innerHeight : 768,
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+      handleResize();
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
+  return windowSize;
+}
+
 import {
   top3ProdutosMes,
   totalVendasMensal,
-  quantidadePedidosUltimos6Meses,
   faturamentoUltimos6Meses,
+  pedidosPorStatusMesAtual,
 } from "@/api/spring/services/RelatorioService";
 
 import { Top3ProdutosResponse } from "@/models/Relatorio/Top3ProdutosResponse";
 
 import Header from "@/components/header";
 
-function ordenarAnoMes(keys: string[]) {
-  return keys.sort((a, b) => {
-    const [ay, am] = a.split("-").map(Number);
-    const [by, bm] = b.split("-").map(Number);
-    return ay !== by ? ay - by : am - bm;
-  });
-}
-
 export default function Dashboard() {
+  const { width } = useWindowSize();
   const [kpiVendas, setKpiVendas] = useState(0);
   const [kpiTop3Produtos, setKpiTop3Produtos] = useState<
     Top3ProdutosResponse[]
   >([]);
-  const [graphQuantidadePedidos, setGraphQuantidadePedidos] = useState<
+  const [faturamento6Meses, setFaturamento6Meses] = useState<
     Record<string, number>
   >({});
-  const [graphFaturamento, setGraphFaturamento] = useState<
+  const [pedidosPorStatus, setPedidosPorStatus] = useState<
     Record<string, number>
   >({});
-  const [mesesDinamicos, setMesesDinamicos] = useState<string[]>([]);
-  const [graphQtdSeries, setGraphQtdSeries] = useState([
-    { name: "Qtd. Pedidos", data: [] as number[] },
-  ]);
-  const [graphFatSeries, setGraphFatSeries] = useState([
-    { name: "Faturamento", data: [] as number[] },
-  ]);
 
-  const getMaxFromData = (data: number[]) => {
-    const max = Math.max(...data, 1);
-    return Math.ceil(max);
-  };
+  // Altura dinâmica do gráfico baseada no tamanho da tela
+  const chartHeight = width < 640 ? 250 : 300;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,23 +67,11 @@ export default function Dashboard() {
         const top3Produtos = await top3ProdutosMes();
         setKpiTop3Produtos(top3Produtos);
 
-        const qtd6mes = await quantidadePedidosUltimos6Meses();
-        setGraphQuantidadePedidos(qtd6mes);
+        const faturamento = await faturamentoUltimos6Meses();
+        setFaturamento6Meses(faturamento);
 
-        const val6meses = await faturamentoUltimos6Meses();
-        setGraphFaturamento(val6meses);
-
-        const mesesOrdenados = ordenarAnoMes(Object.keys(qtd6mes).reverse());
-
-        setMesesDinamicos(mesesOrdenados);
-
-        const seriesQtdArray = mesesOrdenados.map(mes => qtd6mes[mes] ?? 0);
-        const seriesFatArray = mesesOrdenados.map(
-          mes => Number(val6meses[mes]) ?? 0
-        );
-
-        setGraphQtdSeries([{ name: "Qtd. Pedidos", data: seriesQtdArray }]);
-        setGraphFatSeries([{ name: "Faturamento", data: seriesFatArray }]);
+        const pedidosStatus = await pedidosPorStatusMesAtual();
+        setPedidosPorStatus(pedidosStatus);
       } catch (error) {
         console.error("Erro ao buscar dados de relatórios:", error);
       }
@@ -82,76 +79,125 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const maxQtd = getMaxFromData(graphQtdSeries[0].data);
-  const maxFat = getMaxFromData(graphFatSeries[0].data);
-
-  const graphQtdOptions = {
-    chart: { id: "vendas-bar", toolbar: { show: false } },
-    title: {
-      text: "Qtd. Vendas Mensais",
-      align: "left" as const,
-      style: {
-        fontSize: "18px",
-        fontWeight: "bold",
-        fontFamily: "Nunito, Arial, sans-serif",
-        color: "#a6036d",
-      },
-    },
-    xaxis: { categories: mesesDinamicos },
-    yaxis: {
-      min: 0,
-      max: maxQtd,
-      tickAmount: Math.min(maxQtd, 5),
-      forceNiceScale: false,
-    },
-    colors: ["#a6036d"],
+  // Preparar dados para o gráfico de pizza
+  const statusLabels = Object.keys(pedidosPorStatus);
+  const statusValues = Object.values(pedidosPorStatus);
+  const statusColors: Record<string, string> = {
+    PENDENTE: "#FFA500",
+    CONCLUIDO: "#28a745",
+    CANCELADO: "#dc3545",
   };
 
-  const graphFatOptions = {
+  const pieChartOptions = {
     chart: {
-      id: "vendas-line",
+      type: "pie" as const,
       toolbar: { show: false },
+      width: "100%",
     },
     title: {
-      text: "Crescimento R$ Mensal",
-      align: "left" as const,
+      text: "Pedidos por Status - Mês Atual",
+      align: "center" as const,
       style: {
-        fontSize: "18px",
+        fontSize: width < 640 ? "16px" : "18px",
         fontWeight: "bold",
         fontFamily: "Nunito, Arial, sans-serif",
         color: "#a6036d",
       },
     },
-    xaxis: { categories: mesesDinamicos },
-    yaxis: {
-      min: 0,
-      max: maxFat,
-      tickAmount: Math.min(maxFat, 5),
-      forceNiceScale: false,
+    labels: statusLabels,
+    colors: statusLabels.map(label => statusColors[label] || "#a6036d"),
+    legend: {
+      position: "bottom" as const,
+      fontSize: width < 640 ? "11px" : "14px",
+      fontFamily: "Nunito, Arial, sans-serif",
+      itemMargin: {
+        horizontal: width < 640 ? 5 : 10,
+        vertical: width < 640 ? 3 : 5,
+      },
+      horizontalAlign: "center" as const,
     },
-    colors: ["#a6036d"],
     tooltip: {
       y: {
-        formatter: (val: number) =>
-          "R$ " + val.toLocaleString("pt-BR", { minimumFractionDigits: 2 }),
+        formatter: (val: number) => `${val} pedido(s)`,
       },
     },
-    stroke: {
-      curve: "smooth" as const,
-      width: 3,
+    plotOptions: {
+      pie: {
+        offsetY: 0,
+      },
     },
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: width < 640 ? "14px" : "18px",
+        fontWeight: "bold",
+        fontFamily: "Nunito, Arial, sans-serif",
+        colors: ["#FFFFFF"],
+      },
+      dropShadow: {
+        enabled: false,
+      },
+      offsetY: 0,
+    },
+    responsive: [
+      {
+        breakpoint: 640,
+        options: {
+          chart: {
+            width: "100%",
+            height: 280,
+          },
+          legend: {
+            position: "bottom" as const,
+            fontSize: "11px",
+            itemMargin: {
+              horizontal: 5,
+              vertical: 3,
+            },
+            horizontalAlign: "center" as const,
+          },
+          title: {
+            align: "center" as const,
+            style: {
+              fontSize: "16px",
+            },
+          },
+          dataLabels: {
+            style: {
+              fontSize: "14px",
+              fontWeight: "bold",
+              fontFamily: "Nunito, Arial, sans-serif",
+              colors: ["#FFFFFF"],
+            },
+            dropShadow: {
+              enabled: false,
+            },
+            offsetY: 0,
+          },
+        },
+      },
+    ],
   };
+
+  const pieChartSeries = statusValues;
+
+  // Preparar dados da tabela de faturamento
+  // O backend já retorna os meses ordenados (mais recente primeiro)
+  const mesesOrdenados = Object.keys(faturamento6Meses);
 
   return (
     <div className="relative flex flex-col w-full h-screen bg-white-default gap-2">
-      <section className="flex flex-col gap-2 p-4 w-full h-full">
+      <section className="flex flex-col gap-2 p-4 w-full h-full overflow-y-auto">
         <Header title="Geral" subtitle="Relatórios" backRouter="/" />
 
-        <div className="flex gap-2 w-full h-1/6">
-          <div className="bg-white shadow-lg w-full h-full rounded-lg p-2 flex flex-col justify-between">
-            <h3 className="text-xs text-left">Vendas R$ Mensal</h3>
-            <div className="flex-1 flex items-center justify-center">
-              <h2 className="font-bold text-2xl text-center">
+        {/* KPIs - Linha 1 */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <div className="bg-white shadow-lg w-full rounded-lg p-4 flex flex-col justify-center items-center min-h-[100px]">
+            <h3 className="text-xs text-left text-gray-600 mb-2 w-full">
+              Vendas R$ Mensal
+            </h3>
+            <div className="flex items-center justify-center w-full flex-1">
+              <h2 className="font-bold text-2xl text-center text-pink-default">
                 R${" "}
                 {Number(kpiVendas).toLocaleString("pt-BR", {
                   minimumFractionDigits: 2,
@@ -160,33 +206,114 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-white shadow-lg w-full h-full rounded-lg p-2 g-0.5">
-            <h3 className="text-xs">Top 3 Produtos</h3>
-            {kpiTop3Produtos.map((produto, idx) => (
-              <div className="font-bold text-sm" key={produto.id}>
-                {idx + 1}. {produto.nome}
-              </div>
-            ))}
+          <div className="bg-white shadow-lg w-full rounded-lg p-4 flex flex-col min-h-[100px]">
+            <h3 className="text-xs text-gray-600 mb-3 font-semibold">
+              Top 3 Produtos - Mês Atual
+            </h3>
+            <div className="flex flex-col gap-2 flex-1">
+              {kpiTop3Produtos.length > 0 ? (
+                kpiTop3Produtos.map((produto, idx) => (
+                  <div
+                    key={produto.id}
+                    className="flex items-start gap-2 p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-pink-default text-white flex items-center justify-center text-xs font-bold">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className="font-semibold text-sm text-text-default truncate"
+                        title={produto.nome}
+                      >
+                        {produto.nome}
+                      </p>
+                      <div className="flex gap-3 mt-1 text-xs text-gray-500">
+                        <span>Qtd: {produto.quantidadeVendida}</span>
+                        <span>
+                          R${" "}
+                          {Number(produto.valorTotalVendido).toLocaleString(
+                            "pt-BR",
+                            {
+                              minimumFractionDigits: 2,
+                            }
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-gray-400">Carregando...</div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col w-full h-full gap-2">
-          <div className="bg-white rounded-lg shadow-lg p-2 h-full">
-            <ApexCharts
-              options={graphQtdOptions}
-              series={graphQtdSeries}
-              type="bar"
-              title="Qtd. Vendas Mensais"
-            />
+        {/* Tabela de Faturamento - Linha 2 */}
+        <div className="bg-white rounded-lg shadow-lg p-4 w-full">
+          <h3 className="text-lg font-bold text-pink-default mb-4">
+            Faturamento - Últimos 6 Meses
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left p-3 text-sm font-semibold text-gray-700">
+                    Mês
+                  </th>
+                  <th className="text-right p-3 text-sm font-semibold text-gray-700">
+                    Valor Total
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {mesesOrdenados.length > 0 ? (
+                  mesesOrdenados.map(mes => (
+                    <tr
+                      key={mes}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="p-3 text-sm text-text-default">{mes}</td>
+                      <td className="p-3 text-sm text-right font-semibold text-text-default">
+                        R${" "}
+                        {Number(faturamento6Meses[mes] || 0).toLocaleString(
+                          "pt-BR",
+                          { minimumFractionDigits: 2 }
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={2} className="p-4 text-center text-gray-400">
+                      Carregando dados...
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-          <div className="bg-white rounded-lg shadow-lg p-2 h-ful">
-            <ApexCharts
-              options={graphFatOptions}
-              series={graphFatSeries}
-              type="line"
-              title="Crescimento R$ Mensal"
-            />
-          </div>
+        </div>
+
+        {/* Gráfico de Pizza - Linha 3 */}
+        <div className="bg-white rounded-lg shadow-lg p-4 w-full flex items-center justify-center">
+          {statusLabels.length > 0 && statusValues.some(v => v > 0) ? (
+            <div className="w-full flex justify-center">
+              <ApexCharts
+                options={pieChartOptions}
+                series={pieChartSeries}
+                type="pie"
+                height={chartHeight}
+              />
+            </div>
+          ) : (
+            <div
+              className="flex items-center justify-center"
+              style={{ minHeight: `${chartHeight}px` }}
+            >
+              <p className="text-gray-400">Carregando dados do gráfico...</p>
+            </div>
+          )}
         </div>
       </section>
     </div>

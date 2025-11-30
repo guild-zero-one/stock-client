@@ -29,7 +29,7 @@ export const totalVendasMensal = async () => {
 export const top3ProdutosMes = async () => {
   try {
     const response = await api.get<Top3ProdutosResponse[]>(
-      `${router}/vendas-por-produto`
+      `${router}/top3-produtos-mes-atual`
     );
     return response.data;
   } catch (error) {
@@ -58,6 +58,30 @@ export const quantidadePedidosUltimos6Meses = async () => {
     return response.data;
   } catch (error) {
     console.error("Erro ao listar quantidade produtos últimos 6 meses:", error);
+    throw error;
+  }
+};
+
+export const faturamentoUltimos4Meses = async () => {
+  try {
+    const response = await api.get<Record<string, number>>(
+      `${router}/faturamento-ultimos-4-meses`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao listar faturamento últimos 4 meses:", error);
+    throw error;
+  }
+};
+
+export const pedidosPorStatusMesAtual = async () => {
+  try {
+    const response = await api.get<Record<string, number>>(
+      `${router}/pedidos-por-status-mes-atual`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao listar pedidos por status do mês atual:", error);
     throw error;
   }
 };
