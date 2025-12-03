@@ -48,7 +48,7 @@ export default function Estoque() {
   );
 
   return (
-    <div className="relative flex flex-col w-full min-h-screen">
+    <div className="relative flex flex-col w-full h-screen overflow-hidden">
       <Header backRouter="/" title="Estoque" subtitle="Marca">
         <DropdownAdd>
           <Link href={"./marcas/adicionar"}>
@@ -68,13 +68,13 @@ export default function Estoque() {
         />
       </div>
 
-      <div className="bottom-0 absolute flex flex-col bg-pink-secondary p-4 pb-0 rounded-t-2xl w-full h-[80%] max-h-[85%]">
+      <div className="bottom-0 absolute flex flex-col bg-pink-secondary p-4 pb-0 rounded-t-2xl w-full h-[75%]">
         <div className="flex flex-col justify-center items-center my-1 w-full">
           <span className="font-bold text-pink-secondary-dark text-sm">
             Marcas
           </span>
         </div>
-        <div className="flex flex-col flex-1 gap-2 w-full overflow-y-auto scrollbar-minimal">
+        <div className="flex flex-col flex-1 gap-2 w-full overflow-y-auto hide-scrollbar">
           {inputPesquisar.length === 0 ? (
             marcas.length > 0 ? (
               marcas.map(marca => (
@@ -103,7 +103,7 @@ export default function Estoque() {
             ))
           ) : (
             <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
-              <h2>Nenhuma marca encontrada :(</h2>
+              <h2>Nenhuma marca encontrada.</h2>
             </div>
           )}
         </div>
