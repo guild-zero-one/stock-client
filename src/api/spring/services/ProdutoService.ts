@@ -60,7 +60,15 @@ export const produtoPorMarca = async (
     const response = await api.get<Paginacao<Produto>>(
       `${router}/marca/${idMarca}?pagina=${page}&tamanho=${size}`
     );
-    return response.data;
+
+    console.log("Dados retornados pelo endpoint produtoPorMarca:", response.data);
+
+    // Adapta o campo "last" no frontend
+    const dadosPaginados = response.data;
+    const last =
+      dadosPaginados.page.number + 1 === dadosPaginados.page.totalPages;
+
+    return { ...dadosPaginados, last };
   } catch (error) {
     console.error("Erro ao listar produto:", error);
     throw error;

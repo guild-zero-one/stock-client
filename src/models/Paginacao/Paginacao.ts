@@ -14,6 +14,7 @@ export interface Pageable {
 }
 
 export interface Paginacao<T> {
+  page: any;
   content: T[];
   pageable: Pageable;
   last: boolean;
