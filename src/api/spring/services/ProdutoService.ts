@@ -61,8 +61,6 @@ export const produtoPorMarca = async (
       `${router}/marca/${idMarca}?pagina=${page}&tamanho=${size}`
     );
 
-    console.log("Dados retornados pelo endpoint produtoPorMarca:", response.data);
-
     // Adapta o campo "last" no frontend
     const dadosPaginados = response.data;
     const last =
