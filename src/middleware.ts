@@ -50,7 +50,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   } catch (err) {
     console.error("Token inválido ou expirado.");
-    return NextResponse.redirect(new URL("/login", request.url));
+
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("token", "", { maxAge: 0 }); 
+
+    return response;
   }
 }
 
