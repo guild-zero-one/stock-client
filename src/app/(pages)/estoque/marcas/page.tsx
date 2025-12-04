@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 import { Marca } from "@/models/Marca/Marca";
 import { Paginacao } from "@/models/Paginacao/Paginacao";
@@ -117,6 +118,9 @@ export default function Estoque() {
     marca.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim())
   );
 
+  // Remove duplicatas com base no ID antes de renderizar
+  const marcasUnicas = Array.from(new Map(marcas.map(marca => [marca.id, marca])).values());
+
   return (
     <div className="relative flex flex-col w-full h-screen overflow-hidden">
       <Header backRouter="/" title="Estoque" subtitle="Marca">
@@ -148,27 +152,40 @@ export default function Estoque() {
           {inputPesquisar.length === 0 ? (
             marcas.length > 0 ? (
               <>
-                {marcas.map(marca => (
-                  <Link key={marca.id} href={`./marcas/${marca.id}/produtos`}>
-                    <MenuBrand
-                      name={marca.nome}
-                      image={marca.imagemUrl}
-                      description={marca.descricao}
-                    />
-                  </Link>
+                {marcasUnicas.map((marca, index) => (
+                  <motion.div
+                    key={marca.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Link href={`./marcas/${marca.id}/produtos`}>
+                      <MenuBrand
+                        name={marca.nome}
+                        image={marca.imagemUrl}
+                        description={marca.descricao}
+                      />
+                    </Link>
+                  </motion.div>
                 ))}
                 <div ref={sentinelaRef} className="h-5" />
                 {carregandoMais && (
-                  <div className="flex justify-center items-center py-4">
-                    <div className="text-pink-secondary-dark">
-                      Carregando mais marcas...
-                    </div>
+                  <div className="flex flex-col gap-3 px-4">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="animate-pulse flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm">
+                        <div className="w-12 h-12 bg-gray-300 rounded-full" />
+                        <div className="flex flex-col flex-1">
+                          <div className="w-1/3 h-3 bg-gray-300 rounded"></div>
+                          <div className="w-2/3 h-3 bg-gray-200 rounded mt-2"></div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </>
             ) : (
               <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
-                <h2>Nenhuma marca cadastrada :(</h2>
+                <h2>Nenhuma marca encontrada.</h2>
               </div>
             )
           ) : marcasFiltradas.length > 0 ? (
