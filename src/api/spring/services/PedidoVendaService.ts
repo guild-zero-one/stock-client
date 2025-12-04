@@ -21,13 +21,25 @@ export const listarPedidos = async (
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
-    const response = await api.get<Paginacao<PedidoResponse>>(url);
-    return response.data;
+    const response = await api.get(url);
+    const data = response.data;
+
+    // 🔥 ADAPTA O "last" SE NÃO EXISTIR 🔥
+    const last =
+      data.last !== undefined
+        ? data.last
+        : (data.page + 1 >= data.totalPages); // ← cálculo universal
+
+    return {
+      ...data,
+      last,
+    };
   } catch (error) {
     console.error("Erro ao listar pedidos:", error);
     throw error;
   }
 };
+
 
 export const buscarPedidoPorId = async (id: ParamValue) => {
   try {

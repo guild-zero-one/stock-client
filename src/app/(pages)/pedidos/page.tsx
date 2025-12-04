@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { listarPedidos } from "@/api/spring/services/PedidoVendaService";
-import { buscarClientePorId } from "@/api/spring/services/ClienteService";
-
 import { PedidoHasCliente } from "@/models/Pedido/PedidoHasCliente";
 import { PedidoItemResponse } from "@/models/PedidoItem/PedidoItemResponse";
 import { Paginacao } from "@/models/Paginacao/Paginacao";
-import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
@@ -23,79 +20,98 @@ import CardOrder from "@/components/card-order";
 
 export default function Pedido() {
   const [pedidos, setPedidos] = useState<PedidoHasCliente[]>([]);
-  const [status, setStatus] = useState<string[]>(["PENDENTE"]);
+  const [paginacao, setPaginacao] = useState<Paginacao<PedidoHasCliente> | null>(null);
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [carregando, setCarregando] = useState(false);
+  const [carregandoMais, setCarregandoMais] = useState(false);
   const [search, setSearch] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [status, setStatus] = useState<string[]>(["PENDENTE"]);
 
-  const fetchPedidos = async () => {
-    if (loading) return;
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-    setLoading(true);
+  // 🔒 Trava instantânea contra múltiplos triggers do observer
+  const isLoadingRef = useRef(false);
+
+  const carregarPedidos = async (pagina: number = 0, adicionar: boolean = false) => {
+    // 🔒 trava a requisição imediatamente
+    isLoadingRef.current = true;
+
+    if (adicionar) {
+      setCarregandoMais(true);
+    } else {
+      setCarregando(true);
+    }
+
     try {
-      const response = await listarPedidos(0, 200, search);
+      const response = await listarPedidos(pagina, 10, search);
 
-      const pedidosComCliente = await Promise.all(
-        (response.content || []).map(async pedido => {
-          try {
-            const cliente = await buscarClientePorId(pedido.idUsuario);
-            return {
-              ...pedido,
-              cliente,
-            };
-          } catch (error) {
-            console.error(
-              `Erro ao buscar cliente ${pedido.idUsuario} para pedido ${pedido.id}:`,
-              error
-            );
-            // Retorna o pedido sem cliente para não quebrar a lista
-            const clientePadrao: ClienteResponse = {
-              id:
-                typeof pedido.idUsuario === "string"
-                  ? parseInt(pedido.idUsuario)
-                  : 0,
-              nome: "Cliente não encontrado",
-              sobrenome: "",
-              email: "",
-              celular: "",
-              ativo: true,
-              permissao: "CLIENTE",
-              qtdPedidos: 0,
-              criadoEm: new Date(),
-            };
+      setPaginacao(response);
 
-            return {
-              ...pedido,
-              cliente: clientePadrao,
-            };
-          }
-        })
-      );
+      if (adicionar) {
+        setPedidos(prev => [...prev, ...response.content]);
+      } else {
+        setPedidos(response.content);
+      }
 
-      setPedidos(pedidosComCliente);
+      setPaginaAtual(pagina);
     } catch (error) {
-      console.error("Erro ao listar pedidos:", error);
+      console.error("Erro ao carregar pedidos:", error);
+      if (!adicionar) {
+        setPedidos([]);
+        setPaginacao(null);
+      }
     } finally {
-      setLoading(false);
+      setCarregando(false);
+      setCarregandoMais(false);
+      isLoadingRef.current = false; // 🔓 destrava após a requisição
     }
   };
 
-  useEffect(() => {
-    fetchPedidos();
-  }, []);
+  const carregarMaisPedidos = useCallback(() => {
+    if (!paginacao || paginacao.last || isLoadingRef.current) return;
 
-  // Debounce para busca
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchPedidos();
-    }, 500); // Aguarda 500ms após parar de digitar
+    carregarPedidos(paginaAtual + 1, true);
+  }, [paginacao, paginaAtual]);
 
-    return () => clearTimeout(timeoutId);
+  // 🔁 Carregar primeira página
+  useEffect(() => {
+    carregarPedidos(0);
   }, [search]);
 
-  // Reset quando status mudar
+  // 👀 Observer para infinite scroll
   useEffect(() => {
-    fetchPedidos();
-  }, [status]);
+    const node = sentinelaRef.current;
+    if (!node) return;
+
+    // Remove observer existente
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    // Se acabou a paginação, nem cria observer
+    if (paginacao?.last) return;
+
+    observerRef.current = new IntersectionObserver(entries => {
+      const e = entries[0];
+
+      if (e.isIntersecting) {
+        if (!isLoadingRef.current && !paginacao?.last) {
+          carregarMaisPedidos();
+        }
+      }
+    }, {
+      root: null,
+      rootMargin: "100px",
+      threshold: 0.1,
+    });
+
+    observerRef.current.observe(node);
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [paginacao?.last, carregarMaisPedidos]);
 
   function calcularValorPedido(itens: PedidoItemResponse[]): number {
     return itens.reduce(
@@ -104,9 +120,8 @@ export default function Pedido() {
     );
   }
 
-  // Filtro apenas por status (busca é feita no backend)
-  const pedidosFiltrados = pedidos.filter(pedido =>
-    status.includes(pedido.status)
+  const pedidosFiltrados = pedidos.filter(p =>
+    status.includes(p.status)
   );
 
   return (
@@ -132,31 +147,37 @@ export default function Pedido() {
         />
       </div>
 
-      {/* Lista de pedidos */}
+      {/* Lista */}
       <div className="flex flex-col gap-2 p-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto">
-        {pedidosFiltrados.length === 0 && !loading ? (
-          <div className="text-center text-gray-500">
-            Nenhum pedido encontrado :(
-          </div>
+        {pedidosFiltrados.length === 0 && !carregando ? (
+          <div className="text-center text-gray-500">Nenhum pedido encontrado :(</div>
         ) : (
           pedidosFiltrados.map((pedido, index) => (
-            <Link key={pedido.id} href={`/pedidos/detalhes/${pedido.id}`}>
-              <CardOrder
-                key={pedido.id}
-                index={index + 1}
-                nome={pedido.cliente.nome}
-                sobrenome={pedido.cliente.sobrenome}
-                valorPedido={calcularValorPedido(pedido.itens)}
-                criadoEm={pedido.criadoEm}
-              />
-            </Link>
+            <motion.div
+              key={pedido.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <Link href={`/pedidos/detalhes/${pedido.id}`}>
+                <CardOrder
+                  key={pedido.id}
+                  index={index + 1}
+                  nome={pedido.cliente?.nome || ""}
+                  sobrenome={pedido.cliente?.sobrenome || ""}
+                  valorPedido={calcularValorPedido(pedido.itens)}
+                  criadoEm={pedido.criadoEm}
+                />
+              </Link>
+            </motion.div>
           ))
         )}
 
-        {/* Indicador de carregamento */}
-        {loading && (
-          <div className="flex justify-center items-center py-4">
-            <div className="text-gray-500">Carregando pedidos...</div>
+        <div ref={sentinelaRef} className="h-5" />
+
+        {carregandoMais && (
+          <div className="flex justify-center items-center py-4 text-gray-500">
+            Carregando mais pedidos...
           </div>
         )}
       </div>
