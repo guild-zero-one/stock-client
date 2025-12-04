@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { motion } from "framer-motion";
 
 import { listarClientes } from "@/api/spring/services/ClienteService";
 
@@ -27,6 +28,9 @@ export default function Cliente() {
   const [paginacao, setPaginacao] = useState<Paginacao<ClienteResponse> | null>(
     null
   );
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [carregando, setCarregando] = useState(false);
+  const [carregandoMais, setCarregandoMais] = useState(false);
 
   const [filter, setFilter] = useState<string>("Pedidos");
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,39 +38,90 @@ export default function Cliente() {
     "ativos" | "inativos" | "todos"
   >("ativos");
 
-  useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        const response = await listarClientes();
-        setPaginacao(response);
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-        const clientesFiltrados = response.content
-          .filter(cliente =>
-            cliente.permissao && cliente.permissao.includes
-              ? cliente.permissao.includes("COMUM")
-              : false
-          )
-          .filter(cliente => {
-            if (modoListagem === "ativos") {
-              return cliente.ativo ?? true;
-            } else if (modoListagem === "inativos") {
-              return !cliente.ativo;
-            } else {
-              return true; // Mostra todos
-            }
-          });
+  const carregarClientes = async (pagina: number = 0, adicionar: boolean = false) => {
+    if (adicionar) {
+      setCarregandoMais(true);
+    } else {
+      setCarregando(true);
+    }
 
-        setClientes(clientesFiltrados);
-      } catch (error) {
-        console.error("Erro ao listar clientes:", error);
+    try {
+      const response = await listarClientes(pagina, 4);
+      setPaginacao(response);
+
+      if (adicionar) {
+        setClientes(prev => [...prev, ...response.content]);
+      } else {
+        setClientes(response.content);
+      }
+
+      setPaginaAtual(pagina);
+    } catch (error) {
+      console.error("Erro ao carregar clientes:", error);
+      if (!adicionar) {
         setClientes([]);
         setPaginacao(null);
       }
-    };
-    fetchClientes();
-  }, [modoListagem]);
+    } finally {
+      setCarregando(false);
+      setCarregandoMais(false);
+    }
+  };
 
-  const clientesOrdenados = useMemo(() => {
+  const carregarMaisClientes = useCallback(() => {
+    if (!paginacao || paginacao.last || carregandoMais) {
+      return;
+    }
+    carregarClientes(paginaAtual + 1, true);
+  }, [paginacao, carregandoMais, paginaAtual]);
+
+  useEffect(() => {
+    carregarClientes(0);
+  }, []);
+
+  useEffect(() => {
+    if (!sentinelaRef.current) return;
+
+    if (paginacao?.last) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      return;
+    }
+
+    const node = sentinelaRef.current;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          carregarMaisClientes();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      }
+    );
+
+    observerRef.current.observe(node);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [paginacao?.last, carregarMaisClientes]);
+
+  const clientesFiltrados = useMemo(() => {
     let todosClientes = [...clientes];
 
     if (searchTerm) {
@@ -156,10 +211,25 @@ export default function Cliente() {
 
       {/* Lista de clientes */}
       <div className="flex-1 overflow-y-auto">
-        <CustomersList
-          clientes={clientesOrdenados}
-          uri={cliente => `/clientes/${cliente.id}`}
-        />
+        {clientesFiltrados.map((cliente, index) => (
+          <motion.div
+            key={cliente.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <CustomersList
+              clientes={[cliente]}
+              uri={cliente => `/clientes/${cliente.id}`}
+            />
+          </motion.div>
+        ))}
+        <div ref={sentinelaRef} className="h-5" />
+        {carregandoMais && (
+          <div className="flex justify-center items-center py-4">
+            <div className="text-pink-secondary-dark">Carregando mais clientes...</div>
+          </div>
+        )}
       </div>
     </div>
   );
