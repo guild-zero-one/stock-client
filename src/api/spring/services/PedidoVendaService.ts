@@ -3,6 +3,7 @@ import api from "../api";
 import { ParamValue } from "next/dist/server/request/params";
 
 import { PedidoResponse } from "@/models/Pedido/PedidoResponse";
+import { PedidoHasCliente } from "@/models/Pedido/PedidoHasCliente";
 import { PedidoRequest } from "@/models/Pedido/PedidoRequest";
 import { FinalizarPedidoRequest } from "@/models/Pedido/FinalizarPedidoRequest";
 import { VendaResponse } from "@/models/Venda/VendaResponse";
@@ -14,15 +15,24 @@ export const listarPedidos = async (
   page: number = 0,
   size: number = 10,
   search?: string
-) => {
+): Promise<Paginacao<PedidoHasCliente>> => {
   try {
     let url = `${router}?pagina=${page}&tamanho=${size}`;
     if (search && search.trim()) {
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
-    const response = await api.get<Paginacao<PedidoResponse>>(url);
-    return response.data;
+    const response = await api.get<Paginacao<PedidoHasCliente>>(url);
+    const dadosPaginados = response.data;
+
+    // Adapta o campo "last" no frontend
+    const last =
+      dadosPaginados.page.number + 1 === dadosPaginados.page.totalPages;
+
+    return {
+      ...dadosPaginados,
+      last,
+    };
   } catch (error) {
     console.error("Erro ao listar pedidos:", error);
     throw error;
@@ -95,14 +105,11 @@ export const finalizarPedido = async (
   finalizarPedidoRequest: FinalizarPedidoRequest
 ) => {
   try {
-    console.log(`Finalizando pedido ${id} com dados:`, finalizarPedidoRequest);
-
     const response = await api.post<VendaResponse>(
       `${router}/${id}/finalizar`,
       finalizarPedidoRequest
     );
 
-    console.log("Resposta da API de finalização:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("Erro ao finalizar pedido:", error);

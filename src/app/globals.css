@@ -13,20 +13,16 @@
 
   --color-gray-default: #edeef2;
   --color-gray-dark: #dedfe3;
-  --color-gray-dark-hovered: color-mix(
-    in srgb,
-    var(--color-gray-dark) 100%,
-    black 8%
-  );
+  --color-gray-dark-hovered: color-mix(in srgb,
+      var(--color-gray-dark) 100%,
+      black 8%);
   --color-gray-m-dark: #5a5a5a;
   --color-gray-light: #f6f7f9;
 
   --color-pink-default: #a6036d;
-  --color-pink-hovered: color-mix(
-    in srgb,
-    var(--color-pink-default) 100%,
-    white 55%
-  );
+  --color-pink-hovered: color-mix(in srgb,
+      var(--color-pink-default) 100%,
+      white 55%);
   --color-pink-dark: #4f0030;
   --color-pink-light: #ffdfff;
 
@@ -81,11 +77,13 @@ input:is(:-webkit-autofill, :autofill) {
 
   /* Esconder scrollbar mas manter scroll funcional */
   .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
+    -ms-overflow-style: none;
+    /* IE and Edge */
     /* scrollbar-width: none; - removido por compatibilidade */
   }
 
   .hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
+    display: none;
+    /* Safari and Chrome */
   }
 }

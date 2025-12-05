@@ -149,7 +149,6 @@ export default function DetalhePedido() {
     const fetchPedido = async () => {
       try {
         const pedidoDetalhado = await buscarPedidoDetalhadoPorId(pedidoId);
-        console.log("Dados retornados do backend:", pedidoDetalhado);
 
         // Agrupar itens duplicados vindos do backend
         const pedidoComItensAgrupados = {
@@ -157,10 +156,6 @@ export default function DetalhePedido() {
           itens: agruparItensDuplicados(pedidoDetalhado.itens),
         };
 
-        console.log(
-          "Dados após agrupamento no frontend:",
-          pedidoComItensAgrupados
-        );
         setPedido(pedidoComItensAgrupados);
 
         const cliente = await buscarClientePorId(pedidoDetalhado.idUsuario);
@@ -210,8 +205,6 @@ export default function DetalhePedido() {
 
   // Função auxiliar para converter itens para o formato de requisição
   const converterItensParaRequisicao = (itens: any[]): PedidoItemRequest[] => {
-    console.log("Itens antes da conversão:", itens);
-
     // Agrupar itens por produto
     const itensAgrupados: Record<string, PedidoItemRequest> = {};
 
@@ -235,7 +228,6 @@ export default function DetalhePedido() {
     // Converter o objeto agrupado para array
     const itensConvertidos = Object.values(itensAgrupados);
 
-    console.log("Itens após conversão e agrupamento:", itensConvertidos);
     return itensConvertidos;
   };
 
@@ -244,12 +236,8 @@ export default function DetalhePedido() {
     finalizarPedidoRequest: FinalizarPedidoRequest
   ) => {
     try {
-      console.log("Iniciando finalização do pedido:", pedidoId);
-      console.log("Dados do pedido para finalização:", finalizarPedidoRequest);
-
       // Verificar se o pedido já está finalizado
       if (pedido?.status === "CONCLUIDO" || pedido?.status === "FINALIZADO") {
-        console.log("Pedido já está finalizado, status:", pedido.status);
         showToast("alreadyFinalized");
         setModalAberto(false);
         return;
@@ -263,16 +251,9 @@ export default function DetalhePedido() {
         itens: pedido?.itens ? converterItensParaRequisicao(pedido.itens) : [],
       };
 
-      console.log("Atualizando pedido com dados:", pedidoAtualizado);
       await editarPedido(pedidoId, pedidoAtualizado);
 
-      console.log("Chamando finalizarPedido com:", {
-        pedidoId,
-        finalizarPedidoRequest,
-      });
       const response = await finalizarPedido(pedidoId, finalizarPedidoRequest);
-
-      console.log("Resposta da finalização:", response);
 
       if (response) {
         showToast("successFinalize");
@@ -321,12 +302,6 @@ export default function DetalhePedido() {
         idUsuario: pedido?.idUsuario as string,
         itens: pedido?.itens ? converterItensParaRequisicao(pedido.itens) : [],
       };
-
-      console.log(
-        "Corpo da requisição para editar pedido:",
-        JSON.stringify(pedidoAtualizado, null, 2)
-      );
-      console.log("ID do pedido:", pedidoId);
 
       await editarPedido(pedidoId, pedidoAtualizado);
 

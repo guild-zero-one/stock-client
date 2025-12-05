@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 import { marcaPorId } from "@/api/spring/services/MarcaService";
 import { produtoPorMarca } from "@/api/spring/services/ProdutoService";
@@ -28,7 +28,7 @@ export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [paginacao, setPaginacao] = useState<Paginacao<Produto> | null>(null);
   const [paginaAtual, setPaginaAtual] = useState(0);
-  const [tamanhoPagina] = useState(12);
+  const [tamanhoPagina] = useState(4);
   const [inputPesquisar, setInputPesquisar] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [carregandoMais, setCarregandoMais] = useState(false);
@@ -78,9 +78,11 @@ export default function ProdutosPage() {
   };
 
   const carregarMaisProdutos = useCallback(() => {
-    if (paginacao && !paginacao.last && !carregandoMais) {
-      carregarProdutos(paginaAtual + 1, true);
+    // Previne carregamento se já está carregando ou se é a última página
+    if (!paginacao || paginacao.last || carregandoMais) {
+      return;
     }
+    carregarProdutos(paginaAtual + 1, true);
   }, [paginacao, carregandoMais, paginaAtual, idMarca, tamanhoPagina]);
 
   useEffect(() => {
@@ -94,20 +96,64 @@ export default function ProdutosPage() {
     fetchMarca();
   }, [idMarca]);
 
-  // Scroll infinito
+  // Scroll infinito com IntersectionObserver
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Hook para gerenciar o comportamento do IntersectionObserver
   useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 1000
-      ) {
-        carregarMaisProdutos();
+    if (!sentinelaRef.current) return; // Verifica se o elemento sentinela está disponível
+
+    // Desconecta o observer se já estamos na última página ou não há mais conteúdo
+    if (
+      paginacao?.last ||
+      (paginacao?.content?.length === 0 && paginaAtual > 0)
+    ) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      return;
+    }
+
+    const node = sentinelaRef.current; // Obtém o nó DOM da sentinela
+
+    // Evita múltiplos observers desconectando o existente
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    // Cria um novo IntersectionObserver para monitorar a visibilidade da sentinela
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          // Verifica se a sentinela está visível
+          if (!carregandoMais && paginacao && !paginacao.last) {
+            carregarProdutos(paginaAtual + 1, true); // Carrega mais produtos se necessário
+          }
+        }
+      },
+      {
+        root: null, // Usa o viewport como root
+        rootMargin: "0px", // Sem margem adicional
+        threshold: 0.1, // Dispara quando qualquer parte da sentinela está visível
+      }
+    );
+
+    observerRef.current.observe(node); // Inicia a observação do nó sentinela
+
+    // Cleanup: desconecta o observer ao desmontar o componente ou atualizar dependências
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [carregarMaisProdutos]);
+  }, [
+    paginacao?.last,
+    carregandoMais,
+    paginaAtual,
+    paginacao?.content?.length,
+  ]); // Dependências do hook
 
   const produtosFiltrados = (produtos || []).filter(produto =>
     produto.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim())
@@ -146,17 +192,13 @@ export default function ProdutosPage() {
           <div className="gap-4 grid grid-cols-1 px-4">
             <ProductsList produtos={produtos} marca={marca!} />
           </div>
+          {/* Sentinela para IntersectionObserver */}
+          <div ref={sentinelaRef} className="h-5" />
           {carregandoMais && (
             <div className="flex justify-center items-center py-4">
               <div className="text-pink-secondary-dark">
                 Carregando mais produtos...
               </div>
-            </div>
-          )}
-
-          {paginacao && paginacao.last && (
-            <div className="text-center text-sm text-gray-600 py-4">
-              Todos os {paginacao.totalElements} produtos foram carregados
             </div>
           )}
         </>
