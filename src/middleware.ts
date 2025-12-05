@@ -5,7 +5,14 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const path = request.nextUrl.pathname;
 
-  const publicPaths = ["/login", "/_next", "/favicon.ico", "/simlady.svg", "/people.jpg", "/serpapi"];
+  const publicPaths = [
+    "/login",
+    "/_next",
+    "/favicon.ico",
+    "/simlady.svg",
+    "/people.jpg",
+    "/serpapi",
+  ];
   const protectedPaths = [
     "/estoque",
     "/clientes",
@@ -13,6 +20,7 @@ export async function middleware(request: NextRequest) {
     "/relatorio",
     "/usuario",
     "/dashboard",
+    "/assistente",
     "/",
   ];
 
@@ -52,7 +60,7 @@ export async function middleware(request: NextRequest) {
     console.error("Token inválido ou expirado.");
 
     const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.set("token", "", { maxAge: 0 }); 
+    response.cookies.set("token", "", { maxAge: 0 });
 
     return response;
   }
