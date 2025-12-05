@@ -20,7 +20,8 @@ import CardOrder from "@/components/card-order";
 
 export default function Pedido() {
   const [pedidos, setPedidos] = useState<PedidoHasCliente[]>([]);
-  const [paginacao, setPaginacao] = useState<Paginacao<PedidoHasCliente> | null>(null);
+  const [paginacao, setPaginacao] =
+    useState<Paginacao<PedidoHasCliente> | null>(null);
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [carregando, setCarregando] = useState(false);
   const [carregandoMais, setCarregandoMais] = useState(false);
@@ -30,13 +31,10 @@ export default function Pedido() {
   const sentinelaRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // 🔒 Trava instantânea contra múltiplos triggers do observer
-  const isLoadingRef = useRef(false);
-
-  const carregarPedidos = async (pagina: number = 0, adicionar: boolean = false) => {
-    // 🔒 trava a requisição imediatamente
-    isLoadingRef.current = true;
-
+  const carregarPedidos = async (
+    pagina: number = 0,
+    adicionar: boolean = false
+  ) => {
     if (adicionar) {
       setCarregandoMais(true);
     } else {
@@ -64,52 +62,56 @@ export default function Pedido() {
     } finally {
       setCarregando(false);
       setCarregandoMais(false);
-      isLoadingRef.current = false; // 🔓 destrava após a requisição
     }
   };
 
   const carregarMaisPedidos = useCallback(() => {
-    if (!paginacao || paginacao.last || isLoadingRef.current) return;
-
+    if (!paginacao || paginacao.last || carregandoMais) {
+      return;
+    }
     carregarPedidos(paginaAtual + 1, true);
-  }, [paginacao, paginaAtual]);
+  }, [paginacao, carregandoMais, paginaAtual]);
 
-  // 🔁 Carregar primeira página
   useEffect(() => {
     carregarPedidos(0);
   }, [search]);
 
-  // 👀 Observer para infinite scroll
   useEffect(() => {
-    const node = sentinelaRef.current;
-    if (!node) return;
+    if (!sentinelaRef.current) return;
 
-    // Remove observer existente
+    if (paginacao?.last) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      return;
+    }
+
+    const node = sentinelaRef.current;
+
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
 
-    // Se acabou a paginação, nem cria observer
-    if (paginacao?.last) return;
-
-    observerRef.current = new IntersectionObserver(entries => {
-      const e = entries[0];
-
-      if (e.isIntersecting) {
-        if (!isLoadingRef.current && !paginacao?.last) {
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
           carregarMaisPedidos();
         }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
       }
-    }, {
-      root: null,
-      rootMargin: "100px",
-      threshold: 0.1,
-    });
+    );
 
     observerRef.current.observe(node);
 
     return () => {
-      observerRef.current?.disconnect();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
     };
   }, [paginacao?.last, carregarMaisPedidos]);
 
@@ -120,9 +122,7 @@ export default function Pedido() {
     );
   }
 
-  const pedidosFiltrados = pedidos.filter(p =>
-    status.includes(p.status)
-  );
+  const pedidosFiltrados = pedidos.filter(p => status.includes(p.status));
 
   return (
     <div className="relative flex flex-col w-full min-h-screen bg-white-default">
@@ -150,14 +150,16 @@ export default function Pedido() {
       {/* Lista */}
       <div className="flex flex-col gap-2 p-4 w-full max-h-[calc(100vh-200px)] overflow-y-auto">
         {pedidosFiltrados.length === 0 && !carregando ? (
-          <div className="text-center text-gray-500">Nenhum pedido encontrado :(</div>
+          <div className="text-center text-gray-500">
+            Nenhum pedido encontrado :(
+          </div>
         ) : (
           pedidosFiltrados.map((pedido, index) => (
             <motion.div
               key={pedido.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
+              transition={{ delay: index * 0.1 }}
             >
               <Link href={`/pedidos/detalhes/${pedido.id}`}>
                 <CardOrder

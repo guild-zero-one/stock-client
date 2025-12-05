@@ -44,6 +44,7 @@ import Header from "@/components/header";
 
 export default function Dashboard() {
   const { width } = useWindowSize();
+  const [isMounted, setIsMounted] = useState(false);
   const [kpiVendas, setKpiVendas] = useState(0);
   const [kpiTop3Produtos, setKpiTop3Produtos] = useState<
     Top3ProdutosResponse[]
@@ -56,7 +57,12 @@ export default function Dashboard() {
   >({});
 
   // Altura dinâmica do gráfico baseada no tamanho da tela
-  const chartHeight = width < 640 ? 250 : 300;
+  // Usa valor padrão até o componente montar no cliente para evitar hydration mismatch
+  const chartHeight = isMounted && width < 640 ? 250 : 300;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

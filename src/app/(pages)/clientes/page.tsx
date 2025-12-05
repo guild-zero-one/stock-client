@@ -41,7 +41,10 @@ export default function Cliente() {
   const sentinelaRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const carregarClientes = async (pagina: number = 0, adicionar: boolean = false) => {
+  const carregarClientes = async (
+    pagina: number = 0,
+    adicionar: boolean = false
+  ) => {
     if (adicionar) {
       setCarregandoMais(true);
     } else {
@@ -121,12 +124,17 @@ export default function Cliente() {
     };
   }, [paginacao?.last, carregarMaisClientes]);
 
+  // Remove duplicatas com base no ID antes de renderizar
+  const clientesUnicos = Array.from(
+    new Map(clientes.map(cliente => [cliente.id, cliente])).values()
+  );
+
   const clientesFiltrados = useMemo(() => {
     let todosClientes = [...clientes];
 
     if (searchTerm) {
       todosClientes = todosClientes.filter(cliente =>
-        cliente.nome.toLowerCase().includes(searchTerm.toLowerCase())
+        cliente.nome.toLowerCase().includes(searchTerm.toLowerCase().trim())
       );
     }
 
@@ -148,6 +156,29 @@ export default function Cliente() {
 
     return todosClientes;
   }, [filter, clientes, searchTerm]);
+
+  // Aplica filtros de ordenação nos clientes únicos (quando não há pesquisa)
+  const clientesUnicosOrdenados = useMemo(() => {
+    let todosClientes = [...clientesUnicos];
+
+    if (filter === "Nome") {
+      return todosClientes.sort((a, b) => a.nome.localeCompare(b.nome));
+    }
+
+    if (filter === "Pedidos") {
+      return todosClientes.sort((a, b) => b.qtdPedidos - a.qtdPedidos);
+    }
+
+    if (filter === "Recente") {
+      return todosClientes.sort(
+        (a, b) =>
+          new Date(b.criadoEm ?? 0).getTime() -
+          new Date(a.criadoEm ?? 0).getTime()
+      );
+    }
+
+    return todosClientes;
+  }, [filter, clientesUnicos]);
 
   const getModoListagemInfo = () => {
     switch (modoListagem) {
@@ -211,23 +242,62 @@ export default function Cliente() {
 
       {/* Lista de clientes */}
       <div className="flex-1 overflow-y-auto">
-        {clientesFiltrados.map((cliente, index) => (
-          <motion.div
-            key={cliente.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <CustomersList
-              clientes={[cliente]}
-              uri={cliente => `/clientes/${cliente.id}`}
-            />
-          </motion.div>
-        ))}
-        <div ref={sentinelaRef} className="h-5" />
-        {carregandoMais && (
-          <div className="flex justify-center items-center py-4">
-            <div className="text-pink-secondary-dark">Carregando mais clientes...</div>
+        {searchTerm.length === 0 ? (
+          clientes.length > 0 ? (
+            <>
+              {clientesUnicosOrdenados.map((cliente, index) => (
+                <motion.div
+                  key={cliente.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <CustomersList
+                    clientes={[cliente]}
+                    uri={cliente => `/clientes/${cliente.id}`}
+                  />
+                </motion.div>
+              ))}
+              <div ref={sentinelaRef} className="h-5" />
+              {carregandoMais && (
+                <div className="flex flex-col gap-3 px-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <div
+                      key={i}
+                      className="animate-pulse flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm"
+                    >
+                      <div className="w-12 h-12 bg-gray-300 rounded-full" />
+                      <div className="flex flex-col flex-1">
+                        <div className="w-1/3 h-3 bg-gray-300 rounded"></div>
+                        <div className="w-2/3 h-3 bg-gray-200 rounded mt-2"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
+              <h2>Nenhum cliente encontrado.</h2>
+            </div>
+          )
+        ) : clientesFiltrados.length > 0 ? (
+          clientesFiltrados.map((cliente, index) => (
+            <motion.div
+              key={cliente.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <CustomersList
+                clientes={[cliente]}
+                uri={cliente => `/clientes/${cliente.id}`}
+              />
+            </motion.div>
+          ))
+        ) : (
+          <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
+            <h2>Nenhum cliente encontrado.</h2>
           </div>
         )}
       </div>

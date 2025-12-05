@@ -105,8 +105,10 @@ export default function ProdutosPage() {
     if (!sentinelaRef.current) return; // Verifica se o elemento sentinela está disponível
 
     // Desconecta o observer se já estamos na última página ou não há mais conteúdo
-    if (paginacao?.last || (paginacao?.content?.length === 0 && paginaAtual > 0)) {
-      console.log("Nenhum produto restante ou última página alcançada. Desconectando observer.");
+    if (
+      paginacao?.last ||
+      (paginacao?.content?.length === 0 && paginaAtual > 0)
+    ) {
       if (observerRef.current) {
         observerRef.current.disconnect();
         observerRef.current = null;
@@ -124,8 +126,8 @@ export default function ProdutosPage() {
     // Cria um novo IntersectionObserver para monitorar a visibilidade da sentinela
     observerRef.current = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting) { // Verifica se a sentinela está visível
-          console.log("Sentinela visível. Estado carregandoMais:", carregandoMais);
+        if (entries[0].isIntersecting) {
+          // Verifica se a sentinela está visível
           if (!carregandoMais && paginacao && !paginacao.last) {
             carregarProdutos(paginaAtual + 1, true); // Carrega mais produtos se necessário
           }
@@ -146,7 +148,12 @@ export default function ProdutosPage() {
         observerRef.current.disconnect();
       }
     };
-  }, [paginacao?.last, carregandoMais, paginaAtual, paginacao?.content?.length]); // Dependências do hook
+  }, [
+    paginacao?.last,
+    carregandoMais,
+    paginaAtual,
+    paginacao?.content?.length,
+  ]); // Dependências do hook
 
   const produtosFiltrados = (produtos || []).filter(produto =>
     produto.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim())
@@ -186,7 +193,7 @@ export default function ProdutosPage() {
             <ProductsList produtos={produtos} marca={marca!} />
           </div>
           {/* Sentinela para IntersectionObserver */}
-          <div ref={sentinelaRef} className="h-5"/>
+          <div ref={sentinelaRef} className="h-5" />
           {carregandoMais && (
             <div className="flex justify-center items-center py-4">
               <div className="text-pink-secondary-dark">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { marcaPorId } from "@/api/spring/services/MarcaService";
@@ -10,6 +10,7 @@ import { criarPedido } from "@/api/spring/services/PedidoVendaService";
 
 import { ClienteResponse } from "@/models/Cliente/ClienteResponse";
 import { Produto } from "@/models/Produto/Produto";
+import { Paginacao } from "@/models/Paginacao/Paginacao";
 
 import Header from "@/components/header";
 import Input from "@/components/input";
@@ -23,6 +24,11 @@ import { AssignmentTurnedInOutlined } from "@mui/icons-material";
 
 export default function EscolherProduto() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [paginacao, setPaginacao] = useState<Paginacao<Produto> | null>(null);
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [tamanhoPagina] = useState(4);
+  const [carregando, setCarregando] = useState(false);
+  const [carregandoMais, setCarregandoMais] = useState(false);
   const [cliente, setCliente] = useState<ClienteResponse | null>(null);
   const [inputPesquisar, setInputPesquisar] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(
@@ -30,6 +36,9 @@ export default function EscolherProduto() {
   );
   const [modalAberto, setModalAberto] = useState(false);
   const [toast, setToast] = useState<null | "success" | "error">(null);
+
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const showToast = (type: "success" | "error") => {
     setToast(null);
@@ -53,16 +62,65 @@ export default function EscolherProduto() {
 
   const { marcaId: idMarca, clienteId } = useParams();
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setInputPesquisar(value);
+  };
+
+  const carregarProdutos = async (
+    pagina: number = 0,
+    adicionar: boolean = false
+  ) => {
+    if (!idMarca) return;
+
+    if (adicionar) {
+      setCarregandoMais(true);
+    } else {
+      setCarregando(true);
+    }
+
+    try {
+      const dadosPaginados = await produtoPorMarca(
+        idMarca as string,
+        pagina,
+        tamanhoPagina
+      );
+      setPaginacao(dadosPaginados);
+
+      if (adicionar) {
+        setProdutos(prev => [...prev, ...dadosPaginados.content]);
+      } else {
+        setProdutos(dadosPaginados.content);
+      }
+
+      setPaginaAtual(pagina);
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+      if (!adicionar) {
+        setProdutos([]);
+        setPaginacao(null);
+      }
+    } finally {
+      setCarregando(false);
+      setCarregandoMais(false);
+    }
+  };
+
+  const carregarMaisProdutos = useCallback(() => {
+    if (!paginacao || paginacao.last || carregandoMais) {
+      return;
+    }
+    carregarProdutos(paginaAtual + 1, true);
+  }, [paginacao, carregandoMais, paginaAtual, idMarca, tamanhoPagina]);
+
   useEffect(() => {
-    const fetchFornecedor = async () => {
-      const fornecedor = await marcaPorId(idMarca as string);
-      if (fornecedor) {
-        const produtos = await produtoPorMarca(idMarca as string);
-        setProdutos(produtos.content ?? []);
+    const fetchMarca = async () => {
+      const marca = await marcaPorId(idMarca as string);
+      if (marca) {
+        carregarProdutos(0);
       }
     };
-
-    fetchFornecedor();
+    fetchMarca();
   }, [idMarca]);
 
   useEffect(() => {
@@ -74,6 +132,47 @@ export default function EscolherProduto() {
     };
     fetchCliente();
   }, [clienteId]);
+
+  useEffect(() => {
+    if (!sentinelaRef.current) return;
+
+    if (paginacao?.last || (paginacao?.content?.length === 0 && paginaAtual > 0)) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      return;
+    }
+
+    const node = sentinelaRef.current;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          if (!carregandoMais && paginacao && !paginacao.last) {
+            carregarProdutos(paginaAtual + 1, true);
+          }
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      }
+    );
+
+    observerRef.current.observe(node);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [paginacao?.last, carregandoMais, paginaAtual, paginacao?.content?.length]);
 
   const router = useRouter();
 
@@ -106,13 +205,9 @@ export default function EscolherProduto() {
     }
   };
 
-  const produtosFiltrados = useMemo(() => {
-    const termo = inputPesquisar.trim().toLowerCase();
-    if (!termo) return produtos;
-    return produtos.filter(produto =>
-      produto.nome.toLowerCase().includes(termo)
-    );
-  }, [produtos, inputPesquisar]);
+  const produtosFiltrados = (produtos || []).filter(produto =>
+    produto.nome.toLowerCase().includes(inputPesquisar.toLowerCase().trim())
+  );
 
   return (
     <div className="flex flex-col w-full min-h-dvh bg-white-default">
@@ -126,13 +221,37 @@ export default function EscolherProduto() {
           name="search"
           label="Pesquisar"
           iconSymbol={<SearchIcon />}
-          size="small"
-          handleChange={e => setInputPesquisar(e.target.value)}
+          handleChange={handleSearchChange}
         />
       </div>
 
       {/* Lista de Produtos */}
-      {produtosFiltrados.length > 0 ? (
+      {carregando ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-pink-secondary-dark">Carregando produtos...</div>
+        </div>
+      ) : inputPesquisar.length === 0 ? (
+        <>
+          <div className="gap-4 grid grid-cols-1 px-4">
+            <ProductsOrdersList
+              produtos={produtos}
+              onClick={produto => {
+                setProdutoSelecionado(produto);
+                setModalAberto(true);
+              }}
+            />
+          </div>
+          {/* Sentinela para IntersectionObserver */}
+          <div ref={sentinelaRef} className="h-5"/>
+          {carregandoMais && (
+            <div className="flex justify-center items-center py-4">
+              <div className="text-pink-secondary-dark">
+                Carregando mais produtos...
+              </div>
+            </div>
+          )}
+        </>
+      ) : produtosFiltrados.length > 0 ? (
         <div className="gap-4 grid grid-cols-1 px-4">
           <ProductsOrdersList
             produtos={produtosFiltrados}
@@ -143,8 +262,8 @@ export default function EscolherProduto() {
           />
         </div>
       ) : (
-        <div className="flex justify-center items-center h-full">
-          <p className="text-gray-500">Nenhum produto encontrado :(</p>
+        <div className="flex justify-center items-center py-4 font-medium text-pink-secondary-dark">
+          <h2 className="italic">Nenhum produto encontrado</h2>
         </div>
       )}
 

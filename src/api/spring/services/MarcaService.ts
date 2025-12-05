@@ -17,9 +17,6 @@ export const todasMarcas = async (page: number = 0, size: number = 10) => {
     const last =
       dadosPaginados.page.number + 1 === dadosPaginados.page.totalPages;
 
-    // Loga o valor de "last" para depuração
-    console.log("Valor calculado de last:", last);
-
     return { ...dadosPaginados, last };
   } catch (error) {
     console.error("Erro ao listar marcas:", error);
