@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 
 ENV NEXT_PUBLIC_API_URL="/api"
-ENV NEXT_PUBLIC_PDF_API_URL="/pdf"
+ENV NEXT_PUBLIC_GEMINI_API_URL="/api/gemini"
 
 RUN npm run build
 

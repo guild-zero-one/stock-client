@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { marcaPorId } from "@/api/spring/services/MarcaService";
 import {
   cadastrarProduto,
-  produtoPorSku,
   atualizarProduto,
 } from "@/api/spring/services/ProdutoService";
+import { produtoPorSku } from "@/api/gemini/services/ProdutoService";
 
 import { Marca } from "@/models/Marca/Marca";
 import { ProdutoCreate } from "@/models/Produto/Produto";

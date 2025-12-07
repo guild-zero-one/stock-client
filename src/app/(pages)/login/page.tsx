@@ -42,7 +42,7 @@ export default function Home() {
 
   const handleUser = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUser((prevUser) => ({
+    setUser(prevUser => ({
       ...prevUser,
       [name]: value,
     }));
@@ -70,7 +70,13 @@ export default function Home() {
       {/* Banner */}
       <header className="relative h-[100vh] text-white">
         {/* Imagem de fundo */}
-        <Image className="z-0 object-center object-cover" src="/people.jpg" alt="Pessoas" fill priority />
+        <Image
+          className="z-0 object-center object-cover"
+          src="/people.jpg"
+          alt="Pessoas"
+          fill
+          priority
+        />
 
         {/* Filtro de cor */}
         <div className="absolute inset-0 bg-pink-default/65" />
@@ -83,16 +89,30 @@ export default function Home() {
 
       {/* Painel de Navegação */}
       <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
-        <form onSubmit={handleLogin} className="flex flex-col justify-between gap-4 w-full">
-          <h2 className="font-lexend font-semibold text-pink-default text-4xl text-center">SimLady</h2>
+        <form
+          onSubmit={handleLogin}
+          className="flex flex-col justify-between gap-4 w-full"
+        >
+          <h2 className="font-lexend font-semibold text-pink-default text-4xl text-center">
+            SimLady
+          </h2>
 
           <p className="text-center">Faça seu login para continuar</p>
 
-          <Input label="E-mail" name="email" size="small" handleChange={handleUser} />
-          <Input label="Senha" name="senha" size="small" handleChange={handleUser} type="password" />
+          <Input
+            label="E-mail"
+            name="email"
+            size="small"
+            handleChange={handleUser}
+          />
+          <Input
+            label="Senha"
+            name="senha"
+            size="small"
+            handleChange={handleUser}
+            type="password"
+          />
           <Button label="Entrar" fullWidth type="submit" />
-
-          <p className="text-center">Esqueci minha senha</p>
         </form>
       </main>
     </div>
