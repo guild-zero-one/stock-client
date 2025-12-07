@@ -8,6 +8,7 @@ import { PedidoRequest } from "@/models/Pedido/PedidoRequest";
 import { FinalizarPedidoRequest } from "@/models/Pedido/FinalizarPedidoRequest";
 import { VendaResponse } from "@/models/Venda/VendaResponse";
 import { Paginacao } from "@/models/Paginacao/Paginacao";
+import { buscarClientePorId } from "./ClienteService";
 
 const router = "/pedidos";
 
@@ -22,8 +23,38 @@ export const listarPedidos = async (
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
-    const response = await api.get<Paginacao<PedidoHasCliente>>(url);
+    const response = await api.get<Paginacao<PedidoResponse>>(url);
     const dadosPaginados = response.data;
+
+    // Buscar dados do cliente para cada pedido
+    const pedidosComCliente: PedidoHasCliente[] = await Promise.all(
+      dadosPaginados.content.map(async pedido => {
+        try {
+          const cliente = await buscarClientePorId(pedido.idUsuario);
+          return {
+            ...pedido,
+            cliente,
+          };
+        } catch (error) {
+          console.error(`Erro ao buscar cliente ${pedido.idUsuario}:`, error);
+          // Retorna pedido sem cliente em caso de erro
+          return {
+            ...pedido,
+            cliente: {
+              id: 0,
+              nome: "Cliente não encontrado",
+              sobrenome: "",
+              email: "",
+              celular: "",
+              ativo: false,
+              permissao: "",
+              qtdPedidos: 0,
+              criadoEm: new Date(),
+            },
+          };
+        }
+      })
+    );
 
     // Adapta o campo "last" no frontend
     const last =
@@ -31,6 +62,7 @@ export const listarPedidos = async (
 
     return {
       ...dadosPaginados,
+      content: pedidosComCliente,
       last,
     };
   } catch (error) {
