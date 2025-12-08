@@ -75,7 +75,7 @@ export default function Home() {
       </header>
 
       {/* Painel de Navegação */}
-      <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-hidden grow">
+      <main className="z-10 relative flex bg-white-default -mt-5 p-4 rounded-t-3xl w-full h-full overflow-y-scroll grow hide-scrollbar">
         {/* Grid */}
         <div className="gap-2 grid grid-cols-2 w-full h-fit">
           {/* Dashboard View */}
